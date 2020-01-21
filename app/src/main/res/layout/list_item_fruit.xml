@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/parent_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/fruit_name"
+        android:hint="Fruit"
+        tools:text = "Bananas"
+        android:textColor="@android:color/black"
+        android:textSize="40sp"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/fruit_qty"
+        android:layout_below="@+id/fruit_name"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="QTY"
+        tools:text="QTY: 1.5 - 2 kg"
+        android:textColor="@android:color/holo_red_light"/>
+
+    <TextView
+        android:id="@+id/fruit_price"
+        tools:text="50 Rs."
+        android:textSize="50sp"
+        android:textColor="@android:color/holo_green_dark"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>
