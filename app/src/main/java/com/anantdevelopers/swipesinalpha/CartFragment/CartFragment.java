@@ -1,7 +1,6 @@
 package com.anantdevelopers.swipesinalpha.CartFragment;
 
 
-import android.content.ClipData;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -16,9 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.anantdevelopers.swipesinalpha.FruitItem;
+import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.R;
-import com.anantdevelopers.swipesinalpha.RecyclerViewAdapter;
+import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapter;
 
 import java.util.ArrayList;
 
@@ -79,7 +78,7 @@ public class CartFragment extends Fragment {
                mListener = (OnFragmentInteractionListener) context;
           } else {
                throw new RuntimeException(context.toString()
-                       + " must implement OnFragmentInteractionListener");
+                       + " must implement CartFragment.OnFragmentInteractionListener");
           }
 
           fruits = mListener.getFruitsFromMainToCartFragment();

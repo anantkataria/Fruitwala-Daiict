@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha;
+package com.anantdevelopers.swipesinalpha.FruitItem;
 
 import android.content.Context;
 import android.view.GestureDetector;

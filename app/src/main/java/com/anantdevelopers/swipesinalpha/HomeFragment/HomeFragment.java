@@ -6,17 +6,20 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.anantdevelopers.swipesinalpha.FruitItem;
+import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragment;
+import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.R;
-import com.anantdevelopers.swipesinalpha.RecyclerItemClickListener;
-import com.anantdevelopers.swipesinalpha.RecyclerViewAdapter;
+import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerItemClickListener;
+import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapter;
 
 import java.util.ArrayList;
 
@@ -66,7 +69,13 @@ public class HomeFragment extends Fragment {
           recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                @Override
                public void onItemClick(View view, int position) {
+                    //Log.e("HomeFragment", fruits.get(position).getFruitName());
                     mListener.sendToActivityfromHomeFragment(fruits.get(position));
+
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    CustomDialogFragment customDialogFragment = mListener.sendFruitInfoToDialog();
+
+                    customDialogFragment.show(ft, "position of fruit is" + position);
                }
           }));
 
@@ -80,7 +89,7 @@ public class HomeFragment extends Fragment {
                mListener = (OnFragmentInteractionListener) context;
           } else {
                throw new RuntimeException(context.toString()
-                       + " must implement OnFragmentInteractionListener");
+                       + " must implement HomeFragment.OnFragmentInteractionListener");
           }
      }
 
@@ -91,8 +100,8 @@ public class HomeFragment extends Fragment {
      }
 
      public interface OnFragmentInteractionListener {
-          // TODO: Update argument type and name
           void sendToActivityfromHomeFragment(FruitItem item);
+          CustomDialogFragment sendFruitInfoToDialog();
      }
 
 }
