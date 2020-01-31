@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +41,9 @@ public class CartFragment extends Fragment {
      @Override
      public void onCreate(@Nullable Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
-
+          FruitItem fruitItem = fruits.get(0);
+//          Log.e("CartFragment", "fruit = " + fruitItem.getFruitName()
+//          + ", qty = " + fruitItem.getFruitQty() + ", price = " + fruitItem.getFruitPrice());
           adapter = new RecyclerViewAdapter(getContext(), fruits);
      }
 
