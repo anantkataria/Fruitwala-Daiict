@@ -6,6 +6,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,10 +16,16 @@ import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragme
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.razorpay.Checkout;
+import com.razorpay.PaymentResultListener;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, CartFragment.OnFragmentInteractionListener, CustomDialogFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, CartFragment.OnFragmentInteractionListener, CustomDialogFragment.OnFragmentInteractionListener, PaymentResultListener {
+
+     private static final String TAG = "MainActivity";
 
      private ArrayList<FruitItem> receivedItems;
      private String selectedFruitName, selectedFruitQty, selectedFruitPrice;
@@ -58,6 +65,12 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      }
 
      @Override
+     public void startPaymentInMain() {
+          startPayment();
+     }
+
+
+     @Override
      public CustomDialogFragment sendFruitInfoToDialog() {
           CustomDialogFragment customDialogFragment = new CustomDialogFragment();
           Bundle bundle = new Bundle();
@@ -73,4 +86,81 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      public void getItemFromDialogToMainActivity(String receivedFruitName, String receivedFruitQty, String receivedFruitPrice) {
           receivedItems.add(new FruitItem(receivedFruitName, receivedFruitQty, receivedFruitPrice));
      }
+
+     @Override
+     public void onPaymentSuccess(String s) {
+          try {
+               //Toast.makeText(this, "Payment Successful: " + s, Toast.LENGTH_SHORT).show();
+               Toast.makeText(this, "Payment successful: " + s, Toast.LENGTH_SHORT).show();
+          } catch (Exception e) {
+               Log.e(TAG, "Exception in onPaymentSuccess!!!!!", e);
+          }
+     }
+
+     @Override
+     public void onPaymentError(int i, String s) {
+          try {
+               Toast.makeText(this, "payment failed: " + s, Toast.LENGTH_LONG).show();
+               Log.e(TAG, "payment failed: " + s);
+          }catch (Exception e){
+               Log.e(TAG, "Exception in onPayment Error!!!!", e);
+          }
+     }
+
+     public void startPayment() {
+//          checkout.setKeyID("<YOUR_KEY_ID>");
+          /*
+           * Instantiate Checkout
+           */
+          final Checkout checkout = new Checkout();
+          checkout.setKeyID("rzp_test_YqOc9S9XbjhpzM");
+
+          /*
+           * Set your logo here
+           */
+          //checkout.setImage(R.drawable.logo);
+
+          /*
+           * Reference to current activity
+           */
+          Activity activity = this;
+
+          /*
+           * Pass your payment options to the Razorpay Checkout as a JSONObject
+           */
+          try {
+               JSONObject options = new JSONObject();
+
+               /*
+                * Merchant Name
+                * eg: ACME Corp || HasGeek etc.
+                */
+               options.put("name", "Anant Kataria");
+
+               /*
+                * Description can be anything
+                * eg: Reference No. #123123 - This order number is passed by you for your internal reference. This is not the `razorpay_order_id`.
+                *     Invoice Payment
+                *     etc.
+                */
+               options.put("description", "checking api");
+               options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
+               options.put("order_id", "order_9A33XWu170gUtm");
+               options.put("currency", "INR");
+               //options.put("key", "rzp_test_YqOc9S9XbjhpzM");
+
+               /*
+                * Amount is always passed in currency subunits
+                * Eg: "500" = INR 5.00
+                */
+               options.put("amount", "500");
+
+               checkout.open(activity, options);
+          } catch(Exception e) {
+               Log.e(TAG, "Error in starting Razorpay Checkout", e);
+               Toast.makeText(activity, "Error in payment : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+               e.printStackTrace();
+          }
+     }
+
 }
