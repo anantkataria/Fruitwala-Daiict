@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="LOGIN \nOR \nREGISTER"
+        android:textColor="@android:color/white"
+        android:textSize="50dp"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="30dp"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/otpSentTextView"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:textColor="@android:color/holo_red_light"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="OTP sent!"
+        android:textSize="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:visibility="invisible"/>
+    <LinearLayout
+        android:id="@+id/phoneNumberLayout"
+        android:layout_above="@id/sendotpButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="  +91"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"/>
+
+        <EditText
+            android:id="@+id/phoneNumberEditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:textColor="@android:color/white"
+            android:hint="  Enter Phone Number"
+            android:inputType="number"
+            android:textColorHint="@android:color/white"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/otpEditText"
+        android:layout_above="@id/sendotpButton"
+        android:hint="Enter OTP here!"
+        android:textColorHint="@android:color/white"
+        android:inputType="number"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/sendotpButton"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="send otp"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:background="@color/colorPrimaryDark"
+        android:layout_margin="8dp"/>
+
+    <Button
+        android:id="@+id/verifyOtpButton"
+        android:layout_alignParentBottom="true"
+        android:text="verify otp"
+        android:layout_margin="8dp"
+        android:textColor="@android:color/holo_red_light"
+        android:background="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/autoVerficationTextView"
+        android:layout_above="@id/phoneNumberLayout"
+        android:text="otp generation is processing"
+        android:visibility="invisible"
+        android:textStyle="bold"
+        android:gravity="center_horizontal"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+</RelativeLayout>

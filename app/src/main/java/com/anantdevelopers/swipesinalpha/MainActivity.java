@@ -1,5 +1,6 @@
 package com.anantdevelopers.swipesinalpha;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -7,15 +8,19 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.anantdevelopers.swipesinalpha.Authentication.AuthActivity;
 import com.anantdevelopers.swipesinalpha.CartFragment.CartFragment;
 import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragment;
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.razorpay.Checkout;
 import com.razorpay.PaymentResultListener;
 
@@ -27,28 +32,60 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
      private static final String TAG = "MainActivity";
 
+     private FirebaseAuth firebaseAuth;
+     private FirebaseAuth.AuthStateListener authStateListener;
+
      private ArrayList<FruitItem> receivedItems;
      private String selectedFruitName, selectedFruitQty, selectedFruitPrice;
+
+     private BottomNavigationView bottomNavigationView;
+     private AppBarConfiguration appBarConfiguration;
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_main);
 
-          //setting automatic handling of bottom navigation by navigation architecture
-          BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNaigationView);
-
-          AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+          bottomNavigationView = findViewById(R.id.bottomNaigationView);
+          appBarConfiguration = new AppBarConfiguration.Builder(
                   R.id.HomeFragment, R.id.CartFragment, R.id.PreviousOrdersFragment
           ).build();
 
-          NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+          firebaseAuth = FirebaseAuth.getInstance();
 
-          NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+          authStateListener = new FirebaseAuth.AuthStateListener() {
+               @Override
+               public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if(user != null){  //means user is signed in
+                         final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
+                         NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
+                         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-          NavigationUI.setupWithNavController(bottomNavigationView, navController);
+                    }
+                    else{
+                         //user is signed out
+                         //navController.navigate(R.id.AuthFragment);   //this will inflate the fragment in navhostfragment and bottom navigation will still be accessible so instead i will create new auth activity.
+                         Intent Authintent = new Intent(MainActivity.this, AuthActivity.class);
+                         startActivity(Authintent);
+                         finish();
+                    }
+               }
+          };
 
+          firebaseAuth.addAuthStateListener(authStateListener);
           receivedItems = new ArrayList<>();
+     }
+
+     @Override
+     protected void onStart() {
+          super.onStart();
+          //setting automatic handling of bottom navigation by navigation architecture
+     }
+
+     @Override
+     protected void onResume() {
+          super.onResume();
      }
 
      @Override

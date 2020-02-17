@@ -4,64 +4,83 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string-array name="quantityTypesForBananas">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForBananas">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForOranges">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForOranges">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForApple">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForApple">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForChico">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForChico">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForGuava">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForGuava">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForKiwi">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForKiwi">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForPapaya">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForPapaya">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForPears">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForPears">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForStrawberry">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForStrawberry">//we will have one reference price in database
+        (for each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
 
-    <string-array name="quantityTypesForMangoes">//we will have one reference price in database (for each fruit) and we will count the prices for other weights from it.
+    <string-array name="quantityTypesForMangoes">//we will have one reference price in database (for
+        each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
         <item>24 nos.(around 3 kg)</item>
         <item>6 nos.(around 750grams)</item>
     </string-array>
+    <string name="title_activity_login">Sign in</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
 
 </resources>
