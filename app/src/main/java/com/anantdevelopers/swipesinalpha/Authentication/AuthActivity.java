@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
+import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
@@ -38,7 +39,6 @@ public class AuthActivity extends AppCompatActivity {
      private EditText phoneNumberEditText, otpEditText;
      private Button sendOtpButton, verifyOtpButton;
 
-     private int ButtonType = 0;
      private String verificationId;
 
      private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
@@ -163,10 +163,19 @@ public class AuthActivity extends AppCompatActivity {
                             if(task.isSuccessful()){
                                  // Sign in success, update UI with the signed-in user's information
                                  FirebaseUser user = task.getResult().getUser();
-                                 ButtonType = 0;//this is needed because Button Type should always be 0 when this activity is started.
-                                 Intent mainIntent = new Intent(AuthActivity.this, MainActivity.class);
-                                 startActivity(mainIntent);
-                                 finish();
+//                                 Intent mainIntent = new Intent(AuthActivity.this, MainActivity.class);
+//                                 startActivity(mainIntent);
+//                                 finish();
+                                 //if(/*user node exists in the firebase?*/){
+                                      //then take user directly to mainActivity and finish this activity
+                                 //}else {
+                                      //take user first to the profile and finish this activity
+                                      Intent intent = new Intent(AuthActivity.this, UserProfile.class);
+                                      intent.putExtra("authenticatedPhoneNumber", user.getPhoneNumber());
+                                      startActivity(intent);
+                                      finish();//finishing AuthActivity.java
+                                 //}
+
                             } else {
                                  if(task.getException() instanceof FirebaseAuthInvalidCredentialsException){
                                       Toast.makeText(AuthActivity.this, "Entered OTP is wrong!", Toast.LENGTH_SHORT).show();

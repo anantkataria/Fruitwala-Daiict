@@ -18,9 +18,15 @@ import com.anantdevelopers.swipesinalpha.CartFragment.CartFragment;
 import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragment;
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
+import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.razorpay.Checkout;
 import com.razorpay.PaymentResultListener;
 
@@ -35,16 +41,24 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      private FirebaseAuth firebaseAuth;
      private FirebaseAuth.AuthStateListener authStateListener;
 
+     private FirebaseDatabase firebaseDatabase;
+     private DatabaseReference databaseReference;
+
      private ArrayList<FruitItem> receivedItems;
      private String selectedFruitName, selectedFruitQty, selectedFruitPrice;
 
      private BottomNavigationView bottomNavigationView;
      private AppBarConfiguration appBarConfiguration;
 
+     private boolean isHalfwayExit = false;
+
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_main);
+
+          firebaseDatabase = FirebaseDatabase.getInstance();
+          databaseReference = firebaseDatabase.getReference();
 
           bottomNavigationView = findViewById(R.id.bottomNaigationView);
           appBarConfiguration = new AppBarConfiguration.Builder(
@@ -53,14 +67,42 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
           firebaseAuth = FirebaseAuth.getInstance();
 
+          FirebaseUser user = firebaseAuth.getCurrentUser();
+          if(user != null){
+
+
+          }
+
           authStateListener = new FirebaseAuth.AuthStateListener() {
                @Override
                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     if(user != null){  //means user is signed in
-                         final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
-                         NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
-                         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+                              final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
+                              NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
+                              NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+                         final String phoneNo = user.getPhoneNumber();
+                         databaseReference.child("halfWayExit").addListenerForSingleValueEvent(new ValueEventListener() {
+                              @Override
+                              public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                   //enable progress bar in main activity while this is being checked.
+
+                                   if(dataSnapshot.child(phoneNo).exists()) {
+                                        Intent intent = new Intent(MainActivity.this, UserProfile.class);
+                                        intent.putExtra("authenticatedPhoneNumber", phoneNo);
+                                        startActivity(intent);
+                                        finish();
+                                        Log.e("###" , "isHalfwayExit = " + isHalfwayExit);
+                                   }
+                              }
+
+                              @Override
+                              public void onCancelled(@NonNull DatabaseError databaseError) {
+                                   //Toast.makeText(MainActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
+                              }
+                         });
+
 
                     }
                     else{

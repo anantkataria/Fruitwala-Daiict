@@ -4,6 +4,22 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string-array name="wingLetter">
+        <item>-</item>
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+        <item>D</item>
+        <item>E</item>
+        <item>F</item>
+        <item>G</item>
+        <item>H</item>
+        <item>FB1</item>
+        <item>FB2</item>
+        <item>FB3</item>
+        <item>FB4</item>
+    </string-array>
+
     <string-array name="quantityTypesForBananas">//we will have one reference price in database (for
         each fruit) and we will count the prices for other weights from it.
         <item>12 nos.(around 1.5 kg)</item>
