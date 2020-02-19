@@ -1,3 +1,12 @@
+//add a progress bar which will start loading from the start of the app
+//it will stop if user is not connected to internet
+//or when halfway exit is false and user is signed in properly
+//other two scenarios are 1) user is not authenticated
+//                    or  2) user is authenticated halfway
+//                    in both cases above, the user will get shifted to other activity via intent, so disable progressbar here too.
+
+
+//add fade screen when progressbar is running functionality.
 package com.anantdevelopers.swipesinalpha;
 
 import androidx.annotation.NonNull;
@@ -11,6 +20,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.Authentication.AuthActivity;
@@ -22,6 +34,7 @@ import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthCredential;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -52,10 +65,18 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
      private boolean isHalfwayExit = false;
 
+     private ProgressBar progressBar;
+
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_main);
+
+          progressBar = findViewById(R.id.progressBar);
+          progressBar.setVisibility(View.VISIBLE);
+          if(progressBar.getVisibility() == View.VISIBLE){
+               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+          }
 
           firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
@@ -78,9 +99,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     if(user != null){  //means user is signed in
-                              final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
-                              NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
-                              NavigationUI.setupWithNavController(bottomNavigationView, navController);
+                         final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
+                         NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
+                         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
                          final String phoneNo = user.getPhoneNumber();
                          databaseReference.child("halfWayExit").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -88,12 +109,17 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                    //enable progress bar in main activity while this is being checked.
 
+                                   //should rather use phone memory for seamless experience
                                    if(dataSnapshot.child(phoneNo).exists()) {
                                         Intent intent = new Intent(MainActivity.this, UserProfile.class);
                                         intent.putExtra("authenticatedPhoneNumber", phoneNo);
                                         startActivity(intent);
                                         finish();
                                         Log.e("###" , "isHalfwayExit = " + isHalfwayExit);
+                                   }
+                                   progressBar.setVisibility(View.GONE);
+                                   if(progressBar.getVisibility() == View.GONE){
+                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                                    }
                               }
 

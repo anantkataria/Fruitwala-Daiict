@@ -88,15 +88,22 @@ public class AuthActivity extends AppCompatActivity {
           verifyOtpButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    verifyOtpButton.setEnabled(false);
-                    otpEditText.setEnabled(false);
-
-                    otpSentTextView.setVisibility(View.INVISIBLE);
-                    progressBar.setVisibility(View.VISIBLE);
                     String otpCode = otpEditText.getText().toString();
 
-                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otpCode);
-                    signInWithPhoneAuthCredential(credential);
+                    if(otpCode.isEmpty()){
+                         Toast.makeText(AuthActivity.this, "Please enter the OTP sent!", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                         verifyOtpButton.setEnabled(false);
+                         otpEditText.setEnabled(false);
+
+                         otpSentTextView.setVisibility(View.INVISIBLE);
+                         progressBar.setVisibility(View.VISIBLE);
+
+
+                         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otpCode);
+                         signInWithPhoneAuthCredential(credential);
+                    }
                }
           });
 

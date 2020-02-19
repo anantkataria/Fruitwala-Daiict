@@ -185,6 +185,22 @@ public class UserProfile extends AppCompatActivity {
                                            }
                                       }
                                  });
+
+                         databaseReference.child("halfWayExit").child(phoneNum1).addListenerForSingleValueEvent(
+                                 new ValueEventListener() {
+                                      @Override
+                                      public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                           if(dataSnapshot.exists()){
+                                                databaseReference.child("halfWayExit").child(phoneNum1).setValue(null);
+                                           }
+                                      }
+
+                                      @Override
+                                      public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                      }
+                                 }
+                         );
                     }
                }
           });
@@ -211,8 +227,9 @@ public class UserProfile extends AppCompatActivity {
                //so we need to have some kind of flag which shows that user has done halfway exit.
                //for that we will store user number in halfway exit node in firebase database.
 
+               //should rather user phone storage for seamless experience.
                databaseReference.child("halfWayExit").child(phoneNum1).setValue(true);
-
+               databaseReference.child("halfWayExit").keepSynced(true);
                //now we will check particular number in database in mainactivity and if it is
                //halfway sign in then we send it to this activity.
           }
