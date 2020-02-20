@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      private AppBarConfiguration appBarConfiguration;
 
      private boolean isHalfwayExit = false;
+     private boolean isSavingSuccessful = false;
 
      private ProgressBar progressBar;
 
@@ -71,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_main);
+
+          Intent intent = getIntent();
+          isSavingSuccessful = intent.getBooleanExtra("isSavingSuccessful", false);
 
           progressBar = findViewById(R.id.progressBar);
           progressBar.setVisibility(View.VISIBLE);
@@ -88,12 +92,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
           firebaseAuth = FirebaseAuth.getInstance();
 
-          FirebaseUser user = firebaseAuth.getCurrentUser();
-          if(user != null){
-
-
-          }
-
           authStateListener = new FirebaseAuth.AuthStateListener() {
                @Override
                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -103,32 +101,33 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                          NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
                          NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-                         final String phoneNo = user.getPhoneNumber();
-                         databaseReference.child("halfWayExit").addListenerForSingleValueEvent(new ValueEventListener() {
-                              @Override
-                              public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                   //enable progress bar in main activity while this is being checked.
+                         if(!isSavingSuccessful) {
+                              final String phoneNo = user.getPhoneNumber();
+                              databaseReference.child("halfWayExit").addListenerForSingleValueEvent(new ValueEventListener() {
+                                   @Override
+                                   public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        //enable progress bar in main activity while this is being checked.
 
-                                   //should rather use phone memory for seamless experience
-                                   if(dataSnapshot.child(phoneNo).exists()) {
-                                        Intent intent = new Intent(MainActivity.this, UserProfile.class);
-                                        intent.putExtra("authenticatedPhoneNumber", phoneNo);
-                                        startActivity(intent);
-                                        finish();
-                                        Log.e("###" , "isHalfwayExit = " + isHalfwayExit);
+                                        //should rather use phone memory for seamless experience
+                                        if (dataSnapshot.child(phoneNo).exists()) {
+                                             Intent intent = new Intent(MainActivity.this, UserProfile.class);
+                                             intent.putExtra("authenticatedPhoneNumber", phoneNo);
+                                             startActivity(intent);
+                                             finish();
+                                             Log.e("line117MainActivity", "isHalfwayExit = " + isHalfwayExit);
+                                        }
                                    }
-                                   progressBar.setVisibility(View.GONE);
-                                   if(progressBar.getVisibility() == View.GONE){
-                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+                                   @Override
+                                   public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        //Toast.makeText(MainActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
                                    }
-                              }
-
-                              @Override
-                              public void onCancelled(@NonNull DatabaseError databaseError) {
-                                   //Toast.makeText(MainActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
-                              }
-                         });
-
+                              });
+                         }
+                         progressBar.setVisibility(View.GONE);
+                         if (progressBar.getVisibility() == View.GONE) {
+                              getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                         }
 
                     }
                     else{

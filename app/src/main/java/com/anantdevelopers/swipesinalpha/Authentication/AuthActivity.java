@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.TextKeyListener;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
+import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,6 +30,11 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +51,8 @@ public class AuthActivity extends AppCompatActivity {
      private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
      private FirebaseAuth firebaseAuth;
+     private FirebaseDatabase firebaseDatabase;
+     private DatabaseReference databaseReference;
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +69,9 @@ public class AuthActivity extends AppCompatActivity {
           autoVerificationTextView = findViewById(R.id.autoVerficationTextView);
 
           firebaseAuth = FirebaseAuth.getInstance();
+
+          firebaseDatabase = FirebaseDatabase.getInstance();
+          databaseReference = firebaseDatabase.getReference();
 
           sendOtpButton.setOnClickListener(new View.OnClickListener() {
                @Override
@@ -170,18 +182,48 @@ public class AuthActivity extends AppCompatActivity {
                             if(task.isSuccessful()){
                                  // Sign in success, update UI with the signed-in user's information
                                  FirebaseUser user = task.getResult().getUser();
-//                                 Intent mainIntent = new Intent(AuthActivity.this, MainActivity.class);
-//                                 startActivity(mainIntent);
-//                                 finish();
-                                 //if(/*user node exists in the firebase?*/){
-                                      //then take user directly to mainActivity and finish this activity
-                                 //}else {
-                                      //take user first to the profile and finish this activity
-                                      Intent intent = new Intent(AuthActivity.this, UserProfile.class);
-                                      intent.putExtra("authenticatedPhoneNumber", user.getPhoneNumber());
-                                      startActivity(intent);
-                                      finish();//finishing AuthActivity.java
-                                 //}
+                                 final String authenticatedPhoneNumber = user.getPhoneNumber();
+
+
+                                 databaseReference.child("Users").child(authenticatedPhoneNumber).addListenerForSingleValueEvent(
+                                         new ValueEventListener() {
+                                              @Override
+                                              public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                   if(dataSnapshot.exists()){
+                                                        Log.e("userExists", "phoneNum1 = " + dataSnapshot.getValue(User.class).getPhoneNum1());
+                                                        Log.e("userExists", "authenticatedPhoneNumber = " + authenticatedPhoneNumber);
+                                                        Intent intent = new Intent(AuthActivity.this, MainActivity.class);
+                                                        intent.putExtra("isSavingSuccessful", true);
+                                                        startActivity(intent);
+                                                        finish();
+
+                                                   }else {
+                                                        //take user first to the profile and finish this activity
+                                                        Intent intent = new Intent(AuthActivity.this, UserProfile.class);
+                                                        intent.putExtra("authenticatedPhoneNumber", authenticatedPhoneNumber);
+                                                        startActivity(intent);
+                                                        finish();//finishing AuthActivity.java
+                                                   }
+                                              }
+
+                                              @Override
+                                              public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                   if(databaseError.getCode() == DatabaseError.DISCONNECTED){
+                                                        Toast.makeText(AuthActivity.this, "Check your Internet connection!", Toast.LENGTH_SHORT).show();
+                                                   }
+                                              }
+                                         }
+                                 );
+
+//                                 if(userExists(user.getPhoneNumber())/*user node exists in the firebase?*/){
+//
+//                                      //then take user directly to mainActivity and finish this activity
+//                                      Intent intent = new Intent(AuthActivity.this, MainActivity.class);
+//                                      intent.putExtra("isSavingSuccessful", true);
+//                                      startActivity(intent);
+//                                      finish();
+//                                 }
+//
 
                             } else {
                                  if(task.getException() instanceof FirebaseAuthInvalidCredentialsException){
@@ -198,4 +240,5 @@ public class AuthActivity extends AppCompatActivity {
                        }
                   });
      }
+
 }

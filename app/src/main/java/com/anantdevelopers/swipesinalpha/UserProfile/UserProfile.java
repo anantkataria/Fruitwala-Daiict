@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -173,6 +174,7 @@ public class UserProfile extends AppCompatActivity {
                                            progressBar.setVisibility(View.GONE);
                                            savingDataTextView.setVisibility(View.GONE);
                                            Intent intent = new Intent(UserProfile.this, MainActivity.class);
+                                           intent.putExtra("isSavingSuccessful", isSavingSuccessful);
                                            startActivity(intent);
                                            finish();
                                       }
@@ -228,6 +230,7 @@ public class UserProfile extends AppCompatActivity {
                //for that we will store user number in halfway exit node in firebase database.
 
                //should rather user phone storage for seamless experience.
+               Log.e("UserProfile.onDestroy", "isSavingSuccessful = " + isSavingSuccessful);
                databaseReference.child("halfWayExit").child(phoneNum1).setValue(true);
                databaseReference.child("halfWayExit").keepSynced(true);
                //now we will check particular number in database in mainactivity and if it is
