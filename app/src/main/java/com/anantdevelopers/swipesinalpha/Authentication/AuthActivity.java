@@ -51,7 +51,6 @@ public class AuthActivity extends AppCompatActivity {
      private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
      private FirebaseAuth firebaseAuth;
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
 
      @Override
@@ -70,7 +69,7 @@ public class AuthActivity extends AppCompatActivity {
 
           firebaseAuth = FirebaseAuth.getInstance();
 
-          firebaseDatabase = FirebaseDatabase.getInstance();
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
 
           sendOtpButton.setOnClickListener(new View.OnClickListener() {
@@ -226,14 +225,15 @@ public class AuthActivity extends AppCompatActivity {
 //
 
                             } else {
+                                 if(task.getException() instanceof  FirebaseNetworkException){
+                                      Toast.makeText(AuthActivity.this, "Check your Internet connection", Toast.LENGTH_SHORT).show();
+                                 }
                                  if(task.getException() instanceof FirebaseAuthInvalidCredentialsException){
                                       Toast.makeText(AuthActivity.this, "Entered OTP is wrong!", Toast.LENGTH_SHORT).show();
                                       otpEditText.setEnabled(true);
                                       verifyOtpButton.setEnabled(true);
                                  }
-                                 if(task.getException() instanceof  FirebaseNetworkException){
-                                      Toast.makeText(AuthActivity.this, "Check your Internet connection", Toast.LENGTH_SHORT).show();
-                                 }
+
                                  progressBar.setVisibility(View.INVISIBLE);
 
                             }

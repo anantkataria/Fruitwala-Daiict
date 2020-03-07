@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CheckoutFlow.CheckoutFlow">
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:visibility="invisible"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:id="@+id/progressBarTextView"
+        android:layout_marginTop="32dp"
+        android:visibility="invisible"
+        android:layout_below="@id/progressBar"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sending Your Order..."
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/amountDisplayTextView"
+        android:paddingBottom="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pay Using"
+        android:textSize="30sp"/>
+
+    <Button
+        android:id="@+id/upiPaymentButton"
+        android:layout_below="@+id/amountDisplayTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pay using UPI"
+        />
+
+    <Button
+        android:id="@+id/codButton"
+        android:layout_below="@+id/upiPaymentButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="cash on delivery"/>
+
+    <Button
+        android:id="@+id/placeOrderButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="place order"/>
+
+</RelativeLayout>

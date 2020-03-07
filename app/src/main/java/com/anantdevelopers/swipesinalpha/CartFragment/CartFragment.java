@@ -3,6 +3,7 @@ package com.anantdevelopers.swipesinalpha.CartFragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anantdevelopers.swipesinalpha.CheckoutFlow.CheckoutFlow;
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapter;
@@ -60,7 +62,7 @@ public class CartFragment extends Fragment {
 //          + ", qty = " + fruitItem.getFruitQty() + ", price = " + fruitItem.getFruitPrice());
           adapter = new RecyclerViewAdapter(getContext(), fruits);
 
-          Checkout.preload(getContext());
+          //Checkout.preload(getContext());
      }
 
      @Override
@@ -73,12 +75,17 @@ public class CartFragment extends Fragment {
 
           proceedToCheckoutButton = v.findViewById(R.id.proceed_to_checkout_button);
 
-          if(!fruits.isEmpty()) proceedToCheckoutButton.setEnabled(true);
-
           proceedToCheckoutButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    mListener.startPaymentInMain();
+                    if(fruits.isEmpty()) Toast.makeText(getContext(), "Add something to cart first!", Toast.LENGTH_SHORT).show();
+                    else {
+                         /*mListener.startPaymentInMain()*/
+                         Intent checkoutFlowIntent = new Intent(getContext(), CheckoutFlow.class);
+                         checkoutFlowIntent.putExtra("Fruits", fruits);
+                         checkoutFlowIntent.putExtra("grandTotal", grandTotal.getText());
+                         startActivity(checkoutFlowIntent);
+                    }
                }
           });
 
@@ -127,7 +134,7 @@ public class CartFragment extends Fragment {
      private void countGrandTotal() {
           int Total = 0;
           for(FruitItem item: fruits){
-               Total += Integer.valueOf(item.getFruitPrice().substring(0, 3).replaceAll("[a-z\\s]", ""));
+               Total += Integer.valueOf(item.getFruitPrice().replaceAll("[Rs.\\s]", ""));
           }
           grandTotal.setText("Rs. " + Integer.toString(Total));
      }
@@ -135,7 +142,7 @@ public class CartFragment extends Fragment {
      public interface OnFragmentInteractionListener {
           // TODO: Update argument type and name
           ArrayList<FruitItem> getFruitsFromMainToCartFragment();
-          void startPaymentInMain();
+          //void startPaymentInMain();
      }
 
 }

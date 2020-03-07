@@ -168,10 +168,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           return receivedItems;
      }
 
-     @Override
-     public void startPaymentInMain() {
-          startPayment();
-     }
+     //@Override
+     //public void startPaymentInMain() {
+     //     startPayment();
+     //}
 
 
      @Override
@@ -211,60 +211,60 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           }
      }
 
-     public void startPayment() {
-//          checkout.setKeyID("<YOUR_KEY_ID>");
-          /*
-           * Instantiate Checkout
-           */
-          final Checkout checkout = new Checkout();
-          checkout.setKeyID("rzp_test_YqOc9S9XbjhpzM");
-
-          /*
-           * Set your logo here
-           */
-          //checkout.setImage(R.drawable.logo);
-
-          /*
-           * Reference to current activity
-           */
-          Activity activity = this;
-
-          /*
-           * Pass your payment options to the Razorpay Checkout as a JSONObject
-           */
-          try {
-               JSONObject options = new JSONObject();
-
-               /*
-                * Merchant Name
-                * eg: ACME Corp || HasGeek etc.
-                */
-               options.put("name", "Anant Kataria");
-
-               /*
-                * Description can be anything
-                * eg: Reference No. #123123 - This order number is passed by you for your internal reference. This is not the `razorpay_order_id`.
-                *     Invoice Payment
-                *     etc.
-                */
-               options.put("description", "checking api");
-               options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
-               options.put("order_id", "order_9A33XWu170gUtm");
-               options.put("currency", "INR");
-               //options.put("key", "rzp_test_YqOc9S9XbjhpzM");
-
-               /*
-                * Amount is always passed in currency subunits
-                * Eg: "500" = INR 5.00
-                */
-               options.put("amount", "500");
-
-               checkout.open(activity, options);
-          } catch(Exception e) {
-               Log.e(TAG, "Error in starting Razorpay Checkout", e);
-               Toast.makeText(activity, "Error in payment : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-               e.printStackTrace();
-          }
-     }
+//     public void startPayment() {
+////          checkout.setKeyID("<YOUR_KEY_ID>");
+//          /*
+//           * Instantiate Checkout
+//           */
+//          final Checkout checkout = new Checkout();
+//          checkout.setKeyID("rzp_test_YqOc9S9XbjhpzM");
+//
+//          /*
+//           * Set your logo here
+//           */
+//          //checkout.setImage(R.drawable.logo);
+//
+//          /*
+//           * Reference to current activity
+//           */
+//          Activity activity = this;
+//
+//          /*
+//           * Pass your payment options to the Razorpay Checkout as a JSONObject
+//           */
+//          try {
+//               JSONObject options = new JSONObject();
+//
+//               /*
+//                * Merchant Name
+//                * eg: ACME Corp || HasGeek etc.
+//                */
+//               options.put("name", "Anant Kataria");
+//
+//               /*
+//                * Description can be anything
+//                * eg: Reference No. #123123 - This order number is passed by you for your internal reference. This is not the `razorpay_order_id`.
+//                *     Invoice Payment
+//                *     etc.
+//                */
+//               options.put("description", "checking api");
+//               options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
+//               options.put("order_id", "order_9A33XWu170gUtm");
+//               options.put("currency", "INR");
+//               //options.put("key", "rzp_test_YqOc9S9XbjhpzM");
+//
+//               /*
+//                * Amount is always passed in currency subunits
+//                * Eg: "500" = INR 5.00
+//                */
+//               options.put("amount", "500");
+//
+//               checkout.open(activity, options);
+//          } catch(Exception e) {
+//               Log.e(TAG, "Error in starting Razorpay Checkout", e);
+//               Toast.makeText(activity, "Error in payment : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//               e.printStackTrace();
+//          }
+//     }
 
 }

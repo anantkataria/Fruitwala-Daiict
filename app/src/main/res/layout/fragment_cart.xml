@@ -35,7 +35,6 @@
         android:id="@+id/proceed_to_checkout_button"
         android:layout_below="@+id/grand_total_layout"
         android:text="Proceed To Checkout"
-        android:enabled="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
