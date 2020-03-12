@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,6 +40,7 @@ public class CheckoutFlow extends AppCompatActivity {
      private static final int REQUEST_CODE = 123;
      private static final String CASH_ON_DELIVERY = "cod";
      private static final String UPI_PAYMENT = "upiPayment";
+     private static final String INITIAL_ORDER_STATUS = "ORDER PROCESSING";
 
      private Button payWithUpiButton, codButton, placeOrderButton;
 
@@ -188,7 +190,7 @@ public class CheckoutFlow extends AppCompatActivity {
 
      private void placeOrder(final String paymentMethod) {
           FirebaseUser user = firebaseAuth.getCurrentUser();
-          String authPhoneNumber = user.getPhoneNumber();
+          final String authPhoneNumber = user.getPhoneNumber();
 
           databaseReference.child("Users").child(authPhoneNumber).addListenerForSingleValueEvent(new ValueEventListener() {
                @Override
@@ -199,13 +201,23 @@ public class CheckoutFlow extends AppCompatActivity {
                     checkoutUser.setFruits(fruits);
                     checkoutUser.setUser(userDetails);
                     checkoutUser.setPaymentMethod(paymentMethod);
-                    databaseReference.child("Orders").push().setValue(checkoutUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    checkoutUser.setStatus(INITIAL_ORDER_STATUS);
+                    String key = databaseReference.child("Orders").child(authPhoneNumber).push().getKey();
+                    checkoutUser.setFirebaseDatabaseKey(key);
+                    databaseReference.child("Orders").child(authPhoneNumber).child(key).setValue(checkoutUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                          @Override
                          public void onSuccess(Void aVoid) {
                               Toast.makeText(CheckoutFlow.this, "Order Sent Successfully!", Toast.LENGTH_SHORT).show();
-                              //if order is successful then finish the checkout flow and empty the cart again
-                              //and add the order in current orders
-                              //once the order is completed then put it in the previous orders in shared resources
+                              //TODO : if order is successful then finish the checkout flow and empty the cart again
+                              //so to achieve this, we will use --intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);--  which will clear the whole activity stack and we will start new main activity
+                              Intent newMainActivity = new Intent(CheckoutFlow.this, MainActivity.class);
+                              newMainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                              startActivity(newMainActivity);
+
+                              //TODO : and add the order in current orders
+                              //to achieve this, we will work on PreviousOrdersFragment
+
+                              //TODO : once the order is completed then put it in the previous orders in shared resources
                               //and remove it from the firebase
                          }
                     }).addOnFailureListener(new OnFailureListener() {

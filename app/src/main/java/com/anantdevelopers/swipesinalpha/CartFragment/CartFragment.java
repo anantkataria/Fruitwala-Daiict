@@ -1,3 +1,6 @@
+//add the textview saying swipe to delete at the bottom of listview/adapter
+
+
 package com.anantdevelopers.swipesinalpha.CartFragment;
 
 

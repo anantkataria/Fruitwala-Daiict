@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
 
-     private ArrayList<FruitItem> fruits = new ArrayList<>();
+     private ArrayList<FruitItem> fruits;
      private Context context;
 
      public RecyclerViewAdapter(Context context, ArrayList<FruitItem> fruits) {
@@ -45,12 +45,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
           return fruits.size();
      }
 
-     public class ViewHolder extends RecyclerView.ViewHolder{
+     class ViewHolder extends RecyclerView.ViewHolder{
           TextView fruitName;
           TextView fruitQty;
           TextView fruitPrice;
           RelativeLayout parentLayout;
-          public ViewHolder(@NonNull View itemView) {
+          ViewHolder(@NonNull View itemView) {
                super(itemView);
                fruitName = itemView.findViewById(R.id.fruit_name);
                fruitQty = itemView.findViewById(R.id.fruit_qty);

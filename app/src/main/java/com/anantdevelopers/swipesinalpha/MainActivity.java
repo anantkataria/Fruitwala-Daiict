@@ -7,6 +7,8 @@
 
 
 //add fade screen when progressbar is running functionality.
+
+//add fruit price updation check functionality which will check wether fruit prices are changed
 package com.anantdevelopers.swipesinalpha;
 
 import androidx.annotation.NonNull;
@@ -30,6 +32,7 @@ import com.anantdevelopers.swipesinalpha.CartFragment.CartFragment;
 import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragment;
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
+import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
