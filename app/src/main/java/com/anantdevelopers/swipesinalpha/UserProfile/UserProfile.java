@@ -1,7 +1,6 @@
 package com.anantdevelopers.swipesinalpha.UserProfile;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -141,7 +140,7 @@ public class UserProfile extends AppCompatActivity {
                          phoneNum2 = "num2 not given";
                     }
                     if (userName.isEmpty()) {
-                         Toast.makeText(UserProfile.this, "Please Enter your name dear!", Toast.LENGTH_SHORT).show();
+                         Toast.makeText(UserProfile.this, "Please Enter your name", Toast.LENGTH_SHORT).show();
                     }
                     else if (room.isEmpty()) {
                          Toast.makeText(UserProfile.this, "Please Enter your room/office number", Toast.LENGTH_SHORT).show();

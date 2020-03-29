@@ -14,6 +14,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +27,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.anantdevelopers.swipesinalpha.CheckoutFlow.CheckoutUser;
+import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderEntity;
+import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderViewModel;
+import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.RecyclerViewAdapterForPreviousOrders;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +43,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,6 +57,7 @@ public class PreviousOrdersFragment extends Fragment {
      private FirebaseAuth firebaseAuth;
 
      private ArrayList<CheckoutUser> currentOrdersList;
+     private ArrayList<CheckoutUser> previousOrdersList; //for local database
 
      private ProgressBar currentOrderProgressBar;
      private TextView noCurrentOrdersTextView;
@@ -59,12 +67,20 @@ public class PreviousOrdersFragment extends Fragment {
 
      private RecyclerViewAdapterForCurrentOrders adapterForCurrentOrders;
 
+     private View v;
+
+     private PreviousOrderViewModel previousOrderViewModel;
+
      public PreviousOrdersFragment() {
           // Required empty public constructor
      }
 
      private interface DatabaseCallbackInterface { //interface is used to handle asynchronous calls of firebase
           void fromOnChildManipulated(ArrayList<CheckoutUser> currentOrdersList);
+     }
+
+     private interface LocalDatabaseCallbackInterface {
+          void fromOnChildManipulated(ArrayList<CheckoutUser> previousOrdersList);
      }
 
      @Override
@@ -76,46 +92,151 @@ public class PreviousOrdersFragment extends Fragment {
           firebaseAuth = FirebaseAuth.getInstance();
 
           currentOrdersList = new ArrayList<>();
+          previousOrdersList = new ArrayList<>();
+
+          previousOrderViewModel = new ViewModelProvider(this).get(PreviousOrderViewModel.class);
      }
 
      @Override
      public View onCreateView(LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState) {
           // Inflate the layout for this fragment
-          View v = inflater.inflate(R.layout.fragment_previous_orders, container, false);
-
-          currentOrderProgressBar = v.findViewById(R.id.currentOrdersProgressBar);
-          noCurrentOrdersTextView = v.findViewById(R.id.noCurrentOrdersTextView);
-
-          //previousOrderProgressBar = v.findViewById(R.id.previousOrdersProgressBar);
-          //noPreviousOrdersTextView = v.findViewById(R.id.noPreviousOrdersTextView);
-
-          currentOrdersRecyclerView = v.findViewById(R.id.currentOrdersRecyclerView);
-          //previousOrdersRecyclerView = v.findViewById(R.id.previousOrdersRecyclerView);
-
-
-          //previousOrderProgressBar.setVisibility(View.VISIBLE);
-          //fetchPreviousOrders();
-          fetchCurrentOrders(new DatabaseCallbackInterface() {
-               @Override
-               public void fromOnChildManipulated(ArrayList<CheckoutUser> currentOrdersList) {
-                    noCurrentOrdersTextView.setVisibility(View.GONE);
-                    currentOrdersRecyclerView.setVisibility(View.VISIBLE);
-                    adapterForCurrentOrders = new RecyclerViewAdapterForCurrentOrders(getContext(), currentOrdersList);
-                    currentOrdersRecyclerView.setAdapter(adapterForCurrentOrders);
-                    currentOrdersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    currentOrderProgressBar.setVisibility(View.GONE);
-               }
-          });
-
-          if(currentOrdersList.isEmpty()){
-               noCurrentOrdersTextView.setVisibility(View.VISIBLE);
-          }
-
+          v = inflater.inflate(R.layout.fragment_previous_orders, container, false);
+          currentOrderAffairs(v);
+          previousOrderAffairs(v);
           return v;
      }
 
-     private void fetchPreviousOrders() {
+     private void previousOrderAffairs(View v) {
+          previousOrderProgressBar = v.findViewById(R.id.previousOrdersProgressBar);
+          noPreviousOrdersTextView = v.findViewById(R.id.noPreviousOrdersTextView);
+
+          previousOrdersRecyclerView = v.findViewById(R.id.previousOrdersRecyclerView);
+          final RecyclerViewAdapterForPreviousOrders adapter = new RecyclerViewAdapterForPreviousOrders();
+
+          //setting the recycler view
+          previousOrdersRecyclerView.setAdapter(adapter);
+          previousOrdersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+
+          previousOrderViewModel.getAllPreviousOrders().observe(getViewLifecycleOwner(), new Observer<List<PreviousOrderEntity>>() {
+               @Override
+               public void onChanged(List<PreviousOrderEntity> previousOrderEntities) {
+                    if (previousOrderEntities.isEmpty()){
+                         noPreviousOrdersTextView.setVisibility(View.VISIBLE);
+                    }
+                    else {
+
+                         adapter.setPreviousOrders(previousOrderEntities);
+                         Log.e("****", "Number of previous orders : "+previousOrderEntities.size());
+                         noPreviousOrdersTextView.setVisibility(View.GONE);
+                    }
+               }
+          });
+
+          fetchPreviousOrders(new LocalDatabaseCallbackInterface() {
+               @Override
+               public void fromOnChildManipulated(ArrayList<CheckoutUser> previousOrdersList) {
+                    Log.e("fetchPreviousOrders", "previousOrdersList.size() = " + previousOrdersList.size());
+                    ArrayList<PreviousOrderEntity> ordersToAddInRoom = new ArrayList<>();
+                    int i = 0;
+                    for(CheckoutUser u : previousOrdersList){
+                         String orderFruitList = "";
+                         String status = "";
+                         int grandTotal = 0;
+                         status = u.getStatus();
+                         for(FruitItem f : u.getFruits()){
+                              orderFruitList += f.getFruitName() + ", " + f.getFruitQty() + ", " + f.getFruitPrice() + "\n";
+                              grandTotal += Integer.valueOf(f.getFruitPrice().replaceAll("[Rs.\\s]", ""));
+                         }
+
+                         ordersToAddInRoom.add(new PreviousOrderEntity(orderFruitList, status, "GrandTotal : " + grandTotal + " Rs."));
+                         i += 1;
+                    }
+
+                    Log.e("fetchPreviousOrders", "i = " + i);
+
+                    i = 0;
+                    for(PreviousOrderEntity poe : ordersToAddInRoom){
+                         //previousOrderViewModel.insert(poe);
+                         i += 1;
+                    }
+
+                    Log.e("afterInserting" ,  "i = " + i);
+                    previousOrderProgressBar.setVisibility(View.GONE);
+
+                    //todo remove the orders from the database since they are added to previousorderslist
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    String authPhoneNumber = user.getPhoneNumber();
+
+                    databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeValue();
+               }
+          });
+     }
+
+     private void fetchPreviousOrders(final LocalDatabaseCallbackInterface Interface) {
+          //here two things are there
+          //1) check if there is any Delivered orders are there in the database if there
+          //   are any then first remove them from the database and add them in the shared
+          //   preferences
+          //2) fetch orders from the shared preferences (if there are any)
+          FirebaseUser user = firebaseAuth.getCurrentUser();
+          String authPhoneNumber = user.getPhoneNumber();
+
+          previousOrderProgressBar.setVisibility(View.VISIBLE);
+
+          databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).addValueEventListener(new ValueEventListener() {
+               @Override
+               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                         previousOrdersList.clear();
+
+                         for(DataSnapshot data: dataSnapshot.getChildren()){
+                              previousOrdersList.add(data.getValue(CheckoutUser.class));
+                              //Log.e("fetchPreOrders" , ""+data.getValue());
+                         }
+
+                         //todo update the room database
+                         Interface.fromOnChildManipulated(previousOrdersList);
+
+                    }
+                    else{
+                         previousOrderProgressBar.setVisibility(View.GONE);
+                         //no delivered/cancelled orders remaining to read from database
+                    }
+               }
+
+               @Override
+               public void onCancelled(@NonNull DatabaseError databaseError) {
+
+               }
+          });
+
+     }
+
+     private void currentOrderAffairs(View v) {
+          currentOrderProgressBar = v.findViewById(R.id.currentOrdersProgressBar);
+          noCurrentOrdersTextView = v.findViewById(R.id.noCurrentOrdersTextView);
+
+          currentOrdersRecyclerView = v.findViewById(R.id.currentOrdersRecyclerView);
+
+          fetchCurrentOrders(new DatabaseCallbackInterface() {
+               @Override
+               public void fromOnChildManipulated(ArrayList<CheckoutUser> currentOrdersList) {
+                    if(currentOrdersList.isEmpty()){
+                         noCurrentOrdersTextView.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                         currentOrdersRecyclerView.setVisibility(View.VISIBLE);
+                         adapterForCurrentOrders = new RecyclerViewAdapterForCurrentOrders(getContext(), currentOrdersList);
+                         currentOrdersRecyclerView.setAdapter(adapterForCurrentOrders);
+                         currentOrdersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                         noCurrentOrdersTextView.setVisibility(View.GONE);
+                    }
+
+                    currentOrderProgressBar.setVisibility(View.GONE);
+               }
+          });
      }
 
      private void fetchCurrentOrders(final DatabaseCallbackInterface Interface) {
@@ -123,66 +244,28 @@ public class PreviousOrdersFragment extends Fragment {
           FirebaseUser user = firebaseAuth.getCurrentUser();
           String authPhoneNumber = user.getPhoneNumber();
 
-          //currentOrderProgressBar.setVisibility(View.VISIBLE);
+          currentOrderProgressBar.setVisibility(View.VISIBLE);
 
-          databaseReference.child("Orders").child(authPhoneNumber).addChildEventListener(new ChildEventListener() {
+          databaseReference.child("Orders").child(authPhoneNumber).addValueEventListener(new ValueEventListener() {
                @Override
-               public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     currentOrderProgressBar.setVisibility(View.VISIBLE);
-                    //add child in the maintained current orders arraylist.
-                    CheckoutUser child = dataSnapshot.getValue(CheckoutUser.class);
-                    currentOrdersList.add(child);
-                    Log.e("fetchCurrentOrders", "currentOrderList.size() = " + currentOrdersList.size());
+                    currentOrdersList.clear();
+                    for(DataSnapshot data : dataSnapshot.getChildren()){
+                         currentOrdersList.add(data.getValue(CheckoutUser.class));
+                    }
+
 
                     Interface.fromOnChildManipulated(currentOrdersList);
                }
 
                @Override
-               public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    currentOrderProgressBar.setVisibility(View.VISIBLE);
-                    //status of the child may get changed
-                    //in that case update the status of that child in the maintained current orders arraylist
-                    //and if the child's status is changed to order cancelled or delivered then remove it from
-                    //the database and add it to the shared preferences
-                    //if the order is cancelled then send notification to the user about the cancel is successful
-
-
-               }
-
-               @Override
-               public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    currentOrderProgressBar.setVisibility(View.VISIBLE);
-
-                    //find the removed child in the curentOrdersList and remove that child and again render
-                    //the updated list
-                    //child will be removed when order is delivered order order is cancelled
-               }
-
-               @Override
-               public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    currentOrderProgressBar.setVisibility(View.VISIBLE);
-               }
-
-               @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    //TODO implement this
 
                }
-
           });
 
-//          databaseReference.child("Orders").child(authPhoneNumber).addValueEventListener(new ValueEventListener() {
-//               @Override
-//               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//               }
-//
-//               @Override
-//               public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//               }
-//          });
-
-          //Log.e("fetchCurrentOrders", ""+currentOrdersList.isEmpty());
 
      }
 

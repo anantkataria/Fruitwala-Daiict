@@ -32,7 +32,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.net.UnknownServiceException;
 import java.util.ArrayList;
 
 public class CheckoutFlow extends AppCompatActivity {
@@ -67,7 +66,8 @@ public class CheckoutFlow extends AppCompatActivity {
           fruits = intent.getParcelableArrayListExtra("Fruits");
           grandTotal = intent.getStringExtra("grandTotal");
 
-          grandTotalPrice = grandTotal.replace("[Rs.\\s]", "");
+          grandTotalPrice = grandTotal.replaceAll("[Rs.\\s]", "");
+          Log.e("CheckoutFlow", "grandTotalPrice = " + grandTotalPrice);
 
           payWithUpiButton = findViewById(R.id.upiPaymentButton);
           codButton = findViewById(R.id.codButton);
@@ -101,45 +101,42 @@ public class CheckoutFlow extends AppCompatActivity {
 
                     if(paymentMethodNumber == 1) {
                          //start upi payment flow
-                         Log.e("placeorderbutton", "payment method 1");
                          payUsingUPI();
                     }
 
                     if(paymentMethodNumber == 2) {
                          //start cod payment flow
-//                         openDialog();
-                         AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutFlow.this);
-                         builder.setMessage("Do you want to continue using Cash on delivery?");
-                         builder.setPositiveButton("Yes, Do it", new DialogInterface.OnClickListener() {
-                              @Override
-                              public void onClick(DialogInterface dialog, int which) {
-                                   progressBar.setVisibility(View.VISIBLE);
-                                   progressBarTextView.setVisibility(View.VISIBLE);
-                                   getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE); //touch input disabled.
-                                   //now save the order in the database under "Orders"
-                                   //save username, phone, roomno, wing, building and his order(fruits and quantity), and payment status
-                                   //save feature will be common in both payment methods
-                                   placeOrder(CASH_ON_DELIVERY);
-                              }
-                         });
-                         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                              @Override
-                              public void onClick(DialogInterface dialog, int which) {
-                                   dialog.dismiss();
-                              }
-                         });
-                         AlertDialog dialog = builder.create();
-
-                         dialog.show();
+                         payUsingCOD();
                     }
                }
           });
      }
 
-//     private void openDialog() {
-//          CODdialog dialog = new CODdialog();
-//          dialog.show(getSupportFragmentManager(), "Cod dialog");
-//     }
+     private void payUsingCOD() {
+          AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutFlow.this);
+          builder.setMessage("Do you want to continue using Cash on delivery?");
+          builder.setPositiveButton("Yes, Do it", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBarTextView.setVisibility(View.VISIBLE);
+                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE); //touch input disabled.
+                    //now save the order in the database under "Orders"
+                    //save username, phone, roomno, wing, building and his order(fruits and quantity), and payment status
+                    //save feature will be common in both payment methods
+                    placeOrder(CASH_ON_DELIVERY);
+               }
+          });
+          builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+               }
+          });
+          AlertDialog dialog = builder.create();
+
+          dialog.show();
+     }
 
      private void payUsingUPI() {
           Uri uri = new Uri.Builder()
@@ -150,7 +147,7 @@ public class CheckoutFlow extends AppCompatActivity {
                   //.appendQueryParameter("mc", "your-merchant-code")
                   //.appendQueryParameter("tr", "your-transaction-ref-id")
                   //.appendQueryParameter("tn", "your-transaction-note")
-                  .appendQueryParameter("am", "1")
+                  .appendQueryParameter("am", grandTotalPrice)
                   .appendQueryParameter("cu", "INR")
                   //.appendQueryParameter("url", "your-transaction-url")
                   .build();
@@ -159,10 +156,8 @@ public class CheckoutFlow extends AppCompatActivity {
           intent.setData(uri);
 //          intent.setPackage(GOOGLE_PAY_PACKAGE_NAME);
 //          startActivityForResult(intent, REQUEST_CODE);
-
           Intent chooser = Intent.createChooser(intent, "Pay with");
           startActivityForResult(chooser, REQUEST_CODE);
-
      }
 
      @Override
@@ -182,9 +177,12 @@ public class CheckoutFlow extends AppCompatActivity {
                          }
                          else if(status.equals("FAILURE")){
                               //payment is failed
+                              // Todo handle failure
                          }
                     }
                }
+
+               //todo handle RESULT_CANCELLED
           }
      }
 
@@ -196,29 +194,26 @@ public class CheckoutFlow extends AppCompatActivity {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     User userDetails = dataSnapshot.getValue(User.class);
-                    Log.e("placeOrder", userDetails.getUserName());
+
                     CheckoutUser checkoutUser = new CheckoutUser();
                     checkoutUser.setFruits(fruits);
                     checkoutUser.setUser(userDetails);
                     checkoutUser.setPaymentMethod(paymentMethod);
                     checkoutUser.setStatus(INITIAL_ORDER_STATUS);
+
                     String key = databaseReference.child("Orders").child(authPhoneNumber).push().getKey();
                     checkoutUser.setFirebaseDatabaseKey(key);
+
                     databaseReference.child("Orders").child(authPhoneNumber).child(key).setValue(checkoutUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                          @Override
                          public void onSuccess(Void aVoid) {
                               Toast.makeText(CheckoutFlow.this, "Order Sent Successfully!", Toast.LENGTH_SHORT).show();
-                              //TODO : if order is successful then finish the checkout flow and empty the cart again
+
+                              //if order is successful then finish the checkout flow and empty the cart again
                               //so to achieve this, we will use --intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);--  which will clear the whole activity stack and we will start new main activity
                               Intent newMainActivity = new Intent(CheckoutFlow.this, MainActivity.class);
                               newMainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                               startActivity(newMainActivity);
-
-                              //TODO : and add the order in current orders
-                              //to achieve this, we will work on PreviousOrdersFragment
-
-                              //TODO : once the order is completed then put it in the previous orders in shared resources
-                              //and remove it from the firebase
                          }
                     }).addOnFailureListener(new OnFailureListener() {
                          @Override

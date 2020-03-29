@@ -50,13 +50,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, CartFragment.OnFragmentInteractionListener, CustomDialogFragment.OnFragmentInteractionListener, PaymentResultListener {
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, CartFragment.OnFragmentInteractionListener, CustomDialogFragment.OnFragmentInteractionListener {
 
      private static final String TAG = "MainActivity";
 
      private FirebaseAuth firebaseAuth;
-     private FirebaseAuth.AuthStateListener authStateListener;
-
      private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
 
@@ -95,6 +93,15 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
           firebaseAuth = FirebaseAuth.getInstance();
 
+          FirebaseAuth.AuthStateListener authStateListener = buildAuthStateListener();
+          firebaseAuth.addAuthStateListener(authStateListener);
+          receivedItems = new ArrayList<>();
+     }
+
+     FirebaseAuth.AuthStateListener buildAuthStateListener(){
+
+          FirebaseAuth.AuthStateListener authStateListener;
+
           authStateListener = new FirebaseAuth.AuthStateListener() {
                @Override
                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -117,13 +124,13 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                                              intent.putExtra("authenticatedPhoneNumber", phoneNo);
                                              startActivity(intent);
                                              finish();
-                                             Log.e("line117MainActivity", "isHalfwayExit = " + isHalfwayExit);
                                         }
                                    }
 
                                    @Override
                                    public void onCancelled(@NonNull DatabaseError databaseError) {
                                         //Toast.makeText(MainActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this, "Something went really wrong!", Toast.LENGTH_SHORT).show();
                                    }
                               });
                          }
@@ -143,19 +150,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                }
           };
 
-          firebaseAuth.addAuthStateListener(authStateListener);
-          receivedItems = new ArrayList<>();
-     }
-
-     @Override
-     protected void onStart() {
-          super.onStart();
-          //setting automatic handling of bottom navigation by navigation architecture
-     }
-
-     @Override
-     protected void onResume() {
-          super.onResume();
+          return authStateListener;
      }
 
      @Override
@@ -163,19 +158,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           this.selectedFruitName = item.getFruitName();
           this.selectedFruitPrice = item.getFruitPrice();
           this.selectedFruitQty = item.getFruitQty();
-          //Toast.makeText(this, "Added to received items", Toast.LENGTH_SHORT).show();
      }
-
-     @Override
-     public ArrayList<FruitItem> getFruitsFromMainToCartFragment() {
-          return receivedItems;
-     }
-
-     //@Override
-     //public void startPaymentInMain() {
-     //     startPayment();
-     //}
-
 
      @Override
      public CustomDialogFragment sendFruitInfoToDialog() {
@@ -195,79 +178,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      }
 
      @Override
-     public void onPaymentSuccess(String s) {
-          try {
-               //Toast.makeText(this, "Payment Successful: " + s, Toast.LENGTH_SHORT).show();
-               Toast.makeText(this, "Payment successful: " + s, Toast.LENGTH_SHORT).show();
-          } catch (Exception e) {
-               Log.e(TAG, "Exception in onPaymentSuccess!!!!!", e);
-          }
-     }
-
-     @Override
-     public void onPaymentError(int i, String s) {
-          try {
-               Toast.makeText(this, "payment failed: " + s, Toast.LENGTH_LONG).show();
-               Log.e(TAG, "payment failed: " + s);
-          }catch (Exception e){
-               Log.e(TAG, "Exception in onPayment Error!!!!", e);
-          }
-     }
-
-//     public void startPayment() {
-////          checkout.setKeyID("<YOUR_KEY_ID>");
-//          /*
-//           * Instantiate Checkout
-//           */
-//          final Checkout checkout = new Checkout();
-//          checkout.setKeyID("rzp_test_YqOc9S9XbjhpzM");
-//
-//          /*
-//           * Set your logo here
-//           */
-//          //checkout.setImage(R.drawable.logo);
-//
-//          /*
-//           * Reference to current activity
-//           */
-//          Activity activity = this;
-//
-//          /*
-//           * Pass your payment options to the Razorpay Checkout as a JSONObject
-//           */
-//          try {
-//               JSONObject options = new JSONObject();
-//
-//               /*
-//                * Merchant Name
-//                * eg: ACME Corp || HasGeek etc.
-//                */
-//               options.put("name", "Anant Kataria");
-//
-//               /*
-//                * Description can be anything
-//                * eg: Reference No. #123123 - This order number is passed by you for your internal reference. This is not the `razorpay_order_id`.
-//                *     Invoice Payment
-//                *     etc.
-//                */
-//               options.put("description", "checking api");
-//               options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
-//               options.put("order_id", "order_9A33XWu170gUtm");
-//               options.put("currency", "INR");
-//               //options.put("key", "rzp_test_YqOc9S9XbjhpzM");
-//
-//               /*
-//                * Amount is always passed in currency subunits
-//                * Eg: "500" = INR 5.00
-//                */
-//               options.put("amount", "500");
-//
-//               checkout.open(activity, options);
-//          } catch(Exception e) {
-//               Log.e(TAG, "Error in starting Razorpay Checkout", e);
-//               Toast.makeText(activity, "Error in payment : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//               e.printStackTrace();
-//          }
-//     }
+     public ArrayList<FruitItem> getFruitsFromMainToCartFragment() { return receivedItems; }
 
 }

@@ -15,7 +15,7 @@ public class CheckoutUser implements Parcelable {
      private String status; //status can be 'ORDER PROCESSING', 'ORDER CANCELLED', 'ORDER DELIVERED', 'ORDER ON THE WAY'
      private String firebaseDatabaseKey;
 
-     public CheckoutUser() {
+     CheckoutUser() {
      }
 
      public CheckoutUser(User user, ArrayList<FruitItem> fruits, String paymentMethod, String status, String firebaseDatabaseKey) {
@@ -26,7 +26,7 @@ public class CheckoutUser implements Parcelable {
           this.firebaseDatabaseKey = firebaseDatabaseKey;
      }
 
-     protected CheckoutUser(Parcel in) {
+     private CheckoutUser(Parcel in) {
           fruits = in.createTypedArrayList(FruitItem.CREATOR);
           paymentMethod = in.readString();
           status = in.readString();
@@ -45,7 +45,7 @@ public class CheckoutUser implements Parcelable {
           return firebaseDatabaseKey;
      }
 
-     public void setFirebaseDatabaseKey(String firebaseDatabaseKey) {
+     void setFirebaseDatabaseKey(String firebaseDatabaseKey) {
           this.firebaseDatabaseKey = firebaseDatabaseKey;
      }
 
@@ -53,7 +53,7 @@ public class CheckoutUser implements Parcelable {
           return status;
      }
 
-     public void setStatus(String status) {
+     void setStatus(String status) {
           this.status = status;
      }
 
@@ -61,7 +61,7 @@ public class CheckoutUser implements Parcelable {
           return paymentMethod;
      }
 
-     public void setPaymentMethod(String paymentMethod) {
+     void setPaymentMethod(String paymentMethod) {
           this.paymentMethod = paymentMethod;
      }
 
@@ -86,7 +86,7 @@ public class CheckoutUser implements Parcelable {
           return user;
      }
 
-     public void setUser(User user) {
+     void setUser(User user) {
           this.user = user;
      }
 
@@ -94,7 +94,7 @@ public class CheckoutUser implements Parcelable {
           return fruits;
      }
 
-     public void setFruits(ArrayList<FruitItem> fruits) {
+     void setFruits(ArrayList<FruitItem> fruits) {
           this.fruits = fruits;
      }
 }

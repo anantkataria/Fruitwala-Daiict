@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.TextKeyListener;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
-import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -88,13 +86,54 @@ public class AuthActivity extends AppCompatActivity {
                             mCallbacks
                     );
 
-                    //this is when firebase will try automatic sign in without user to type otp manually.
                     progressBar.setVisibility(View.VISIBLE);
                     sendOtpButton.setVisibility(View.INVISIBLE);
-                    //autoVerificationTextView.setVisibility(View.VISIBLE);
                     phoneNumberLayout.setVisibility(View.INVISIBLE);
                }
           });
+
+          mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+               @Override
+               public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                    signInWithPhoneAuthCredential(phoneAuthCredential);
+               }
+
+               @Override
+               public void onVerificationFailed(@NonNull FirebaseException e) {
+                    if(e instanceof FirebaseNetworkException){
+                         Toast.makeText(AuthActivity.this, "Check your Internet connection", Toast.LENGTH_SHORT).show();
+                    }
+                    if (e instanceof FirebaseTooManyRequestsException) {
+                         Toast.makeText(AuthActivity.this, "Your quota of getting otp is over because of too many requests", Toast.LENGTH_LONG).show();
+                    }
+                    if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                         Toast.makeText(AuthActivity.this, "Enter valid number", Toast.LENGTH_SHORT).show();
+                         TextKeyListener.clear(phoneNumberEditText.getText());//user has typed number in the wrong way, so clear it
+                    }
+                    phoneNumberEditText.setEnabled(true);//and since user will type number again (in right format), we have to enable it(we disabled it in onclick of 'generate otp' button)
+                    sendOtpButton.setEnabled(true);//we have to enable it again since we disabled it in onclick of 'generate otp' button
+                    sendOtpButton.setVisibility(View.VISIBLE);
+                    autoVerificationTextView.setVisibility(View.INVISIBLE);
+                    phoneNumberLayout.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.INVISIBLE);
+               }
+
+               @Override
+               public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                    super.onCodeSent(s, forceResendingToken);
+                    verificationId = s;
+
+                    progressBar.setVisibility(View.INVISIBLE);
+                    verifyOtpButton.setVisibility(View.VISIBLE);
+                    otpEditText.setVisibility(View.VISIBLE);
+                    otpSentTextView.setVisibility(View.VISIBLE);
+               }
+
+               @Override
+               public void onCodeAutoRetrievalTimeOut(@NonNull String s) {
+                    super.onCodeAutoRetrievalTimeOut(s);
+               }
+          };
 
           verifyOtpButton.setOnClickListener(new View.OnClickListener() {
                @Override
@@ -111,66 +150,11 @@ public class AuthActivity extends AppCompatActivity {
                          otpSentTextView.setVisibility(View.INVISIBLE);
                          progressBar.setVisibility(View.VISIBLE);
 
-
                          PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otpCode);
                          signInWithPhoneAuthCredential(credential);
                     }
                }
           });
-
-          mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-               @Override
-               public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                    signInWithPhoneAuthCredential(phoneAuthCredential);
-               }
-
-               @Override
-               public void onVerificationFailed(@NonNull FirebaseException e) {
-                    if(e instanceof FirebaseNetworkException){
-                         Toast.makeText(AuthActivity.this, "Check your Internet connection", Toast.LENGTH_SHORT).show();
-                    }
-
-                    if (e instanceof FirebaseTooManyRequestsException) {
-                         // The SMS quota for the project has been exceeded
-                         // ...
-                         Toast.makeText(AuthActivity.this, "Your quota of getting otp is over because of too many requests", Toast.LENGTH_LONG).show();
-
-
-                         // Toast.makeText(AuthActivity.this, "Try again later...", Toast.LENGTH_LONG).show();
-                    }
-                    if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                         // Invalid request
-                         // ...
-                         Toast.makeText(AuthActivity.this, "Enter valid number", Toast.LENGTH_SHORT).show();
-                         TextKeyListener.clear(phoneNumberEditText.getText());//user has typed number in the wrong way, so clear it
-                    }
-
-                    phoneNumberEditText.setEnabled(true);//and since user will type number again (in right format), we have to enable it(we disabled it in onclick of 'generate otp' button)
-                    sendOtpButton.setEnabled(true);//we have to enable it again since we disabled it in onclick of 'generate otp' button
-                    sendOtpButton.setVisibility(View.VISIBLE);
-                    autoVerificationTextView.setVisibility(View.INVISIBLE);
-                    phoneNumberLayout.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.INVISIBLE);
-
-               }
-
-               @Override
-               public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                    super.onCodeSent(s, forceResendingToken);
-
-                    verificationId = s;
-               }
-
-               @Override
-               public void onCodeAutoRetrievalTimeOut(@NonNull String s) {
-                    super.onCodeAutoRetrievalTimeOut(s);
-                    autoVerificationTextView.setVisibility(View.INVISIBLE);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    verifyOtpButton.setVisibility(View.VISIBLE);
-                    otpEditText.setVisibility(View.VISIBLE);
-                    otpSentTextView.setVisibility(View.VISIBLE);
-               }
-          };
      }
 
      private void signInWithPhoneAuthCredential(PhoneAuthCredential credential){
@@ -189,14 +173,14 @@ public class AuthActivity extends AppCompatActivity {
                                               @Override
                                               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                    if(dataSnapshot.exists()){
-                                                        Log.e("userExists", "phoneNum1 = " + dataSnapshot.getValue(User.class).getPhoneNum1());
-                                                        Log.e("userExists", "authenticatedPhoneNumber = " + authenticatedPhoneNumber);
+
                                                         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                                                         intent.putExtra("isSavingSuccessful", true);
                                                         startActivity(intent);
                                                         finish();
 
-                                                   }else {
+                                                   }
+                                                   else {
                                                         //take user first to the profile and finish this activity
                                                         Intent intent = new Intent(AuthActivity.this, UserProfile.class);
                                                         intent.putExtra("authenticatedPhoneNumber", authenticatedPhoneNumber);
@@ -214,19 +198,16 @@ public class AuthActivity extends AppCompatActivity {
                                          }
                                  );
 
-//                                 if(userExists(user.getPhoneNumber())/*user node exists in the firebase?*/){
-//
-//                                      //then take user directly to mainActivity and finish this activity
-//                                      Intent intent = new Intent(AuthActivity.this, MainActivity.class);
-//                                      intent.putExtra("isSavingSuccessful", true);
-//                                      startActivity(intent);
-//                                      finish();
-//                                 }
-//
 
                             } else {
                                  if(task.getException() instanceof  FirebaseNetworkException){
                                       Toast.makeText(AuthActivity.this, "Check your Internet connection", Toast.LENGTH_SHORT).show();
+                                      phoneNumberEditText.setEnabled(true);//and since user will type number again (in right format), we have to enable it(we disabled it in onclick of 'generate otp' button)
+                                      sendOtpButton.setEnabled(true);//we have to enable it again since we disabled it in onclick of 'generate otp' button
+                                      sendOtpButton.setVisibility(View.VISIBLE);
+                                      phoneNumberLayout.setVisibility(View.VISIBLE);
+                                      progressBar.setVisibility(View.INVISIBLE);
+
                                  }
                                  if(task.getException() instanceof FirebaseAuthInvalidCredentialsException){
                                       Toast.makeText(AuthActivity.this, "Entered OTP is wrong!", Toast.LENGTH_SHORT).show();

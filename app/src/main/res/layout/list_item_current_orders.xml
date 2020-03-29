@@ -52,6 +52,7 @@
     <Button
         android:id="@+id/requestCancellationButton"
         android:text="Request Cancellation?"
+        android:textSize="10dp"
         android:layout_width="match_parent"
         android:layout_height="36dp"/>
 

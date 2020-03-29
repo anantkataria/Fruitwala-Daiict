@@ -1,6 +1,5 @@
 package com.anantdevelopers.swipesinalpha.CustomDialogFragment;
 
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -26,9 +25,6 @@ import com.anantdevelopers.swipesinalpha.R;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class CustomDialogFragment extends DialogFragment {
      private Button addToCartButton;
      private TextView fruitNameTxtView;
@@ -40,9 +36,7 @@ public class CustomDialogFragment extends DialogFragment {
      private String receivedFruitName, receivedFruitQty, receivedFruitPrice;
 
      private String qty, updatedPrice; //used inside the spinner
-
      private String defaultSpinnerItem;
-
      private int SpinnerArrayTypeId;
 
      public CustomDialogFragment() {
@@ -58,17 +52,16 @@ public class CustomDialogFragment extends DialogFragment {
                this.receivedFruitName = bundle.getString("fruitName");
                this.receivedFruitPrice = bundle.getString("fruitPrice");
                this.receivedFruitQty = bundle.getString("fruitQty");
-               //Log.e("CustomDialogfragment", receivedFruitName);
           }
      }
 
      @NonNull
      @Override
      public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
           AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
           LayoutInflater inflater = requireActivity().getLayoutInflater();
-
           View v = inflater.inflate(R.layout.fragment_custom_dialog, null);
 
           fruitNameTxtView = v.findViewById(R.id.fruitName);
@@ -114,6 +107,22 @@ public class CustomDialogFragment extends DialogFragment {
 
      }
 
+     private void setFruitParams() {
+          if (!receivedFruitQty.equals("") && !receivedFruitPrice.equals("") && !receivedFruitName.equals("")){
+               fruitNameTxtView.setText(receivedFruitName);
+               fruitPriceTxtView.setText(receivedFruitPrice);
+          }
+     }
+
+     private void setSpinnerOptions() {
+          selectSpinnerArrayFromGivenFruitName(receivedFruitName);
+          ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), SpinnerArrayTypeId, android.R.layout.simple_spinner_item);
+          adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+          fruitQtySpinner.setAdapter(adapter);
+          fruitQtySpinner.setSelection(0);
+          defaultSpinnerItem = fruitQtySpinner.getSelectedItem().toString();
+     }
+
      @Override
      public void onAttach(@NonNull Context context) {
           super.onAttach(context);
@@ -129,24 +138,6 @@ public class CustomDialogFragment extends DialogFragment {
      public void onDetach() {
           super.onDetach();
           mListener = null;
-     }
-
-     private void setFruitParams() {
-          if (!receivedFruitQty.equals("") && !receivedFruitPrice.equals("") && !receivedFruitName.equals("")){
-               //Log.e("setFruitParams()", receivedFruitName);
-               fruitNameTxtView.setText(receivedFruitName);
-               fruitPriceTxtView.setText(receivedFruitPrice);
-          }
-     }
-
-     private void setSpinnerOptions() {
-          selectSpinnerArrayFromGivenFruitName(receivedFruitName);
-          ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), SpinnerArrayTypeId, android.R.layout.simple_spinner_item);
-          adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-          fruitQtySpinner.setAdapter(adapter);
-          fruitQtySpinner.setSelection(0);
-          defaultSpinnerItem = fruitQtySpinner.getSelectedItem().toString();
-          //Log.e("setSpinnerOptions", fruitQtySpinner.getSelectedItem().toString());
      }
 
      private void selectSpinnerArrayFromGivenFruitName(String fruitName) {

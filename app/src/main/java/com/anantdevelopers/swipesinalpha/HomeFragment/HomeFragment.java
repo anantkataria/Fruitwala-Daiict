@@ -23,9 +23,7 @@ import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapter;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class HomeFragment extends Fragment {
 
      private ArrayList<FruitItem> fruits;
@@ -74,7 +72,6 @@ public class HomeFragment extends Fragment {
 
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
                     CustomDialogFragment customDialogFragment = mListener.sendFruitInfoToDialog();
-
                     customDialogFragment.show(ft, "position of fruit is" + position);
                }
           }));

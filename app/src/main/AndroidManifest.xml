@@ -11,16 +11,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CheckoutFlow.CheckoutFlow"></activity>
+        <activity android:name=".CheckoutFlow.CheckoutFlow"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".UserProfile.UserProfile"
-            android:screenOrientation="locked"></activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".Authentication.AuthActivity"
-            android:screenOrientation="locked" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="locked">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
