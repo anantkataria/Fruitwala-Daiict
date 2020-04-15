@@ -1,0 +1,49 @@
+AuthActivity
+
+PreviousOrderFragment
+
+	//Add refresh feature (swipe up) in here
+
+	//Add No Internet snack bar & try again
+
+	fix 2 - recycler view problem
+
+	Add functionality to request cancel button of current order
+
+	Add functionality of order again button of previous orders
+
+	(partially solved) fix previous orders duplicate problem
+
+MainActivity
+
+	Checking of isSavingSuccessful is currently done using database operations. Convert it to use phone memory (local memory) instead (consider)
+
+	Make a fragment/activity which pops whenever there is no internet
+
+	Handle onCancelled of every database calls in App(may be that is related to the task just above this)
+
+	Handle screen rotations
+
+	->Change firebase security rules for database
+
+	find ways of compressing app (decreasing app size) before launching it to playstore
+	What should be done before publishing app to playstore.
+
+	consider changing all toasts into snackbars as a better communicator( Toasts have grown too old, and looks a bit outdated )
+
+	enable floating labels for editText using TextInputLayout.(https://android-developers.googleblog.com/2015/05/android-design-support-library.html)
+
+HomeFragment
+
+	Add menu for logout, about, settings and other things
+
+	-> Add functionality with which i can manipulate prices of fruits 
+		Implementing this, i will have to implement connection snack bar and swipe down to refresh functionality
+
+CartFragment
+
+	//No internet connection warning snakbar in proceed to checkout button, place order button;
+
+	//Add swipe to delete text in the cart fragment
+
+	& add "Sorry service is off today" functionality

@@ -32,6 +32,6 @@ public class PreviousOrderViewModel extends AndroidViewModel {
      }
 
      public LiveData<List<PreviousOrderEntity>> getAllPreviousOrders(){
-          return repository.getAllPreviousOrders();
+          return allPreviousOrders;
      }
 }

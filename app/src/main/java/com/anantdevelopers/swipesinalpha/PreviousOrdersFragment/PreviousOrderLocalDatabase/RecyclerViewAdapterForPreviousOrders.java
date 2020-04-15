@@ -44,12 +44,12 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
           //todo implement better than notifydatasetchanged from coding in flow
      }
 
-     public class ViewHolder extends RecyclerView.ViewHolder {
+     static class ViewHolder extends RecyclerView.ViewHolder {
           private TextView listOfFruitsTextView;
           private TextView statusTextView;
           private TextView grandTotalTextView;
 
-          public ViewHolder(@NonNull View itemView) {
+          ViewHolder(@NonNull View itemView) {
                super(itemView);
                listOfFruitsTextView = itemView.findViewById(R.id.listOfFruitsTextView);
                statusTextView = itemView.findViewById(R.id.PreviousOrderStatus);

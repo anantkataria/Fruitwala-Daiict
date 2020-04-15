@@ -45,9 +45,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class PreviousOrdersFragment extends Fragment {
 
      private RecyclerView currentOrdersRecyclerView, previousOrdersRecyclerView;
@@ -70,6 +68,8 @@ public class PreviousOrdersFragment extends Fragment {
      private View v;
 
      private PreviousOrderViewModel previousOrderViewModel;
+
+     private ValueEventListener valueEventListener;
 
      public PreviousOrdersFragment() {
           // Required empty public constructor
@@ -105,6 +105,15 @@ public class PreviousOrdersFragment extends Fragment {
           currentOrderAffairs(v);
           previousOrderAffairs(v);
           return v;
+     }
+
+     @Override
+     public void onDestroy() {
+          super.onDestroy();
+
+          String authPhoneNumber = firebaseAuth.getCurrentUser().getPhoneNumber();
+          databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeEventListener(valueEventListener);
+
      }
 
      private void previousOrderAffairs(View v) {
@@ -158,7 +167,7 @@ public class PreviousOrdersFragment extends Fragment {
 
                     i = 0;
                     for(PreviousOrderEntity poe : ordersToAddInRoom){
-                         //previousOrderViewModel.insert(poe);
+                         previousOrderViewModel.insert(poe);
                          i += 1;
                     }
 
@@ -185,7 +194,7 @@ public class PreviousOrdersFragment extends Fragment {
 
           previousOrderProgressBar.setVisibility(View.VISIBLE);
 
-          databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).addValueEventListener(new ValueEventListener() {
+          valueEventListener = new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
@@ -210,7 +219,9 @@ public class PreviousOrdersFragment extends Fragment {
                public void onCancelled(@NonNull DatabaseError databaseError) {
 
                }
-          });
+          };
+
+          databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).addValueEventListener(valueEventListener);
 
      }
 

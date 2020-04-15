@@ -27,15 +27,15 @@ public class PreviousOrderEntity {
           return id;
      }
 
-     public String getOrderFruitList() {
+     String getOrderFruitList() {
           return orderFruitList;
      }
 
-     public String getStatus() {
+     String getStatus() {
           return status;
      }
 
-     public String getGrandTotal() {
+     String getGrandTotal() {
           return grandTotal;
      }
 }

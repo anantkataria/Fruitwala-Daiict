@@ -4,11 +4,10 @@ import android.app.Application;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
-import androidx.room.Delete;
 
 import java.util.List;
 
-public class PreviousOrderRepository {
+class PreviousOrderRepository {
      private PreviousOrderDao previousOrderDao;
      private LiveData<List<PreviousOrderEntity>> allPreviousOrders;
 
@@ -18,19 +17,19 @@ public class PreviousOrderRepository {
           allPreviousOrders = previousOrderDao.getAllOrders();
      }
 
-     public void insert(PreviousOrderEntity poe){
+     void insert(PreviousOrderEntity poe){
           new InsertPreviousOrderAsyncTask(previousOrderDao).execute(poe);
      }
 
-     public void delete(PreviousOrderEntity poe){
+     void delete(PreviousOrderEntity poe){
           new DeletePreviousOrderAsyncTask(previousOrderDao).execute(poe);
      }
 
-     public void deleteAllNotes() {
+     void deleteAllNotes() {
           new DeleteAllPreviousOrdersAsyncTask(previousOrderDao).execute();
      }
 
-     public LiveData<List<PreviousOrderEntity>> getAllPreviousOrders() {
+     LiveData<List<PreviousOrderEntity>> getAllPreviousOrders() {
           return allPreviousOrders;
      }
 

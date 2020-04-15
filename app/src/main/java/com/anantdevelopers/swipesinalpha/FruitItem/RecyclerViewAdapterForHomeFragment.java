@@ -14,12 +14,12 @@ import com.anantdevelopers.swipesinalpha.R;
 
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
+public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<RecyclerViewAdapterForHomeFragment.ViewHolder>{
 
-     private ArrayList<FruitItem> fruits;
+     private ArrayList<FruitItem2> fruits;
      private Context context;
 
-     public RecyclerViewAdapter(Context context, ArrayList<FruitItem> fruits) {
+     public RecyclerViewAdapterForHomeFragment(Context context, ArrayList<FruitItem2> fruits) {
           this.fruits = fruits;
           this.context = context;
      }
@@ -27,17 +27,24 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
      @NonNull
      @Override
      public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-          View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_fruit
+          View view = LayoutInflater.from(context).inflate(R.layout.list_item_fruit
           , parent, false);
-          ViewHolder holder = new ViewHolder(view);
-          return holder;
+          return new ViewHolder(view);
      }
 
      @Override
      public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-          holder.fruitName.setText(fruits.get(position).getFruitName());
-          holder.fruitPrice.setText(fruits.get(position).getFruitPrice());
-          holder.fruitQty.setText(fruits.get(position).getFruitQty());
+          FruitItem2 currentItem = fruits.get(position);
+          holder.fruitName.setText(currentItem.getFruitName());
+          if(currentItem.getAvailability().equals("Available")){
+               holder.fruitQty.setText(currentItem.getQuantities().get(0));
+               holder.fruitPrice.setText(currentItem.getPrices().get(0));
+          }
+          else {
+               holder.fruitPrice.setVisibility(View.GONE);
+               holder.fruitQty.setText(" - - ");
+               holder.notAvailableTxtView.setVisibility(View.VISIBLE);
+          }
      }
 
      @Override
@@ -49,12 +56,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
           TextView fruitName;
           TextView fruitQty;
           TextView fruitPrice;
+          TextView notAvailableTxtView;
+
           RelativeLayout parentLayout;
           ViewHolder(@NonNull View itemView) {
                super(itemView);
                fruitName = itemView.findViewById(R.id.fruit_name);
                fruitQty = itemView.findViewById(R.id.fruit_qty);
                fruitPrice = itemView.findViewById(R.id.fruit_price);
+               notAvailableTxtView = itemView.findViewById(R.id.not_available_text_view);
+
                parentLayout = itemView.findViewById(R.id.parent_layout);
           }
      }

@@ -23,8 +23,8 @@ import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.CheckoutFlow.CheckoutFlow;
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapterForCartfragment;
 import com.anantdevelopers.swipesinalpha.R;
-import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapter;
 
 import java.util.ArrayList;
 
@@ -33,7 +33,7 @@ public class CartFragment extends Fragment {
      private ArrayList<FruitItem> fruits;
 
      private RecyclerView recyclerView;
-     private RecyclerViewAdapter adapter;
+     private RecyclerViewAdapterForCartfragment adapter;
 
      private TextView grandTotal;
 
@@ -48,7 +48,7 @@ public class CartFragment extends Fragment {
      @Override
      public void onCreate(@Nullable Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
-          adapter = new RecyclerViewAdapter(getContext(), fruits);
+          adapter = new RecyclerViewAdapterForCartfragment(getContext(), fruits);
      }
 
      @Override

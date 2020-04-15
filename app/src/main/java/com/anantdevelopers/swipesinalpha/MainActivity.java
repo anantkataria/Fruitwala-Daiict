@@ -18,10 +18,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
@@ -31,40 +29,31 @@ import com.anantdevelopers.swipesinalpha.Authentication.AuthActivity;
 import com.anantdevelopers.swipesinalpha.CartFragment.CartFragment;
 import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragment;
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem2;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
-import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthCredential;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.razorpay.Checkout;
-import com.razorpay.PaymentResultListener;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, CartFragment.OnFragmentInteractionListener, CustomDialogFragment.OnFragmentInteractionListener {
 
-     private static final String TAG = "MainActivity";
-
-     private FirebaseAuth firebaseAuth;
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
 
      private ArrayList<FruitItem> receivedItems;
-     private String selectedFruitName, selectedFruitQty, selectedFruitPrice;
+     private String selectedFruitName;
+     private ArrayList<String> selectedFruitQtys, selectedFruitPrices;
 
      private BottomNavigationView bottomNavigationView;
      private AppBarConfiguration appBarConfiguration;
 
-     private boolean isHalfwayExit = false;
      private boolean isSavingSuccessful = false;
 
      private ProgressBar progressBar;
@@ -83,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
           }
 
-          firebaseDatabase = FirebaseDatabase.getInstance();
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
 
           bottomNavigationView = findViewById(R.id.bottomNaigationView);
@@ -91,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                   R.id.HomeFragment, R.id.CartFragment, R.id.PreviousOrdersFragment
           ).build();
 
-          firebaseAuth = FirebaseAuth.getInstance();
+          FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
           FirebaseAuth.AuthStateListener authStateListener = buildAuthStateListener();
           firebaseAuth.addAuthStateListener(authStateListener);
@@ -154,10 +143,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      }
 
      @Override
-     public void sendToActivityfromHomeFragment(FruitItem item) {
+     public void sendToActivityfromHomeFragment(FruitItem2 item) {
           this.selectedFruitName = item.getFruitName();
-          this.selectedFruitPrice = item.getFruitPrice();
-          this.selectedFruitQty = item.getFruitQty();
+          this.selectedFruitPrices = item.getPrices();
+          this.selectedFruitQtys = item.getQuantities();
      }
 
      @Override
@@ -165,8 +154,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           CustomDialogFragment customDialogFragment = new CustomDialogFragment();
           Bundle bundle = new Bundle();
           bundle.putString("fruitName", this.selectedFruitName);
-          bundle.putString("fruitQty", this.selectedFruitQty);
-          bundle.putString("fruitPrice", this.selectedFruitPrice);
+          bundle.putStringArrayList("fruitQty", this.selectedFruitQtys);
+          bundle.putStringArrayList("fruitPrice", this.selectedFruitPrices);
           //Log.e("MainActivity", this.selectedFruitName);
           customDialogFragment.setArguments(bundle);
           return customDialogFragment;

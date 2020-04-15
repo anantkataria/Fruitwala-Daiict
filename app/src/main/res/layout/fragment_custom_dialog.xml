@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:text="Qunatity"/>
 
-        <androidx.appcompat.widget.AppCompatSpinner
+        <Spinner
             android:id="@+id/spinnerForQuantity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
