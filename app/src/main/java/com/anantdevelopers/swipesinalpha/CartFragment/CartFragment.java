@@ -32,14 +32,11 @@ public class CartFragment extends Fragment {
 
      private ArrayList<FruitItem> fruits;
 
-     private RecyclerView recyclerView;
      private RecyclerViewAdapterForCartfragment adapter;
 
      private TextView grandTotal;
 
      private OnFragmentInteractionListener mListener;
-
-     private Button proceedToCheckoutButton;
 
      public CartFragment() {
           // Required empty public constructor
@@ -59,7 +56,7 @@ public class CartFragment extends Fragment {
 
           countGrandTotal();
 
-          proceedToCheckoutButton = v.findViewById(R.id.proceed_to_checkout_button);
+          Button proceedToCheckoutButton = v.findViewById(R.id.proceed_to_checkout_button);
 
           proceedToCheckoutButton.setOnClickListener(new View.OnClickListener() {
                @Override
@@ -74,7 +71,7 @@ public class CartFragment extends Fragment {
                }
           });
 
-          recyclerView = v.findViewById(R.id.recycler_view_cart);
+          RecyclerView recyclerView = v.findViewById(R.id.recycler_view_cart);
           recyclerView.setAdapter(adapter);
           new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
           recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

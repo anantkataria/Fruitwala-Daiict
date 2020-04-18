@@ -22,7 +22,6 @@ import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem2;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerItemClickListener;
 import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapterForHomeFragment;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,12 +33,9 @@ import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
 
-//     private ArrayList<FruitItem> fruits;
      private ArrayList<FruitItem2> fruits;
-     private ArrayList<String> quantities, prices;
 
      private RecyclerView recyclerView;
      private RecyclerViewAdapterForHomeFragment adapter;
@@ -61,7 +57,7 @@ public class HomeFragment extends Fragment {
 
           fruits = new ArrayList<>();
 
-          firebaseDatabase = FirebaseDatabase.getInstance();
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
 
      }

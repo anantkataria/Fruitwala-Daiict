@@ -32,8 +32,6 @@ public class CustomDialogFragment extends DialogFragment {
      private ArrayList<String> receivedFruitQtys, receivedFruitPrices;
 
      private String qty, updatedPrice; //used inside the spinner
-     private String defaultSpinnerItem;
-     private int SpinnerArrayTypeId;
 
      public CustomDialogFragment() {
           // Required empty public constructor
@@ -70,15 +68,16 @@ public class CustomDialogFragment extends DialogFragment {
           fruitQtySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                @Override
                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                    qty = parent.getItemAtPosition(position).toString();
-//                    int defaultQty = Integer.valueOf(defaultSpinnerItem.substring(0, 3).replaceAll("[a-z\\s]", ""));
-//                    int selectedQty = Integer.valueOf(qty.substring(0, 3).replaceAll("[a-z\\s]", ""));
-//                    int defaultprice = Integer.valueOf(receivedFruitPrices.substring(0, 3).replaceAll("[a-z\\s]", ""));
-//                    //Log.e("###", "defaultQty = " + defaultQty + ", selectedQty = " + selectedQty + ", defaultPrice = " + defaultprice);
-//                    //Integer.valueOf(qty.substring(0, 3).replaceAll("\\s", ""))*Integer.valueOf(receivedFruitPrice.substring(0, 3).replaceAll("\\s", ""))/Integer.valueOf(defaultSpinnerItem.substring(0, 3).replaceAll("\\s", ""))
-//                    updatedPrice = Integer.toString((selectedQty*defaultprice)/defaultQty);
-//                    fruitPriceTxtView.setText(updatedPrice+" Rs.");
-//                    //Log.e("spinnerItemSelected", qty);
+                    qty = parent.getItemAtPosition(position).toString();
+
+                    for(String q: receivedFruitQtys){
+                         if(q.equals(qty)){
+                              int index = receivedFruitQtys.indexOf(q);
+                              updatedPrice = receivedFruitPrices.get(index);
+                              fruitPriceTxtView.setText(updatedPrice);
+                              break;
+                         }
+                    }
                }
 
                @Override
@@ -92,7 +91,7 @@ public class CustomDialogFragment extends DialogFragment {
           addToCartButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    mListener.getItemFromDialogToMainActivity(receivedFruitName, qty, updatedPrice+" Rs.");
+                    mListener.getItemFromDialogToMainActivity(receivedFruitName, qty, updatedPrice);
                     dismiss();
                }
           });
@@ -111,17 +110,9 @@ public class CustomDialogFragment extends DialogFragment {
      }
 
      private void setSpinnerOptions() {
-//          selectSpinnerArrayFromGivenFruitName(receivedFruitName);
-//          ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), SpinnerArrayTypeId, android.R.layout.simple_spinner_item);
-//          adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//          fruitQtySpinner.setAdapter(adapter);
-//          fruitQtySpinner.setSelection(0);
-//          defaultSpinnerItem = fruitQtySpinner.getSelectedItem().toString();
           ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.item_spinnet, receivedFruitQtys);
           fruitQtySpinner.setAdapter(adapter);
           fruitQtySpinner.setSelection(0);
-          defaultSpinnerItem = fruitQtySpinner.getSelectedItem().toString();
-
      }
 
      @Override
