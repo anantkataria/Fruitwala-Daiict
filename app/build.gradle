@@ -55,6 +55,5 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
 
 
-
 }
 apply plugin: 'com.google.gms.google-services'

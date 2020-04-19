@@ -20,6 +20,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
@@ -31,6 +34,10 @@ import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragme
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem2;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
+import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
+import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsAreHealthyActivity;
+import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsInNewsActivity;
+import com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity.SettingsActivity;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -159,6 +166,41 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           //Log.e("MainActivity", this.selectedFruitName);
           customDialogFragment.setArguments(bundle);
           return customDialogFragment;
+     }
+
+     @Override
+     public boolean onCreateOptionsMenu(Menu menu) {
+          MenuInflater inflater = getMenuInflater();
+          inflater.inflate(R.menu.options_menu, menu);
+          return true;
+     }
+
+     @Override
+     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+          switch(item.getItemId()){
+               case R.id.settings_dest:
+                    Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                    startActivity(intent);
+                    return true;
+               case R.id.fruits_are_healthy_dest:
+                    Toast.makeText(this, "Fruits are healthy selected", Toast.LENGTH_SHORT).show();
+                    Intent intent1 = new Intent(MainActivity.this, FruitsAreHealthyActivity.class);
+                    startActivity(intent1);
+                    return true;
+               case R.id.fruits_in_news:
+                    Toast.makeText(this, "Fruits in NEWS selected", Toast.LENGTH_SHORT).show();
+                    Intent intent2 = new Intent(MainActivity.this, FruitsInNewsActivity.class);
+                    startActivity(intent2);
+                    return true;
+               case R.id.about_dest:
+                    Toast.makeText(this, "About selected", Toast.LENGTH_SHORT).show();
+                    Intent intent3 = new Intent(MainActivity.this, AboutActivity.class);
+                    startActivity(intent3);
+                    return true;
+               default:
+                    return super.onOptionsItemSelected(item);
+          }
      }
 
      @Override
