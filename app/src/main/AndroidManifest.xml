@@ -11,21 +11,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".OptionsMenuResources.SettingsActivity.FeedbackActivity"></activity>
         <activity
             android:name=".OptionsMenuResources.SettingsActivity.ProfileActivity"
-            android:screenOrientation="locked"></activity>
+            android:screenOrientation="locked" />
         <activity
             android:name=".OptionsMenuResources.AboutActivity"
-            android:screenOrientation="locked"/>
-        <activity
-            android:name=".OptionsMenuResources.FruitsInNewsActivity"
-            android:screenOrientation="locked"/>
+            android:screenOrientation="locked" />
         <activity
             android:name=".OptionsMenuResources.FruitsAreHealthyActivity"
-            android:screenOrientation="locked"/>
+            android:screenOrientation="locked" />
         <activity
             android:name=".OptionsMenuResources.SettingsActivity.SettingsActivity"
-            android:screenOrientation="locked"/>
+            android:screenOrientation="locked" />
         <activity
             android:name=".CheckoutFlow.CheckoutFlow"
             android:screenOrientation="locked" />
@@ -40,7 +38,6 @@
             android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -9,10 +9,6 @@
         android:title="Fruits are Healthy"/>
 
     <item
-        android:id="@+id/fruits_in_news"
-        android:title="Fruits in NEWS"/>
-
-    <item
         android:id="@+id/about_dest"
         android:title="About"/>
 

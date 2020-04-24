@@ -1,21 +1,37 @@
 package com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.anantdevelopers.swipesinalpha.Authentication.AuthActivity;
+import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
 import com.anantdevelopers.swipesinalpha.R;
+import com.anantdevelopers.swipesinalpha.UserProfile.User;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SettingsActivity extends AppCompatActivity {
+
+//     private User user;
+     private String userName = "User";
+     private String authPhone = "";
+
+     private FirebaseAuth firebaseAuth;
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_settings);
+
+          Intent intent = getIntent();
+          userName = intent.getStringExtra("userName");
+          authPhone = intent.getStringExtra("authPhone");
 
           Button profileBtn = findViewById(R.id.profile_btn);
           Button feedbackBtn = findViewById(R.id.feedback_btn);
@@ -26,11 +42,14 @@ public class SettingsActivity extends AppCompatActivity {
 
           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+          firebaseAuth = FirebaseAuth.getInstance();
+
           profileBtn.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    Toast.makeText(SettingsActivity.this, "Profile Button clicked", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(SettingsActivity.this, ProfileActivity.class);
+                    //intent.putExtra("user", user);
+                    intent.putExtra("authPhone", authPhone);
                     startActivity(intent);
                }
           });
@@ -38,24 +57,55 @@ public class SettingsActivity extends AppCompatActivity {
           feedbackBtn.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    Toast.makeText(SettingsActivity.this, "Feedback Button clicked", Toast.LENGTH_SHORT).show();
+                    Intent intent1 = new Intent(SettingsActivity.this, FeedbackActivity.class);
+                    intent1.putExtra("authPhone", authPhone);
+                    startActivity(intent1);
                }
           });
 
           aboutBtn.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    Toast.makeText(SettingsActivity.this, "About Button clicked", Toast.LENGTH_SHORT).show();
+                    Intent intent1 = new Intent(SettingsActivity.this, AboutActivity.class);
+                    intent1.putExtra("userName", userName);
+                    startActivity(intent1);
                }
           });
 
           logoutBtn.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    Toast.makeText(SettingsActivity.this, "Logout Button clicked", Toast.LENGTH_SHORT).show();
+                    //TODO on click of this button, there will be alert dialog saying are you sure about
+                    // TODO logging out of the app? and if the user press yes then get the user to
+                    // TODO AuthActivity and finish all activity stack.
+                    initiateLogoutProcess();
                }
           });
 
+     }
+
+     private void initiateLogoutProcess() {
+          AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+          builder.setMessage("Are you sure you want to logout?");
+          builder.setPositiveButton("Yeah", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which) {
+                    firebaseAuth.signOut();
+//                       Intent intent = new Intent(SettingsActivity.this, AuthActivity.class);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(intent);
+               }
+          });
+          builder.setNegativeButton("No, I want to buy more", new DialogInterface.OnClickListener() {
+               @Override
+               public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+               }
+          });
+
+          AlertDialog dialog = builder.create();
+
+          dialog.show();
      }
 
      @Override

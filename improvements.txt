@@ -1,5 +1,7 @@
 AuthActivity
 
+	
+
 PreviousOrderFragment
 
 	//Add refresh feature (swipe up) in here
@@ -39,6 +41,9 @@ HomeFragment
 
 	// Add functionality with which i can manipulate prices of fruits 
 		Implementing this, i will have to implement connection snack bar and swipe down to refresh functionality
+
+	as the app starts for the first time without logged in, there are two progressbars running, one is of mainactivity and other is of homefragment, those are looking one just above the
+	other and really bad, fix it.
 
 CartFragment
 

@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:padding="10dp"
-    android:textSize="14sp"
     tools:text="ABCD"
+    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
     android:textColor="#000"
     android:spinnerMode="dialog" />

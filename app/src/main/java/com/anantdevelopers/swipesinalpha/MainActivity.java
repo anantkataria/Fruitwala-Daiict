@@ -13,6 +13,10 @@ package com.anantdevelopers.swipesinalpha;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentContainer;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -36,9 +40,10 @@ import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem2;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsAreHealthyActivity;
-import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsInNewsActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity.SettingsActivity;
+import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
+import com.google.android.gms.dynamic.IFragmentWrapper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -59,11 +64,20 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      private ArrayList<String> selectedFruitQtys, selectedFruitPrices;
 
      private BottomNavigationView bottomNavigationView;
+     private FragmentContainerView navHostFragment;
      private AppBarConfiguration appBarConfiguration;
 
      private boolean isSavingSuccessful = false;
 
      private ProgressBar progressBar;
+
+     private String userName = "User";
+     private String authPhone = "";
+//     private User user;
+
+     private interface afterDatabaseFetchingWorkInterface {
+          void afterFetch();
+     }
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
@@ -74,15 +88,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           isSavingSuccessful = intent.getBooleanExtra("isSavingSuccessful", false);
 
           progressBar = findViewById(R.id.progressBar);
-          progressBar.setVisibility(View.VISIBLE);
-          if(progressBar.getVisibility() == View.VISIBLE){
-               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-          }
-
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
+//          user = new User();
 
-          bottomNavigationView = findViewById(R.id.bottomNaigationView);
+
+          bottomNavigationView = findViewById(R.id.bottomNavigationView);
+          navHostFragment = findViewById(R.id.nav_host_fragment);
+
           appBarConfiguration = new AppBarConfiguration.Builder(
                   R.id.HomeFragment, R.id.CartFragment, R.id.PreviousOrdersFragment
           ).build();
@@ -92,6 +105,12 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           FirebaseAuth.AuthStateListener authStateListener = buildAuthStateListener();
           firebaseAuth.addAuthStateListener(authStateListener);
           receivedItems = new ArrayList<>();
+
+          progressBar.setVisibility(View.VISIBLE);
+          if(progressBar.getVisibility() == View.VISIBLE){
+               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+          }
+
      }
 
      FirebaseAuth.AuthStateListener buildAuthStateListener(){
@@ -103,43 +122,28 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     if(user != null){  //means user is signed in
-                         final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
-                         NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
-                         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-                         if(!isSavingSuccessful) {
-                              final String phoneNo = user.getPhoneNumber();
-                              databaseReference.child("halfWayExit").addListenerForSingleValueEvent(new ValueEventListener() {
-                                   @Override
-                                   public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        //enable progress bar in main activity while this is being checked.
-
-                                        //should rather use phone memory for seamless experience
-                                        if (dataSnapshot.child(phoneNo).exists()) {
-                                             Intent intent = new Intent(MainActivity.this, UserProfile.class);
-                                             intent.putExtra("authenticatedPhoneNumber", phoneNo);
-                                             startActivity(intent);
-                                             finish();
-                                        }
+                         authPhone = user.getPhoneNumber();
+                         checkInDatabase(new afterDatabaseFetchingWorkInterface() {
+                              @Override
+                              public void afterFetch() {
+                                   progressBar.setVisibility(View.GONE);
+                                   if (progressBar.getVisibility() == View.GONE) {
+                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                                    }
 
-                                   @Override
-                                   public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        //Toast.makeText(MainActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
-                                        Toast.makeText(MainActivity.this, "Something went really wrong!", Toast.LENGTH_SHORT).show();
-                                   }
-                              });
-                         }
-                         progressBar.setVisibility(View.GONE);
-                         if (progressBar.getVisibility() == View.GONE) {
-                              getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                         }
+                                   bottomNavigationView.setVisibility(View.VISIBLE);
+                                   navHostFragment.setVisibility(View.VISIBLE);
+                              }
+                         });
+
 
                     }
                     else{
                          //user is signed out
                          //navController.navigate(R.id.AuthFragment);   //this will inflate the fragment in navhostfragment and bottom navigation will still be accessible so instead i will create new auth activity.
                          Intent Authintent = new Intent(MainActivity.this, AuthActivity.class);
+                         Authintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                          startActivity(Authintent);
                          finish();
                     }
@@ -147,6 +151,69 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           };
 
           return authStateListener;
+     }
+
+     private void checkInDatabase(final afterDatabaseFetchingWorkInterface Interface) {
+          if(!isSavingSuccessful) {
+               //
+               databaseReference.child("halfWayExit").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                         //enable progress bar in main activity while this is being checked.
+
+                         //should rather use phone memory for seamless experience
+                         if (dataSnapshot.child(authPhone).exists()) {
+                              Intent intent = new Intent(MainActivity.this, UserProfile.class);
+                              intent.putExtra("authenticatedPhoneNumber", authPhone);
+                              startActivity(intent);
+                              finish();
+                         }
+                         else {
+                              final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
+                              NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
+                              NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+                              getUser();
+                         }
+
+                         //call the interface
+                         Interface.afterFetch();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                         //Toast.makeText(MainActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
+                         Toast.makeText(MainActivity.this, "Something went really wrong!", Toast.LENGTH_SHORT).show();
+                    }
+               });
+          }
+          else {
+               //final String phoneNumber = user.getPhoneNumber();
+               final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
+               NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
+               NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+               getUser();
+               Interface.afterFetch();
+          }
+
+     }
+
+     private void getUser() {
+          databaseReference.child("Users").child(authPhone).child("userName").addListenerForSingleValueEvent(
+                  new ValueEventListener() {
+                       @Override
+                       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                            user = dataSnapshot.getValue(User.class);
+                              userName = dataSnapshot.getValue(String.class);
+                       }
+
+                       @Override
+                       public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                       }
+                  }
+          );
      }
 
      @Override
@@ -179,23 +246,18 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      public boolean onOptionsItemSelected(@NonNull MenuItem item) {
           switch(item.getItemId()){
                case R.id.settings_dest:
-                    Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                    intent.putExtra("userName", userName);
+                    intent.putExtra("authPhone", authPhone);
                     startActivity(intent);
                     return true;
                case R.id.fruits_are_healthy_dest:
-                    Toast.makeText(this, "Fruits are healthy selected", Toast.LENGTH_SHORT).show();
                     Intent intent1 = new Intent(MainActivity.this, FruitsAreHealthyActivity.class);
                     startActivity(intent1);
                     return true;
-               case R.id.fruits_in_news:
-                    Toast.makeText(this, "Fruits in NEWS selected", Toast.LENGTH_SHORT).show();
-                    Intent intent2 = new Intent(MainActivity.this, FruitsInNewsActivity.class);
-                    startActivity(intent2);
-                    return true;
                case R.id.about_dest:
-                    Toast.makeText(this, "About selected", Toast.LENGTH_SHORT).show();
                     Intent intent3 = new Intent(MainActivity.this, AboutActivity.class);
+                    intent3.putExtra("userName", userName);
                     startActivity(intent3);
                     return true;
                default:

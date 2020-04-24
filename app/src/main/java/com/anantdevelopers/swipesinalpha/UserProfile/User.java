@@ -1,6 +1,9 @@
 package com.anantdevelopers.swipesinalpha.UserProfile;
 
-public class User {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class User implements Parcelable {
      private String building;
      private String phoneNum1;
      private String phoneNum2;
@@ -20,6 +23,27 @@ public class User {
      public User(){
 
      }
+
+     protected User(Parcel in) {
+          building = in.readString();
+          phoneNum1 = in.readString();
+          phoneNum2 = in.readString();
+          room = in.readString();
+          userName = in.readString();
+          wing = in.readString();
+     }
+
+     public static final Creator<User> CREATOR = new Creator<User>() {
+          @Override
+          public User createFromParcel(Parcel in) {
+               return new User(in);
+          }
+
+          @Override
+          public User[] newArray(int size) {
+               return new User[size];
+          }
+     };
 
      public String getBuilding() {
           return building;
@@ -67,5 +91,20 @@ public class User {
 
      public void setWing(String wing) {
           this.wing = wing;
+     }
+
+     @Override
+     public int describeContents() {
+          return 0;
+     }
+
+     @Override
+     public void writeToParcel(Parcel dest, int flags) {
+          dest.writeString(building);
+          dest.writeString(phoneNum1);
+          dest.writeString(phoneNum2);
+          dest.writeString(room);
+          dest.writeString(userName);
+          dest.writeString(wing);
      }
 }

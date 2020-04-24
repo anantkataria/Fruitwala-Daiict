@@ -14,10 +14,10 @@
         <item>F</item>
         <item>G</item>
         <item>H</item>
-        <item>FB1</item>
-        <item>FB2</item>
-        <item>FB3</item>
-        <item>FB4</item>
+        <item>FB-1</item>
+        <item>FB-2</item>
+        <item>FB-3</item>
+        <item>FB-4</item>
     </string-array>
 
     <string-array name="quantityTypesForBananas">//we will have one reference price in database (for
