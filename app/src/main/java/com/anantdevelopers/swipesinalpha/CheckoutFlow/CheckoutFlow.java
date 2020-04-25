@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -32,7 +31,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class CheckoutFlow extends AppCompatActivity {
 
@@ -56,6 +58,8 @@ public class CheckoutFlow extends AppCompatActivity {
      private ArrayList<FruitItem> fruits;
 
      private int paymentMethodNumber = 0; //should either be 1 or 2  1-indicates upi payment, 2-indicates cod payment
+
+     //private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
@@ -200,6 +204,10 @@ public class CheckoutFlow extends AppCompatActivity {
                     checkoutUser.setUser(userDetails);
                     checkoutUser.setPaymentMethod(paymentMethod);
                     checkoutUser.setStatus(INITIAL_ORDER_STATUS);
+                    //Date date = new Date();
+                    long unixTime = System.currentTimeMillis();
+                    checkoutUser.setOrderPlacedDate(unixTime+"");
+                    checkoutUser.setOrderDeliveredOrCancelledDate("N/A");
 
                     String key = databaseReference.child("Orders").child(authPhoneNumber).push().getKey();
                     checkoutUser.setFirebaseDatabaseKey(key);
