@@ -95,23 +95,26 @@ public class HomeFragment extends Fragment {
                     // now for each fruit, make a new FruitItem2 object and add it in the
                     // fruits arraylist.
 
-                    for(DataSnapshot d : dataSnapshot.getChildren()){
-                         FruitItem2 newFruit = new FruitItem2();
-                         ArrayList<String> quantities = new ArrayList<>();
-                         ArrayList<String> prices = new ArrayList<>();
+                    if(fruits.isEmpty()) {
 
-                         newFruit.setFruitName(d.getKey());
-                         newFruit.setAvailability(d.child("Availability").getValue(String.class));
-                         for(DataSnapshot d1: d.child("qty").getChildren()){
-                              quantities.add(d1.getValue(String.class));
-                         }
-                         for(DataSnapshot d2: d.child("prices").getChildren()){
-                              prices.add(d2.getValue(String.class));
-                         }
-                         newFruit.setQuantities(quantities);
-                         newFruit.setPrices(prices);
+                         for (DataSnapshot d : dataSnapshot.getChildren()) {
+                              FruitItem2 newFruit = new FruitItem2();
+                              ArrayList<String> quantities = new ArrayList<>();
+                              ArrayList<String> prices = new ArrayList<>();
 
-                         fruits.add(newFruit);
+                              newFruit.setFruitName(d.getKey());
+                              newFruit.setAvailability(d.child("Availability").getValue(String.class));
+                              for (DataSnapshot d1 : d.child("qty").getChildren()) {
+                                   quantities.add(d1.getValue(String.class));
+                              }
+                              for (DataSnapshot d2 : d.child("prices").getChildren()) {
+                                   prices.add(d2.getValue(String.class));
+                              }
+                              newFruit.setQuantities(quantities);
+                              newFruit.setPrices(prices);
+
+                              fruits.add(newFruit);
+                         }
                     }
 
                     fruitsInterface.afterFetching();

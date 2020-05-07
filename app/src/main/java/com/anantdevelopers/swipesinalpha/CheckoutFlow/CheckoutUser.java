@@ -63,7 +63,7 @@ public class CheckoutUser implements Parcelable {
           return status;
      }
 
-     void setStatus(String status) {
+     public void setStatus(String status) {
           this.status = status;
      }
 

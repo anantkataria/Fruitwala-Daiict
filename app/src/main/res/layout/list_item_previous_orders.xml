@@ -10,6 +10,7 @@
     <!--    what we need to show is fruit -> qty pairs and grandtotal-->
     <TextView
         android:id="@+id/listOfFruitsTextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:text="Apple, 1kg, 100 Rs.\nBananas, 1kg, 50 Rs.\nOranges, 1kg, 80 Rs."
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -18,9 +19,9 @@
 
     <TextView
         android:id="@+id/grandTotalTextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:text="GrandTotal : 230 Rs."
         android:gravity="end"
-        android:textSize="16sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -30,19 +31,19 @@
         android:orientation="horizontal">
 
         <TextView
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="STATUS : "
             android:layout_marginStart="8dp"
-            android:textSize="16sp"
             android:layout_weight="0"/>
 
         <TextView
             android:id="@+id/PreviousOrderStatus"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             tools:text="ORDER DELIVERED"
             android:textColor="@android:color/holo_green_dark"
             android:layout_weight="1"
-            android:textSize="16sp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
 
@@ -52,7 +53,7 @@
         android:id="@+id/orderAgainButton"
         android:text="Order Again?"
         android:layout_width="match_parent"
-        android:layout_height="36dp"/>
+        android:layout_height="wrap_content"/>
 
 <!--    add a review system, or rating the delivery system-->
 

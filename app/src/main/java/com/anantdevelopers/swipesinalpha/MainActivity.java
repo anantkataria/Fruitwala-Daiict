@@ -13,9 +13,6 @@ package com.anantdevelopers.swipesinalpha;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentContainer;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -41,9 +38,8 @@ import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsAreHealthyActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity.SettingsActivity;
-import com.anantdevelopers.swipesinalpha.UserProfile.User;
+import com.anantdevelopers.swipesinalpha.StoreClosed.StoreClosedActivity;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
-import com.google.android.gms.dynamic.IFragmentWrapper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -77,6 +73,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
      private interface afterDatabaseFetchingWorkInterface {
           void afterFetch();
+     }
+
+     private interface afterOpenOrClosedCheckedInterface {
+          void afterChecked(boolean isOpen, String openingAgainTimeString);
      }
 
      @Override
@@ -124,6 +124,22 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     if(user != null){  //means user is signed in
 
                          authPhone = user.getPhoneNumber();
+
+                         checkThatStoreIsOpenOrClose(new afterOpenOrClosedCheckedInterface() {
+                              @Override
+                              public void afterChecked(boolean isOpen, String openingAgainTimeString) {
+                                   if(!isOpen){
+                                        //store is supposed to be closed so launch store closed activity
+                                        // and clear the back stack
+                                        Intent intent = new Intent(MainActivity.this, StoreClosedActivity.class);
+                                        intent.putExtra("openingAgainTimeString", openingAgainTimeString);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
+                                   }
+                                   //other wise everything continues normal, because store is open
+                              }
+                         });
+
                          checkInDatabase(new afterDatabaseFetchingWorkInterface() {
                               @Override
                               public void afterFetch() {
@@ -151,6 +167,23 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           };
 
           return authStateListener;
+     }
+
+     private void checkThatStoreIsOpenOrClose(final afterOpenOrClosedCheckedInterface Interface) {
+          databaseReference.child("OpenOrClose").addValueEventListener(new ValueEventListener() {
+               @Override
+               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    boolean isOpen = dataSnapshot.child("isOpen").getValue(Boolean.class);
+                    String openingAgainTimeString = dataSnapshot.child("openingAgainTime").getValue(String.class);
+
+                    Interface.afterChecked(isOpen, openingAgainTimeString);
+               }
+
+               @Override
+               public void onCancelled(@NonNull DatabaseError databaseError) {
+
+               }
+          });
      }
 
      private void checkInDatabase(final afterDatabaseFetchingWorkInterface Interface) {
