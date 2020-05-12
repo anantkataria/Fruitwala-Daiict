@@ -16,6 +16,8 @@ public class StoreClosedActivity extends AppCompatActivity {
      private TextView openingAgainTimeTextView;
      private Button feedbackButton;
 
+     private String authPhone;
+
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
@@ -23,6 +25,7 @@ public class StoreClosedActivity extends AppCompatActivity {
 
           Intent intent = getIntent();
           String openingAgainTimeString = intent.getStringExtra("openingAgainTimeString");
+          authPhone = intent.getStringExtra("authPhone");
 
           openingAgainTimeTextView = findViewById(R.id.open_again_time_text_view);
           feedbackButton = findViewById(R.id.feedback_btn);
@@ -33,6 +36,7 @@ public class StoreClosedActivity extends AppCompatActivity {
                @Override
                public void onClick(View v) {
                     Intent intent1 = new Intent(StoreClosedActivity.this, FeedbackActivity.class);
+                    intent1.putExtra("authPhone", authPhone);
                     startActivity(intent1);
                }
           });

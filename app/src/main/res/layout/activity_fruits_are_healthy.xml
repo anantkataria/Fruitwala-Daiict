@@ -4,19 +4,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="8dp"
     tools:context=".OptionsMenuResources.FruitsAreHealthyActivity">
 
-    <WebView
-        android:id="@+id/web_view"
-        android:layout_below="@id/progress_bar"
+    <RelativeLayout
+        android:id="@+id/main_layout"
+        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <WebView
+            android:id="@+id/web_view"
+            android:layout_below="@id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:progress="100"
+            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
 
     <ProgressBar
-        android:id="@+id/progress_bar"
-        android:progress="100"
+        android:id="@+id/progress_bar_main"
         android:layout_centerInParent="true"
-        android:layout_alignParentTop="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

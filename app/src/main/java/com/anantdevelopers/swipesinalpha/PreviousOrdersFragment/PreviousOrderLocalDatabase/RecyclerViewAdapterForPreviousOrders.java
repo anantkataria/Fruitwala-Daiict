@@ -44,6 +44,10 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
           //todo implement better than notifydatasetchanged from coding in flow
      }
 
+     public PreviousOrderEntity getOrderAtPosition(int position) {
+          return previousOrders.get(position);
+     }
+
      static class ViewHolder extends RecyclerView.ViewHolder {
           private TextView listOfFruitsTextView;
           private TextView statusTextView;

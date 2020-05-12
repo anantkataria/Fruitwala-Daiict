@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,6 @@ import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,11 +51,9 @@ import static android.view.View.GONE;
 
 public class PreviousOrdersFragment extends Fragment {
 
-     private RecyclerView currentOrdersRecyclerView, previousOrdersRecyclerView;
+     private RecyclerView currentOrdersRecyclerView;
 
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
-     private FirebaseAuth firebaseAuth;
 
      private ArrayList<CheckoutUser> currentOrdersList;
      private ArrayList<CheckoutUser> previousOrdersList; //for local database
@@ -69,12 +65,13 @@ public class PreviousOrdersFragment extends Fragment {
      private TextView noPreviousOrdersTextView;
 
      private RecyclerViewAdapterForCurrentOrders adapterForCurrentOrders;
-
-     private View v;
+     private RecyclerViewAdapterForPreviousOrders adapter;
 
      private PreviousOrderViewModel previousOrderViewModel;
 
      private ValueEventListener valueEventListener;
+
+     private String authPhoneNumber;
 
      public PreviousOrdersFragment() {
           // Required empty public constructor
@@ -92,9 +89,11 @@ public class PreviousOrdersFragment extends Fragment {
      public void onCreate(@Nullable Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
 
-          firebaseDatabase = FirebaseDatabase.getInstance();
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
-          firebaseAuth = FirebaseAuth.getInstance();
+          FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
+          authPhoneNumber = firebaseAuth.getCurrentUser().getPhoneNumber();
 
           currentOrdersList = new ArrayList<>();
           previousOrdersList = new ArrayList<>();
@@ -106,7 +105,8 @@ public class PreviousOrdersFragment extends Fragment {
      public View onCreateView(LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState) {
           // Inflate the layout for this fragment
-          v = inflater.inflate(R.layout.fragment_previous_orders, container, false);
+          View v = inflater.inflate(R.layout.fragment_previous_orders, container, false);
+
           currentOrderAffairs(v);
           previousOrderAffairs(v);
           return v;
@@ -115,21 +115,21 @@ public class PreviousOrdersFragment extends Fragment {
      @Override
      public void onDestroy() {
           super.onDestroy();
-          String authPhoneNumber = firebaseAuth.getCurrentUser().getPhoneNumber();
           databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeEventListener(valueEventListener);
      }
+
+
 
      private void previousOrderAffairs(View v) {
           previousOrderProgressBar = v.findViewById(R.id.previousOrdersProgressBar);
           noPreviousOrdersTextView = v.findViewById(R.id.noPreviousOrdersTextView);
 
-          previousOrdersRecyclerView = v.findViewById(R.id.previousOrdersRecyclerView);
-          final RecyclerViewAdapterForPreviousOrders adapter = new RecyclerViewAdapterForPreviousOrders();
+          RecyclerView previousOrdersRecyclerView = v.findViewById(R.id.previousOrdersRecyclerView);
+          adapter = new RecyclerViewAdapterForPreviousOrders();
 
           //setting the recycler view
           previousOrdersRecyclerView.setAdapter(adapter);
           previousOrdersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
 
           previousOrderViewModel.getAllPreviousOrders().observe(getViewLifecycleOwner(), new Observer<List<PreviousOrderEntity>>() {
                @Override
@@ -146,12 +146,12 @@ public class PreviousOrdersFragment extends Fragment {
                }
           });
 
+
+
           fetchPreviousOrders(new LocalDatabaseCallbackInterface() {
                @Override
                public void fromOnChildManipulated(ArrayList<CheckoutUser> previousOrdersList) {
-//                    Log.e("fetchPreviousOrders", "previousOrdersList.size() = " + previousOrdersList.size());
                     ArrayList<PreviousOrderEntity> ordersToAddInRoom = new ArrayList<>();
-//                    int i = 0;
                     for(CheckoutUser u : previousOrdersList){
                          String orderFruitList = "";
                          String status = "";
@@ -177,8 +177,6 @@ public class PreviousOrdersFragment extends Fragment {
 //                    Log.e("afterInserting" ,  "i = " + i);
                     previousOrderProgressBar.setVisibility(GONE);
 
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
-                    String authPhoneNumber = user.getPhoneNumber();
 
                     databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeValue();
                }
@@ -191,8 +189,6 @@ public class PreviousOrdersFragment extends Fragment {
           //   are any then first remove them from the database and add them in the shared
           //   preferences
           //2) fetch orders from the shared preferences (if there are any)
-          FirebaseUser user = firebaseAuth.getCurrentUser();
-          String authPhoneNumber = user.getPhoneNumber();
 
           previousOrderProgressBar.setVisibility(View.VISIBLE);
 
@@ -207,7 +203,6 @@ public class PreviousOrdersFragment extends Fragment {
                               //Log.e("fetchPreOrders" , ""+data.getValue());
                          }
 
-                         //todo update the room database
                          Interface.fromOnChildManipulated(previousOrdersList);
 
                     }
@@ -278,8 +273,6 @@ public class PreviousOrdersFragment extends Fragment {
                               currentOrderProgressBar.setVisibility(View.VISIBLE);
                               String firebaseKey = currentOrderDetails.getFirebaseDatabaseKey();
 
-                              String authPhoneNumber = firebaseAuth.getCurrentUser().getPhoneNumber();
-
                               databaseReference.child("Orders").child(authPhoneNumber).child(firebaseKey).setValue(currentOrderDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                                    @Override
                                    public void onSuccess(Void aVoid) {
@@ -309,7 +302,6 @@ public class PreviousOrdersFragment extends Fragment {
      }
 
      private void changeStatusInDatabase(String firebaseKey, CheckoutUser currentOrderDetails) {
-          String authPhoneNumber = firebaseAuth.getCurrentUser().getPhoneNumber();
 
           databaseReference.child("Users").child(authPhoneNumber).child(firebaseKey).setValue(currentOrderDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                @Override
@@ -327,9 +319,6 @@ public class PreviousOrdersFragment extends Fragment {
      }
 
      private void fetchCurrentOrders(final DatabaseCallbackInterface Interface) {
-
-          FirebaseUser user = firebaseAuth.getCurrentUser();
-          String authPhoneNumber = user.getPhoneNumber();
 
           currentOrderProgressBar.setVisibility(View.VISIBLE);
 

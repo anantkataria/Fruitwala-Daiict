@@ -36,7 +36,6 @@ public class FeedbackActivity extends AppCompatActivity {
 
      private EditText concernEditText;
      private ImageView imageView1, imageView2, imageView3;
-     private Button nextButton;
      private ScrollView scrollView;
      private ProgressBar progressBar;
 
@@ -44,12 +43,10 @@ public class FeedbackActivity extends AppCompatActivity {
      private static final int REQUEST_IMAGE2_GET = 2;
      private static final int REQUEST_IMAGE3_GET = 3;
 
-     private ArrayList<Uri> uris;
      private Uri uri1, uri2, uri3;
 
      private String authPhone;
 
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
 
      private User user;
@@ -70,26 +67,19 @@ public class FeedbackActivity extends AppCompatActivity {
           Intent intent = getIntent();
           authPhone = intent.getStringExtra("authPhone");
 
-          firebaseDatabase = FirebaseDatabase.getInstance();
-          databaseReference = firebaseDatabase.getReference();
-
           user = new User();
 
           concernEditText = findViewById(R.id.concern_edit_text);
           imageView1 = findViewById(R.id.image1_image_view);
           imageView2 = findViewById(R.id.image2_image_view);
           imageView3 = findViewById(R.id.image3_image_view);
-          nextButton = findViewById(R.id.next_button);
+          Button nextButton = findViewById(R.id.next_button);
           scrollView = findViewById(R.id.scroll_view);
           progressBar = findViewById(R.id.progress_bar);
-
-          uris = new ArrayList<>();
-
 
           imageView1.setOnClickListener(new View.OnClickListener() {
                        @Override
                        public void onClick(View v) {
-                            //todo make user choose photo or screenshot from gallery
                             selectImage1();
                        }
                   });
@@ -105,6 +95,48 @@ public class FeedbackActivity extends AppCompatActivity {
                @Override
                public void onClick(View v) {
                     selectImage3();
+               }
+          });
+
+          imageView1.setOnLongClickListener(new View.OnLongClickListener() {
+               @Override
+               public boolean onLongClick(View v) {
+                    if(uri1 != null){
+                         uri1 = null;
+                         imageView1.setImageResource(R.drawable.ic_add);
+                         return true;
+                    }
+                    else {
+                         return false;
+                    }
+               }
+          });
+
+          imageView2.setOnLongClickListener(new View.OnLongClickListener() {
+               @Override
+               public boolean onLongClick(View v) {
+                    if(uri2 != null){
+                         uri2 = null;
+                         imageView2.setImageResource(R.drawable.ic_add);
+                         return true;
+                    }
+                    else {
+                         return false;
+                    }
+               }
+          });
+
+          imageView3.setOnLongClickListener(new View.OnLongClickListener() {
+               @Override
+               public boolean onLongClick(View v) {
+                    if(uri3 != null){
+                         uri3 = null;
+                         imageView3.setImageResource(R.drawable.ic_add);
+                         return true;
+                    }
+                    else {
+                         return false;
+                    }
                }
           });
 
@@ -158,6 +190,7 @@ public class FeedbackActivity extends AppCompatActivity {
      }
 
      private void getUserFromDatabase(final fetchFromDatabase Interface) {
+          databaseReference = FirebaseDatabase.getInstance().getReference();
           databaseReference.child("Users").child(authPhone).addListenerForSingleValueEvent(new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

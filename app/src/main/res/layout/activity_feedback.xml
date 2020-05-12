@@ -1,90 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    android:id="@+id/scroll_view"
-    android:layout_height="match_parent"
+
+<RelativeLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            tools:context=".OptionsMenuResources.AboutActivity">
+
+            <TextView
+                android:id="@+id/first_line_text_view"
+                android:text="Tell us how can we Improve?"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:gravity="center"
+                android:textColor="@android:color/holo_green_dark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/concern_edit_text"
+                android:layout_below="@+id/first_line_text_view"
+                android:layout_width="match_parent"
+                android:layout_marginTop="16dp"
+                android:layout_height="wrap_content"
+                android:lines="10"
+                android:hint="We take your concerns seriously and will reply as soon as possible"
+                />
+
+            <TextView
+                android:id="@+id/add_screenshots_text_view"
+                android:layout_below="@id/concern_edit_text"
+                android:layout_marginTop="32dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add photos (optional)"
+                android:textColor="@android:color/holo_green_dark"/>
+
+            <ImageView
+                android:id="@+id/image1_image_view"
+                android:layout_below="@id/add_screenshots_text_view"
+                android:background="@drawable/ic_add"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:contentDescription="TODO" />
+
+            <ImageView
+                android:id="@+id/image2_image_view"
+                android:layout_toEndOf="@+id/image1_image_view"
+                android:layout_below="@id/add_screenshots_text_view"
+                android:layout_marginStart="8dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/ic_add"
+                android:layout_marginTop="16dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"/>
+
+            <ImageView
+                android:id="@+id/image3_image_view"
+                android:layout_below="@id/add_screenshots_text_view"
+                android:layout_marginStart="8dp"
+                android:scaleType="centerCrop"
+                android:layout_toEndOf="@id/image2_image_view"
+                android:background="@drawable/ic_add"
+                android:layout_marginTop="16dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"/>
+
+            <TextView
+                android:id="@+id/hardcoded_text_view"
+                android:layout_below="@+id/image3_image_view"
+                android:layout_marginStart="8dp"
+                android:text="Long press on image to remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:visibility="gone"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/next_button"
+        android:layout_marginTop="32dp"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        tools:context=".OptionsMenuResources.AboutActivity">
+        android:text="Next"/>
 
-        <TextView
-            android:id="@+id/first_line_text_view"
-            android:text="Tell us how can we Improve?"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:gravity="center"
-            android:textColor="@android:color/holo_green_dark"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <EditText
-            android:id="@+id/concern_edit_text"
-            android:layout_below="@+id/first_line_text_view"
-            android:layout_width="match_parent"
-            android:layout_marginTop="16dp"
-            android:layout_height="wrap_content"
-            android:lines="10"
-            android:hint="We take your concerns seriously and will reply as soon as possible"
-            />
-
-        <TextView
-            android:id="@+id/add_screenshots_text_view"
-            android:layout_below="@id/concern_edit_text"
-            android:layout_marginTop="32dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add photos (optional)"
-            android:textColor="@android:color/holo_green_dark"/>
-
-        <ImageView
-            android:id="@+id/image1_image_view"
-            android:layout_below="@id/add_screenshots_text_view"
-            android:background="@drawable/ic_add"
-            android:layout_marginTop="16dp"
-            android:scaleType="centerCrop"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:contentDescription="TODO" />
-
-        <ImageView
-            android:id="@+id/image2_image_view"
-            android:layout_toEndOf="@+id/image1_image_view"
-            android:layout_below="@id/add_screenshots_text_view"
-            android:layout_marginStart="8dp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/ic_add"
-            android:layout_marginTop="16dp"
-            android:layout_width="70dp"
-            android:layout_height="70dp"/>
-
-        <ImageView
-            android:id="@+id/image3_image_view"
-            android:layout_below="@id/add_screenshots_text_view"
-            android:layout_marginStart="8dp"
-            android:scaleType="centerCrop"
-            android:layout_toEndOf="@id/image2_image_view"
-            android:background="@drawable/ic_add"
-            android:layout_marginTop="16dp"
-            android:layout_width="70dp"
-            android:layout_height="70dp"/>
-
-        <Button
-            android:id="@+id/next_button"
-            android:layout_marginTop="32dp"
-            android:layout_below="@id/image3_image_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Next"/>
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:visibility="gone"
-            android:layout_centerInParent="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-    </RelativeLayout>
-</ScrollView>
+</RelativeLayout>

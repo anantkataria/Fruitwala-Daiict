@@ -14,10 +14,12 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +27,7 @@ import com.anantdevelopers.swipesinalpha.CheckoutFlow.CheckoutFlow;
 import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapterForCartfragment;
 import com.anantdevelopers.swipesinalpha.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -34,7 +37,8 @@ public class CartFragment extends Fragment {
 
      private RecyclerViewAdapterForCartfragment adapter;
 
-     private TextView grandTotal;
+     private TextView grandTotal, swipeToDeleteTextView;
+     private RelativeLayout parentLayout;
 
      private OnFragmentInteractionListener mListener;
 
@@ -53,6 +57,12 @@ public class CartFragment extends Fragment {
                               Bundle savedInstanceState) {
           View v = inflater.inflate(R.layout.fragment_cart, container, false);
           grandTotal = v.findViewById(R.id.grand_total_text);
+          swipeToDeleteTextView = v.findViewById(R.id.hardcoded_text_view);
+          parentLayout = v.findViewById(R.id.parent_layout);
+
+          if(!fruits.isEmpty()){
+               swipeToDeleteTextView.setVisibility(View.VISIBLE);
+          }
 
           countGrandTotal();
 
@@ -87,11 +97,42 @@ public class CartFragment extends Fragment {
 
           @Override
           public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-               fruits.remove(viewHolder.getAdapterPosition());
+               int position = viewHolder.getAdapterPosition();
+               FruitItem fruitItem = fruits.get(position);
+               fruits.remove(position);
                countGrandTotal();
-               adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+               adapter.notifyItemRemoved(position);
+               showSnackbar(position, fruitItem);
+
+               if(fruits.isEmpty()){
+                    swipeToDeleteTextView.setVisibility(View.GONE);
+               }
           }
      };
+
+     public class MyUndoListener implements View.OnClickListener {
+
+          private int position;
+          private FruitItem fruit;
+
+          MyUndoListener(int position, FruitItem fruitItem){
+               this.position = position;
+               this.fruit = fruitItem;
+          }
+
+          @Override
+          public void onClick(View v) {
+               fruits.add(position, fruit);
+               adapter.notifyItemInserted(position);
+               countGrandTotal();
+          }
+     }
+
+     private void showSnackbar(int position, FruitItem fruit) {
+          Snackbar mySnackbar = Snackbar.make(parentLayout, "1 Item removed", Snackbar.LENGTH_SHORT);
+          mySnackbar.setAction("undo", new MyUndoListener(position, fruit));
+          mySnackbar.show();
+     }
 
      @Override
      public void onAttach(Context context) {

@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                                         // and clear the back stack
                                         Intent intent = new Intent(MainActivity.this, StoreClosedActivity.class);
                                         intent.putExtra("openingAgainTimeString", openingAgainTimeString);
+                                        intent.putExtra("authPhone", authPhone);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);
                                    }
