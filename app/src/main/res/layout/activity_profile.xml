@@ -6,7 +6,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
     tools:context=".OptionsMenuResources.SettingsActivity.ProfileActivity">
 
     <ScrollView
@@ -21,12 +20,17 @@
 
             <TextView
                 android:text="Name"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <EditText
                 android:id="@+id/name_edit_text"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
@@ -34,6 +38,8 @@
 
             <TextView
                 android:layout_width="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -42,18 +48,24 @@
             <EditText
                 android:id="@+id/phone1_edit_text"
                 android:layout_width="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"/>
 
             <TextView
                 android:text="Phone-2"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <EditText
                 android:id="@+id/phone2_edit_text"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:inputType="phone"
                 android:gravity="center_horizontal"
                 android:textColor="@android:color/black"
@@ -62,6 +74,8 @@
 
             <TextView
                 android:text="Building"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
@@ -70,13 +84,13 @@
             <Spinner
                 android:id="@+id/building_selection_spinner"
                 android:layout_width="wrap_content"
-
                 android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
                 android:layout_height="wrap_content"/>
 
             <TextView
                 android:text="Address"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
@@ -132,7 +146,10 @@
 
     <Button
         android:id="@+id/save_changes_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
         android:text="Save Changes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

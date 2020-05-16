@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,9 +43,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.view.View.GONE;
 
@@ -72,6 +77,7 @@ public class PreviousOrdersFragment extends Fragment {
      private ValueEventListener valueEventListener;
 
      private String authPhoneNumber;
+     private String token;
 
      public PreviousOrdersFragment() {
           // Required empty public constructor
@@ -99,6 +105,18 @@ public class PreviousOrdersFragment extends Fragment {
           previousOrdersList = new ArrayList<>();
 
           previousOrderViewModel = new ViewModelProvider(this).get(PreviousOrderViewModel.class);
+
+          getToken();
+     }
+
+     private void getToken() {
+          FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+               @Override
+               public void onSuccess(InstanceIdResult instanceIdResult) {
+                    token = instanceIdResult.getToken();
+                    Log.e("6969", "token = " + token);
+               }
+          });
      }
 
      @Override
@@ -199,7 +217,7 @@ public class PreviousOrdersFragment extends Fragment {
                          previousOrdersList.clear();
 
                          for(DataSnapshot data: dataSnapshot.getChildren()){
-                              previousOrdersList.add(data.getValue(CheckoutUser.class));
+                              previousOrdersList.add(data.child("Order").getValue(CheckoutUser.class));
                               //Log.e("fetchPreOrders" , ""+data.getValue());
                          }
 
@@ -273,11 +291,14 @@ public class PreviousOrdersFragment extends Fragment {
                               currentOrderProgressBar.setVisibility(View.VISIBLE);
                               String firebaseKey = currentOrderDetails.getFirebaseDatabaseKey();
 
-                              databaseReference.child("Orders").child(authPhoneNumber).child(firebaseKey).setValue(currentOrderDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                              Map<String, Object> map = new HashMap<>();
+                              map.put( "/Orders/" + authPhoneNumber + "/" + firebaseKey, currentOrderDetails);
+                              map.put("/tokens/" + authPhoneNumber, token);
+
+                              databaseReference.updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                    @Override
                                    public void onSuccess(Void aVoid) {
                                         currentOrderProgressBar.setVisibility(GONE);
-
                                         Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_SHORT).show();
                                    }
                               }).addOnFailureListener(new OnFailureListener() {

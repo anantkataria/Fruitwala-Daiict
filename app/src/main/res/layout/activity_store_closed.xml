@@ -1,50 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+
+<RelativeLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="16dp"
-    tools:context=".StoreClosed.StoreClosedActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <TextView
-        android:id="@+id/hardcoded_text_view_1"
+    <ScrollView
+        android:layout_above="@id/feedback_btn"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/almendra_sc"
-        android:gravity="center"
-        android:text="Closed Today"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="50sp" />
+        xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <TextView
-        android:id="@+id/hardcoded_text_view_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/hardcoded_text_view_1"
-        android:layout_marginTop="32dp"
-        android:fontFamily="@font/roboto_italic"
-        android:gravity="center"
-        android:text="We are extremely sorry for the inconvenience"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        <RelativeLayout
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".StoreClosed.StoreClosedActivity">
 
-    <TextView
-        android:id="@+id/open_again_time_text_view"
-        android:layout_below="@+id/hardcoded_text_view_2"
-        android:layout_marginTop="32dp"
-        android:fontFamily="@font/roboto_italic"
-        android:textColor="@android:color/holo_green_dark"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:hint="Services will be resumed from tomorrow as normal"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/hardcoded_text_view_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/almendra_sc"
+                android:gravity="center"
+                android:text="Closed Today"
+                android:textColor="@android:color/holo_red_light"
+                android:textSize="50sp" />
+
+            <TextView
+                android:id="@+id/hardcoded_text_view_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/hardcoded_text_view_1"
+                android:layout_marginTop="32dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/roboto_italic"
+                android:gravity="center"
+                android:text="We are extremely sorry for the inconvenience"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+            <TextView
+                android:id="@+id/open_again_time_text_view"
+                android:layout_below="@+id/hardcoded_text_view_2"
+                android:layout_marginTop="32dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/roboto_italic"
+                android:textColor="@android:color/holo_green_dark"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:hint="Services will be resumed from tomorrow as normal"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
 
     <Button
-        android:id="@+id/feedback_btn"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
+        android:id="@+id/feedback_btn"
         android:text="feedback / queries"
-        android:layout_width="match_parent"
+        android:layout_centerHorizontal="true"
+        android:paddingStart="64dp"
+        android:paddingEnd="64dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
 </RelativeLayout>

@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,10 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class CheckoutFlow extends AppCompatActivity {
 
@@ -43,17 +41,14 @@ public class CheckoutFlow extends AppCompatActivity {
      private static final String UPI_PAYMENT = "upiPayment";
      private static final String INITIAL_ORDER_STATUS = "ORDER PROCESSING";
 
-     private Button payWithUpiButton, codButton, placeOrderButton;
-
      private ProgressBar progressBar;
-
      private TextView progressBarTextView;
+     private ImageView upiCheckImage, codCheckImage;
 
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
      private FirebaseAuth firebaseAuth;
 
-     private String grandTotal, grandTotalPrice;  //grandTotal will be of form "Rs. 300", and grandTotalPrice will be of form "300"
+     private String grandTotalPrice;  //grandTotal will be of form "Rs. 300", and grandTotalPrice will be of form "300"
 
      private ArrayList<FruitItem> fruits;
 
@@ -68,26 +63,30 @@ public class CheckoutFlow extends AppCompatActivity {
 
           Intent intent = getIntent();
           fruits = intent.getParcelableArrayListExtra("Fruits");
-          grandTotal = intent.getStringExtra("grandTotal");
+          String grandTotal = intent.getStringExtra("grandTotal");
 
           grandTotalPrice = grandTotal.replaceAll("[Rs.\\s]", "");
           Log.e("CheckoutFlow", "grandTotalPrice = " + grandTotalPrice);
 
-          payWithUpiButton = findViewById(R.id.upiPaymentButton);
-          codButton = findViewById(R.id.codButton);
-          placeOrderButton = findViewById(R.id.placeOrderButton);
+          Button payWithUpiButton = findViewById(R.id.upiPaymentButton);
+          final Button codButton = findViewById(R.id.codButton);
+          Button placeOrderButton = findViewById(R.id.placeOrderButton);
           progressBar = findViewById(R.id.progressBar);
           progressBarTextView = findViewById(R.id.progressBarTextView);
+          upiCheckImage = findViewById(R.id.upiCheckImage);
+          codCheckImage = findViewById(R.id.codCheckImage);
 
           firebaseAuth = FirebaseAuth.getInstance();
 
-          firebaseDatabase = FirebaseDatabase.getInstance();
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
 
           payWithUpiButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
                     paymentMethodNumber = 1;
+                    upiCheckImage.setVisibility(View.VISIBLE);
+                    codCheckImage.setVisibility(View.INVISIBLE);
                }
           });
 
@@ -95,6 +94,8 @@ public class CheckoutFlow extends AppCompatActivity {
                @Override
                public void onClick(View v) {
                     paymentMethodNumber = 2;
+                    codCheckImage.setVisibility(View.VISIBLE);
+                    upiCheckImage.setVisibility(View.INVISIBLE);
                }
           });
 

@@ -8,51 +8,77 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:visibility="invisible"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/progressBarTextView"
-        android:layout_marginTop="32dp"
-        android:visibility="invisible"
-        android:layout_below="@id/progressBar"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="20sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/progressBar"
+        android:layout_marginTop="32dp"
+        android:gravity="center_horizontal"
         android:text="Sending Your Order..."
-        android:gravity="center_horizontal"/>
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="20sp"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/amountDisplayTextView"
-        android:paddingBottom="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:text="Pay Using"
-        android:textSize="30sp"/>
+        android:textSize="30sp" />
 
     <Button
         android:id="@+id/upiPaymentButton"
-        android:layout_below="@+id/amountDisplayTextView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pay using UPI"
-        />
+        android:layout_below="@+id/amountDisplayTextView"
+        android:layout_margin="8dp"
+        android:text="Pay using UPI" />
 
     <Button
         android:id="@+id/codButton"
-        android:layout_below="@+id/upiPaymentButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="cash on delivery"/>
+        android:layout_below="@+id/upiPaymentButton"
+        android:layout_margin="8dp"
+        android:text="cash on delivery" />
+
+    <ImageView
+        android:id="@+id/upiCheckImage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/amountDisplayTextView"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/ic_check"
+        android:visibility="invisible" />
 
     <Button
         android:id="@+id/placeOrderButton"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="place order"/>
+        android:text="place order" />
+
+    <ImageView
+        android:id="@+id/codCheckImage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/upiPaymentButton"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/ic_check"
+        android:visibility="invisible" />
 
 </RelativeLayout>
