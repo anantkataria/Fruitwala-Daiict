@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment;
+package com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,32 +14,28 @@ import androidx.fragment.app.DialogFragment;
 
 import com.anantdevelopers.swipesinalpha.R;
 
-public class DeletePreviousOrdersDialog extends DialogFragment {
+public class CashOnDeliveryDialog extends DialogFragment {
 
-     private CheckBox checkBox;
-
-     public interface DeletePreviousOrdersDialogListener {
-          void onDialogPositiveClick(boolean keepStarredOrders);
+     public interface cashOnDeliveryDialogListener {
+          void onDialogPositiveClick();
      }
 
-     private DeletePreviousOrdersDialogListener listener;
+     private cashOnDeliveryDialogListener listener;
 
      @NonNull
      @Override
      public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
           AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
           LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-          View v = inflater.inflate(R.layout.dialog_delete_previous_orders, null);
-
-          checkBox = v.findViewById(R.id.keep_starred_orders_checkbox);
+          View v = inflater.inflate(R.layout.dialog_cash_on_delivery, null);
 
           builder.setView(v)
-                  .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+                  .setPositiveButton("YES, DO IT", new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
-                            boolean keepStarred = checkBox.isChecked();
-                            listener.onDialogPositiveClick(keepStarred);
+                            listener.onDialogPositiveClick();
                             dialog.dismiss();
                        }
                   })
@@ -52,6 +47,7 @@ public class DeletePreviousOrdersDialog extends DialogFragment {
                   });
 
           return builder.create();
+
      }
 
      @Override
@@ -59,9 +55,9 @@ public class DeletePreviousOrdersDialog extends DialogFragment {
           super.onAttach(context);
 
           try {
-               listener = (DeletePreviousOrdersDialogListener) getTargetFragment();
-          } catch(ClassCastException e){
-               throw new ClassCastException(getTargetFragment().toString() + " must implement DeletePreviousOrdersDialogListener");
+               listener = (cashOnDeliveryDialogListener) context;
+          }catch (ClassCastException e) {
+               throw new ClassCastException(getActivity().toString() + " must implement cashOnDeliveryDialogListener.");
           }
      }
 }

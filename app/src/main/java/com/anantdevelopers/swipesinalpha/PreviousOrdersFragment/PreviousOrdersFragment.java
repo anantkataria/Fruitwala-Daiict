@@ -51,7 +51,7 @@ import java.util.Map;
 import static android.view.View.GONE;
 
 
-public class PreviousOrdersFragment extends Fragment implements DeletePreviousOrdersDialog.DeletePreviousOrdersDialogListener {
+public class PreviousOrdersFragment extends Fragment implements DeletePreviousOrdersDialog.DeletePreviousOrdersDialogListener, CancelCurrentOrderDialog.cancelCurrentOrderDialogListener {
 
      private static final String SORTING_ORDER_1 = "newest_first";
      private static final String SORTING_ORDER_2 = "oldest_first";
@@ -325,43 +325,35 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           adapterForCurrentOrders.setOnButtonClickListener(new RecyclerViewAdapterForCurrentOrders.onButtonClickListener() {
                @Override
                public void onButtonClick(final int position) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Are you sure you want to cancel this order?");
-                    builder.setPositiveButton("Yes please", new DialogInterface.OnClickListener() {
-                         @Override
-                         public void onClick(DialogInterface dialog, int which) {
-                              CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
-                              currentOrderDetails.setStatus("CANCELLATION REQUESTED");
-                              currentOrderProgressBar.setVisibility(View.VISIBLE);
-                              String firebaseKey = currentOrderDetails.getFirebaseDatabaseKey();
+                    CancelCurrentOrderDialog dialog1 = new CancelCurrentOrderDialog(position);
+                    dialog1.setTargetFragment(PreviousOrdersFragment.this, 0);
+                    dialog1.show(getParentFragmentManager(), "cancelling order at position " + position);
+               }
+          });
+     }
 
-                              Map<String, Object> map = new HashMap<>();
-                              map.put( "/Orders/" + authPhoneNumber + "/" + firebaseKey, currentOrderDetails);
-                              map.put("/tokens/" + authPhoneNumber, token);
+     @Override
+     public void onDialogPositiveClick(int position) {
+          CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
+          currentOrderDetails.setStatus("CANCELLATION REQUESTED");
+          currentOrderProgressBar.setVisibility(View.VISIBLE);
+          String firebaseKey = currentOrderDetails.getFirebaseDatabaseKey();
 
-                              databaseReference.updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                   @Override
-                                   public void onSuccess(Void aVoid) {
-                                        currentOrderProgressBar.setVisibility(GONE);
-                                        Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_SHORT).show();
-                                   }
-                              }).addOnFailureListener(new OnFailureListener() {
-                                   @Override
-                                   public void onFailure(@NonNull Exception e) {
-                                        currentOrderProgressBar.setVisibility(GONE);
-                                        Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_SHORT).show();
-                                   }
-                              });                         }
-                    });
-                    builder.setNegativeButton("Nope", new DialogInterface.OnClickListener() {
-                         @Override
-                         public void onClick(DialogInterface dialog, int which) {
-                              dialog.dismiss();
-                         }
-                    });
+          Map<String, Object> map = new HashMap<>();
+          map.put( "/Orders/" + authPhoneNumber + "/" + firebaseKey, currentOrderDetails);
+          map.put("/tokens/" + authPhoneNumber, token);
 
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+          databaseReference.updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+               @Override
+               public void onSuccess(Void aVoid) {
+                    currentOrderProgressBar.setVisibility(GONE);
+                    Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_SHORT).show();
+               }
+          }).addOnFailureListener(new OnFailureListener() {
+               @Override
+               public void onFailure(@NonNull Exception e) {
+                    currentOrderProgressBar.setVisibility(GONE);
+                    Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_SHORT).show();
                }
           });
      }

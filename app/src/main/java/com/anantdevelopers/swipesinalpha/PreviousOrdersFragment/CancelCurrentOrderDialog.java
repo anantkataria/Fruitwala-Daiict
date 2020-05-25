@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,15 +14,19 @@ import androidx.fragment.app.DialogFragment;
 
 import com.anantdevelopers.swipesinalpha.R;
 
-public class DeletePreviousOrdersDialog extends DialogFragment {
+public class CancelCurrentOrderDialog extends DialogFragment {
 
-     private CheckBox checkBox;
+     private int position;
 
-     public interface DeletePreviousOrdersDialogListener {
-          void onDialogPositiveClick(boolean keepStarredOrders);
+     CancelCurrentOrderDialog(int position){
+          this.position = position;
      }
 
-     private DeletePreviousOrdersDialogListener listener;
+     public interface cancelCurrentOrderDialogListener {
+          void onDialogPositiveClick(int position);
+     }
+
+     private cancelCurrentOrderDialogListener listener;
 
      @NonNull
      @Override
@@ -31,20 +34,17 @@ public class DeletePreviousOrdersDialog extends DialogFragment {
           AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
           LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-          View v = inflater.inflate(R.layout.dialog_delete_previous_orders, null);
-
-          checkBox = v.findViewById(R.id.keep_starred_orders_checkbox);
+          View v = inflater.inflate(R.layout.dialog_cancel_current_order, null);
 
           builder.setView(v)
-                  .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+                  .setPositiveButton("YES PLEASE", new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
-                            boolean keepStarred = checkBox.isChecked();
-                            listener.onDialogPositiveClick(keepStarred);
+                            listener.onDialogPositiveClick(position);
                             dialog.dismiss();
                        }
                   })
-                  .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                  .setNegativeButton("NOPE", new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
@@ -59,9 +59,9 @@ public class DeletePreviousOrdersDialog extends DialogFragment {
           super.onAttach(context);
 
           try {
-               listener = (DeletePreviousOrdersDialogListener) getTargetFragment();
-          } catch(ClassCastException e){
-               throw new ClassCastException(getTargetFragment().toString() + " must implement DeletePreviousOrdersDialogListener");
+               listener = (cancelCurrentOrderDialogListener) getTargetFragment();
+          } catch (ClassCastException e){
+               throw new ClassCastException(getTargetFragment().toString() + " must implement cancelCurrentOrderDialogListener.");
           }
      }
 }

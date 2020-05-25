@@ -34,7 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class CheckoutFlow extends AppCompatActivity {
+public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDialog.cashOnDeliveryDialogListener {
 
      private static final int REQUEST_CODE = 123;
      private static final String CASH_ON_DELIVERY = "cod";
@@ -60,6 +60,9 @@ public class CheckoutFlow extends AppCompatActivity {
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_checkout_flow);
+
+          setTitle("Checkout");
+          getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
           Intent intent = getIntent();
           fruits = intent.getParcelableArrayListExtra("Fruits");
@@ -118,29 +121,16 @@ public class CheckoutFlow extends AppCompatActivity {
      }
 
      private void payUsingCOD() {
-          AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutFlow.this);
-          builder.setMessage("Do you want to continue using Cash on delivery?");
-          builder.setPositiveButton("Yes, Do it", new DialogInterface.OnClickListener() {
-               @Override
-               public void onClick(DialogInterface dialog, int which) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    progressBarTextView.setVisibility(View.VISIBLE);
-                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE); //touch input disabled.
-                    //now save the order in the database under "Orders"
-                    //save username, phone, roomno, wing, building and his order(fruits and quantity), and payment status
-                    //save feature will be common in both payment methods
-                    placeOrder(CASH_ON_DELIVERY);
-               }
-          });
-          builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-               @Override
-               public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-               }
-          });
-          AlertDialog dialog = builder.create();
+          CashOnDeliveryDialog dialog = new CashOnDeliveryDialog();
+          dialog.show(getSupportFragmentManager(), "paying with COD");
+     }
 
-          dialog.show();
+     @Override
+     public void onDialogPositiveClick() {
+          progressBar.setVisibility(View.VISIBLE);
+          progressBarTextView.setVisibility(View.VISIBLE);
+          getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE); //touch input disabled.
+          placeOrder(CASH_ON_DELIVERY);
      }
 
      private void payUsingUPI() {
@@ -241,5 +231,9 @@ public class CheckoutFlow extends AppCompatActivity {
           });
      }
 
-
+     @Override
+     public boolean onSupportNavigateUp() {
+          finish();
+          return true;
+     }
 }

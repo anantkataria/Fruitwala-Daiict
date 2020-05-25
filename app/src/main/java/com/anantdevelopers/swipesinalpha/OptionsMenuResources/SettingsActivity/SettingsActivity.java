@@ -13,7 +13,7 @@ import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements LogoutDialog.logoutDialogListener {
 
 //     private User user;
      private String userName = "User";
@@ -79,24 +79,13 @@ public class SettingsActivity extends AppCompatActivity {
      }
 
      private void initiateLogoutProcess() {
-          AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
-          builder.setMessage("Are you sure you want to logout?");
-          builder.setPositiveButton("Yeah", new DialogInterface.OnClickListener() {
-               @Override
-               public void onClick(DialogInterface dialog, int which) {
-                    firebaseAuth.signOut();
-               }
-          });
-          builder.setNegativeButton("No, I want to buy more", new DialogInterface.OnClickListener() {
-               @Override
-               public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-               }
-          });
+          LogoutDialog dialog = new LogoutDialog();
+          dialog.show(getSupportFragmentManager(), "logging out dialog");
+     }
 
-          AlertDialog dialog = builder.create();
-
-          dialog.show();
+     @Override
+     public void onDialogPositiveClick() {
+          firebaseAuth.signOut();
      }
 
      @Override
