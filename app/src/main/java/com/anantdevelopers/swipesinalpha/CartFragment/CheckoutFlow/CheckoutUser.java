@@ -1,9 +1,9 @@
-package com.anantdevelopers.swipesinalpha.CheckoutFlow;
+package com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
 
 import java.util.ArrayList;

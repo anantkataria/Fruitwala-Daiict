@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha.FruitItem;
+package com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem;
 
 import android.content.Context;
 import android.view.LayoutInflater;

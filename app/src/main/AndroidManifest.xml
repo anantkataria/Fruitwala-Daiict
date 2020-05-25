@@ -26,7 +26,7 @@
             android:name=".OptionsMenuResources.SettingsActivity.SettingsActivity"
             android:screenOrientation="locked" />
         <activity
-            android:name=".CheckoutFlow.CheckoutFlow"
+            android:name=".CartFragment.CheckoutFlow.CheckoutFlow"
             android:screenOrientation="locked" />
         <activity
             android:name=".UserProfile.UserProfile"

@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha.CustomDialogFragment;
+package com.anantdevelopers.swipesinalpha.HomeFragment.CustomDialogFragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

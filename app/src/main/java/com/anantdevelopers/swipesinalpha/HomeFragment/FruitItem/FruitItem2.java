@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha.FruitItem;
+package com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem;
 
 import android.os.Parcel;
 import android.os.Parcelable;

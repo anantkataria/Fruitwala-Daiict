@@ -31,9 +31,9 @@ import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.Authentication.AuthActivity;
 import com.anantdevelopers.swipesinalpha.CartFragment.CartFragment;
-import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragment;
-import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
-import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem2;
+import com.anantdevelopers.swipesinalpha.HomeFragment.CustomDialogFragment.CustomDialogFragment;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem2;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsAreHealthyActivity;

@@ -10,12 +10,15 @@ package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,14 +26,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.anantdevelopers.swipesinalpha.CheckoutFlow.CheckoutUser;
-import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow.CheckoutUser;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderEntity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderViewModel;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.RecyclerViewAdapterForPreviousOrders;
@@ -56,6 +62,10 @@ import static android.view.View.GONE;
 
 public class PreviousOrdersFragment extends Fragment {
 
+     private static final String SORTING_ORDER_1 = "newest_first";
+     private static final String SORTING_ORDER_2 = "oldest_first";
+     private static final String SORTING_ORDER_TYPE_STORAGE_KEY = "sorting_type";
+
      private RecyclerView currentOrdersRecyclerView;
 
      private DatabaseReference databaseReference;
@@ -79,6 +89,11 @@ public class PreviousOrdersFragment extends Fragment {
      private String authPhoneNumber;
      private String token;
 
+     private SharedPreferences sharedPreferences;
+     private String sortingOrderType;
+
+     private Observer<List<PreviousOrderEntity>> observerForNewestFirst, observerForOldestFirst;
+
      public PreviousOrdersFragment() {
           // Required empty public constructor
      }
@@ -94,6 +109,10 @@ public class PreviousOrdersFragment extends Fragment {
      @Override
      public void onCreate(@Nullable Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
+
+          setHasOptionsMenu(true);
+
+          sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
@@ -114,7 +133,6 @@ public class PreviousOrdersFragment extends Fragment {
                @Override
                public void onSuccess(InstanceIdResult instanceIdResult) {
                     token = instanceIdResult.getToken();
-                    Log.e("6969", "token = " + token);
                }
           });
      }
@@ -138,7 +156,7 @@ public class PreviousOrdersFragment extends Fragment {
 
 
 
-     private void previousOrderAffairs(View v) {
+     private void previousOrderAffairs(final View v) {
           previousOrderProgressBar = v.findViewById(R.id.previousOrdersProgressBar);
           noPreviousOrdersTextView = v.findViewById(R.id.noPreviousOrdersTextView);
 
@@ -149,21 +167,33 @@ public class PreviousOrdersFragment extends Fragment {
           previousOrdersRecyclerView.setAdapter(adapter);
           previousOrdersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-          previousOrderViewModel.getAllPreviousOrders().observe(getViewLifecycleOwner(), new Observer<List<PreviousOrderEntity>>() {
-               @Override
-               public void onChanged(List<PreviousOrderEntity> previousOrderEntities) {
-                    if (previousOrderEntities.isEmpty()){
-                         noPreviousOrdersTextView.setVisibility(View.VISIBLE);
-                    }
-                    else {
+//          previousOrderViewModel.getAllPreviousOrders().observe(getViewLifecycleOwner(), new Observer<List<PreviousOrderEntity>>() {
+//               @Override
+//               public void onChanged(List<PreviousOrderEntity> previousOrderEntities) {
+//                    if (previousOrderEntities.isEmpty()){
+//                         noPreviousOrdersTextView.setVisibility(View.VISIBLE);
+//                    }
+//                    else {
+//                         adapter.setPreviousOrders(previousOrderEntities);
+//                         noPreviousOrdersTextView.setVisibility(GONE);
+//                         handleLongClicks(v, previousOrderEntities);
+//                    }
+//               }
+//          });
 
-                         adapter.setPreviousOrders(previousOrderEntities);
-//                         Log.e("****", "Number of previous orders : "+previousOrderEntities.size());
-                         noPreviousOrdersTextView.setVisibility(GONE);
-                    }
-               }
-          });
+          sortingOrderType = sharedPreferences.getString(SORTING_ORDER_TYPE_STORAGE_KEY, SORTING_ORDER_1);
 
+          switch(sortingOrderType) {
+               case SORTING_ORDER_1:
+                    observeNewestFirst();
+                    break;
+               case SORTING_ORDER_2:
+                    observeOldestFirst();
+                    break;
+               default:
+                    observeNewestFirst();
+                    break;
+          }
 
 
           fetchPreviousOrders(new LocalDatabaseCallbackInterface() {
@@ -180,33 +210,79 @@ public class PreviousOrdersFragment extends Fragment {
                               grandTotal += Integer.valueOf(f.getFruitPrice().replaceAll("[Rs.\\s]", ""));
                          }
 
-                         ordersToAddInRoom.add(new PreviousOrderEntity(orderFruitList, status, "GrandTotal : " + grandTotal + " Rs."));
-//                         i += 1;
+                         Long orderPlacedDate =Long.parseLong(u.getOrderPlacedDate());
+                         Long orderDeliveredOrCancelledDate = Long.parseLong(u.getOrderDeliveredOrCancelledDate());
+
+                         ordersToAddInRoom.add(new PreviousOrderEntity(orderFruitList, status, "GrandTotal : " + grandTotal + " Rs.", orderPlacedDate, orderDeliveredOrCancelledDate,false));
                     }
 
-//                    Log.e("fetchPreviousOrders", "i = " + i);
-
-//                    i = 0;
                     for(PreviousOrderEntity poe : ordersToAddInRoom){
                          previousOrderViewModel.insert(poe);
-//                         i += 1;
                     }
 
-//                    Log.e("afterInserting" ,  "i = " + i);
                     previousOrderProgressBar.setVisibility(GONE);
-
 
                     databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeValue();
                }
           });
      }
 
+     private void observeOldestFirst() {
+          observerForOldestFirst = new Observer<List<PreviousOrderEntity>>() {
+               @Override
+               public void onChanged(List<PreviousOrderEntity> previousOrderEntities) {
+                    if (previousOrderEntities.isEmpty()){
+                         noPreviousOrdersTextView.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                         adapter.setPreviousOrders(previousOrderEntities);
+                         noPreviousOrdersTextView.setVisibility(GONE);
+                         handleLongClicks();
+                    }
+               }
+          };
+
+          previousOrderViewModel.getAllPreviousOrdersOldestFirst().observe(getViewLifecycleOwner(), observerForOldestFirst);
+     }
+
+     private void observeNewestFirst() {
+          observerForNewestFirst = new Observer<List<PreviousOrderEntity>>() {
+               @Override
+               public void onChanged(List<PreviousOrderEntity> previousOrderEntities) {
+                    if (previousOrderEntities.isEmpty()){
+                         noPreviousOrdersTextView.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                         adapter.setPreviousOrders(previousOrderEntities);
+                         noPreviousOrdersTextView.setVisibility(GONE);
+                         handleLongClicks();
+                    }
+               }
+          };
+
+          previousOrderViewModel.getAllPreviousOrdersNewestFirst().observe(getViewLifecycleOwner(), observerForNewestFirst);
+     }
+
+     private void handleLongClicks() {
+          adapter.setOnItemClickListener(new RecyclerViewAdapterForPreviousOrders.OnItemClickListener() {
+               @Override
+               public void onItemTouchHold(int position) {
+                    PreviousOrderEntity poe = adapter.getOrderAtPosition(position);
+                    boolean isStarred = poe.getIsStarred();
+
+                    if(isStarred){
+                         poe.setIsStarred(false);
+                    }
+                    else {
+                         poe.setIsStarred(true);
+                    }
+                    previousOrderViewModel.update(poe);
+
+               }
+          });
+     }
+
      private void fetchPreviousOrders(final LocalDatabaseCallbackInterface Interface) {
-          //here two things are there
-          //1) check if there is any Delivered orders are there in the database if there
-          //   are any then first remove them from the database and add them in the shared
-          //   preferences
-          //2) fetch orders from the shared preferences (if there are any)
 
           previousOrderProgressBar.setVisibility(View.VISIBLE);
 
@@ -218,7 +294,6 @@ public class PreviousOrdersFragment extends Fragment {
 
                          for(DataSnapshot data: dataSnapshot.getChildren()){
                               previousOrdersList.add(data.child("Order").getValue(CheckoutUser.class));
-                              //Log.e("fetchPreOrders" , ""+data.getValue());
                          }
 
                          Interface.fromOnChildManipulated(previousOrdersList);
@@ -271,16 +346,6 @@ public class PreviousOrdersFragment extends Fragment {
           adapterForCurrentOrders.setOnButtonClickListener(new RecyclerViewAdapterForCurrentOrders.onButtonClickListener() {
                @Override
                public void onButtonClick(final int position) {
-                    //TODO in click of this button, show an alert dialog showing are you sure?.
-                    //TODO then change the order status to cancel requested , and in allOrdersFragment in the
-                    //TODO AdminSwipesInAlpha2, add flow that if status equals cancel requested, then show that in
-                    //TODO listItem For All current orders in red mark
-                    //TODO then if Admin presses the cancel order button, than there will be several cases:
-                    //TODO if payment is by cash, then simply delete the order from orders in database and
-                    //TODO change status to order cancelled and put it into the local database and send notification to user that your order of so and so is cancelled and check the flow to save in local database of user side(SwipesInAlpha)
-                    //TODO if payment id by UPI, then send notification that your payment will be initiated soon
-                    //TODO and think about showing "payment will be initiated to you soon" in that particular order
-                    //TODO item.
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setMessage("Are you sure you want to cancel this order?");
                     builder.setPositiveButton("Yes please", new DialogInterface.OnClickListener() {
@@ -322,23 +387,6 @@ public class PreviousOrdersFragment extends Fragment {
           });
      }
 
-     private void changeStatusInDatabase(String firebaseKey, CheckoutUser currentOrderDetails) {
-
-          databaseReference.child("Users").child(authPhoneNumber).child(firebaseKey).setValue(currentOrderDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
-               @Override
-               public void onSuccess(Void aVoid) {
-                    currentOrderProgressBar.setVisibility(GONE);
-                    Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_SHORT).show();
-               }
-          }).addOnFailureListener(new OnFailureListener() {
-               @Override
-               public void onFailure(@NonNull Exception e) {
-                    currentOrderProgressBar.setVisibility(GONE);
-                    Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_SHORT).show();
-               }
-          });
-     }
-
      private void fetchCurrentOrders(final DatabaseCallbackInterface Interface) {
 
           currentOrderProgressBar.setVisibility(View.VISIBLE);
@@ -365,4 +413,63 @@ public class PreviousOrdersFragment extends Fragment {
 
      }
 
+     @Override
+     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+          inflater.inflate(R.menu.options_menu_previous_orders_fragment, menu);
+     }
+
+     @Override
+     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+          SharedPreferences.Editor editor = sharedPreferences.edit();
+
+          switch(item.getItemId()){
+               //case R.id.sort_by_favorite_first:
+               //    return true;
+               case R.id.sort_by_latest_first:
+                    //TODO check if the current sorting is not the one selected here
+                    // if not then only do the following
+                    // remove the current observer(if the data doesn't get removed then first empty the list and then remove the observer), and add the observer of this type of sorting
+                    // and update current sorting order in the sharedPreferences to this type.
+                    if(!sortingOrderType.equals(SORTING_ORDER_1)) {
+                         editor.putString(SORTING_ORDER_TYPE_STORAGE_KEY, SORTING_ORDER_1);
+                         editor.apply();
+                         // remove observer of current sorting type by if else chain
+                         if(sortingOrderType.equals(SORTING_ORDER_2)){
+                              //then remove the observer for SORTING_ORDER_2
+                              //previousOrderViewModel.getAllPreviousOrdersOldestFirst().removeObserver(observerForOldestFirst);
+                              LiveData<List<PreviousOrderEntity>> observable = previousOrderViewModel.getAllPreviousOrdersOldestFirst();
+                              observable.removeObserver(observerForOldestFirst);
+                         }
+                         //else if (sortingOrderType.equals(some other sorting type)){}
+
+                         observeNewestFirst();
+                         sortingOrderType = SORTING_ORDER_1;
+                    }
+                    return true;
+               case R.id.sort_by_oldest_first:
+                    if(!sortingOrderType.equals(SORTING_ORDER_2)) {
+                         editor.putString(SORTING_ORDER_TYPE_STORAGE_KEY, SORTING_ORDER_2);
+                         editor.apply();
+
+                         // remove observer of current sorting type by if else chain
+                         if(sortingOrderType.equals(SORTING_ORDER_1)){
+                              //then remove the observer for SORTING_ORDER_2
+                              //previousOrderViewModel.getAllPreviousOrdersOldestFirst().removeObserver(observerForNewestFirst);
+                              LiveData<List<PreviousOrderEntity>> observable = previousOrderViewModel.getAllPreviousOrdersNewestFirst();
+                              observable.removeObserver(observerForNewestFirst);
+                         }
+                         //else if (sortingOrderType.equals(some other sorting type)){}
+
+                         observeOldestFirst();
+                         sortingOrderType = SORTING_ORDER_2;
+                    }
+                    return true;
+               case R.id.delete_all_previous_orders:
+                    return true;
+               default:
+                    return super.onOptionsItemSelected(item);
+          }
+
+     }
 }

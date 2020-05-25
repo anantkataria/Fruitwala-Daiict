@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sort_by"
+        android:title="Sort orders by">
+
+        <menu>
+
+<!--            <item-->
+<!--                android:id="@+id/sort_by_favorite_first"-->
+<!--                android:title="Favorites first"/>-->
+
+            <item
+                android:id="@+id/sort_by_latest_first"
+                android:title="Newest first"/>
+
+            <item
+                android:id="@+id/sort_by_oldest_first"
+                android:title="Oldest first"/>
+
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/delete_all_previous_orders"
+        android:title="Delete orders"/>
+</menu>

@@ -1,10 +1,9 @@
-package com.anantdevelopers.swipesinalpha.FruitItem;
+package com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem;
 
 import android.content.Context;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;

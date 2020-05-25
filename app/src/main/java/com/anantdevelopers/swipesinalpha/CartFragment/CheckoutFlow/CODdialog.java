@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha.CheckoutFlow;
+package com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

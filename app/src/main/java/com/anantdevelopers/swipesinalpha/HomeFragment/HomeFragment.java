@@ -17,11 +17,11 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.anantdevelopers.swipesinalpha.CustomDialogFragment.CustomDialogFragment;
-import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem2;
+import com.anantdevelopers.swipesinalpha.HomeFragment.CustomDialogFragment.CustomDialogFragment;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem2;
 import com.anantdevelopers.swipesinalpha.R;
-import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerItemClickListener;
-import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapterForHomeFragment;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerItemClickListener;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerViewAdapterForHomeFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha.CheckoutFlow;
+package com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;

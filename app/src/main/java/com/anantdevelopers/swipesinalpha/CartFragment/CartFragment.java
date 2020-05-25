@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +22,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.anantdevelopers.swipesinalpha.CheckoutFlow.CheckoutFlow;
-import com.anantdevelopers.swipesinalpha.FruitItem.FruitItem;
-import com.anantdevelopers.swipesinalpha.FruitItem.RecyclerViewAdapterForCartfragment;
+import com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow.CheckoutFlow;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerViewAdapterForCartfragment;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.material.snackbar.Snackbar;
 
