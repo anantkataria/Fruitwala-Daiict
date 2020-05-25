@@ -15,20 +15,20 @@ public interface PreviousOrderDao {
      @Insert
      void insert(PreviousOrderEntity poe);
 
+     @Query("SELECT * FROM previous_orders_table ORDER BY orderPlacedDate")
+     LiveData<List<PreviousOrderEntity>> getAllOrdersOldestFirst();
+
+     @Query("SELECT * FROM previous_orders_table ORDER BY orderPlacedDate DESC")
+     LiveData<List<PreviousOrderEntity>> getAllOrdersNewestFirst();
+
      @Delete
      void delete(PreviousOrderEntity poe);
 
      @Query("DELETE FROM previous_orders_table")
      void deleteAllOrders();
 
-//     @Query("SELECT * FROM previous_orders_table")
-//     LiveData<List<PreviousOrderEntity>> getAllOrders();
-
-     @Query("SELECT * FROM previous_orders_table ORDER BY orderPlacedDate")
-     LiveData<List<PreviousOrderEntity>> getAllOrdersOldestFirst();
-
-     @Query("SELECT * FROM previous_orders_table ORDER BY orderPlacedDate DESC")
-     LiveData<List<PreviousOrderEntity>> getAllOrdersNewestFirst();
+     @Query("DELETE FROM previous_orders_table WHERE isStarred = 'false'")
+     void deleteAllNotStarredOrders();
 
      @Update
      void updateOrder(PreviousOrderEntity poe);

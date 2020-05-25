@@ -12,11 +12,11 @@ public class PreviousOrderEntity {
      private String orderFruitList;
      private String status;
      private String grandTotal;
-     private boolean isStarred;
+     private String isStarred;
      private Long orderPlacedDate;
      private Long orderDeliveredOrCancelledDate;
 
-     public PreviousOrderEntity(String orderFruitList, String status, String grandTotal, Long orderPlacedDate, Long orderDeliveredOrCancelledDate, boolean isStarred){
+     public PreviousOrderEntity(String orderFruitList, String status, String grandTotal, Long orderPlacedDate, Long orderDeliveredOrCancelledDate, String isStarred){
           this.orderFruitList = orderFruitList;
           this.status = status;
           this.grandTotal = grandTotal;
@@ -49,11 +49,11 @@ public class PreviousOrderEntity {
 
      Long getOrderDeliveredOrCancelledDate() { return orderDeliveredOrCancelledDate; }
 
-     public boolean getIsStarred() {
+     public String getIsStarred() {
           return isStarred;
      }
 
-     public void setIsStarred(boolean val) {
+     public void setIsStarred(String val) {
           this.isStarred = val;
      }
 }

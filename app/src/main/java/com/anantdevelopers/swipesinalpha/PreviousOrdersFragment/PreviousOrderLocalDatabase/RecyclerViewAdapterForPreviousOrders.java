@@ -42,7 +42,7 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
           holder.listOfFruitsTextView.setText(current.getOrderFruitList());
           holder.statusTextView.setText(current.getStatus());
           holder.grandTotalTextView.setText(current.getGrandTotal());
-          if(current.getIsStarred()){
+          if(current.getIsStarred().equals("true")){
                holder.starImageView.setVisibility(View.VISIBLE);
           }
           else {

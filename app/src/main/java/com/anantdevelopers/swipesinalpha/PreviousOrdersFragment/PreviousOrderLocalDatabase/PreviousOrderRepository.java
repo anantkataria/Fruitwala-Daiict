@@ -16,13 +16,20 @@ class PreviousOrderRepository {
      PreviousOrderRepository(Application application){
           PreviousOrderDatabase database = PreviousOrderDatabase.getInstance(application);
           previousOrderDao = database.previousOrderDao();
-//          allPreviousOrders = previousOrderDao.getAllOrders();
           allPreviousOrdersOldestFirst = previousOrderDao.getAllOrdersOldestFirst();
           allPreviousOrdersNewestFirst = previousOrderDao.getAllOrdersNewestFirst();
      }
 
      void insert(PreviousOrderEntity poe){
           new InsertPreviousOrderAsyncTask(previousOrderDao).execute(poe);
+     }
+
+     LiveData<List<PreviousOrderEntity>> getAllPreviousOrdersOldestFirst() {
+          return allPreviousOrdersOldestFirst;
+     }
+
+     LiveData<List<PreviousOrderEntity>> getAllPreviousOrdersNewestFirst() {
+          return allPreviousOrdersNewestFirst;
      }
 
      void delete(PreviousOrderEntity poe){
@@ -33,20 +40,12 @@ class PreviousOrderRepository {
           new UpdatePreviousOrderAsyncTask(previousOrderDao).execute(poe);
      }
 
-     void deleteAllNotes() {
+     void deleteAllOrders() {
           new DeleteAllPreviousOrdersAsyncTask(previousOrderDao).execute();
      }
 
-//     LiveData<List<PreviousOrderEntity>> getAllPreviousOrders() {
-//          return allPreviousOrders;
-//     }
-
-     LiveData<List<PreviousOrderEntity>> getAllPreviousOrdersOldestFirst() {
-          return allPreviousOrdersOldestFirst;
-     }
-
-     LiveData<List<PreviousOrderEntity>> getAllPreviousOrdersNewestFirst() {
-          return allPreviousOrdersNewestFirst;
+     void deleteAllNotStarredOrders() {
+          new DeleteAllNotStarredPreviousOrdersAsyncTask(previousOrderDao).execute();
      }
 
      private static class UpdatePreviousOrderAsyncTask extends AsyncTask<PreviousOrderEntity, Void, Void> {
@@ -102,6 +101,20 @@ class PreviousOrderRepository {
           @Override
           protected Void doInBackground(Void... voids) {
                previousOrderDao.deleteAllOrders();
+               return null;
+          }
+     }
+
+     private static class DeleteAllNotStarredPreviousOrdersAsyncTask extends AsyncTask<Void, Void, Void> {
+          private PreviousOrderDao previousOrderDao;
+
+          private DeleteAllNotStarredPreviousOrdersAsyncTask(PreviousOrderDao previousOrderDao){
+               this.previousOrderDao = previousOrderDao;
+          }
+
+          @Override
+          protected Void doInBackground(Void... voids) {
+               previousOrderDao.deleteAllNotStarredOrders();
                return null;
           }
      }

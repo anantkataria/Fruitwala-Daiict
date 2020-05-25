@@ -1,11 +1,3 @@
-//TODO : show current orders fetching from the database
-//TODO : show previous orders fetching from shared preferences
-//TODO : Once the current order is delivered, remove it from the database and add it into the shared preferences previous orderes
-
-//first thing we will do is try fetching the data from database, and we will be needing active
-//listener (not one time listener) and we will be working with the list of childs so we will use
-//child event listener.
-
 package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment;
 
 
@@ -24,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,7 +51,7 @@ import java.util.Map;
 import static android.view.View.GONE;
 
 
-public class PreviousOrdersFragment extends Fragment {
+public class PreviousOrdersFragment extends Fragment implements DeletePreviousOrdersDialog.DeletePreviousOrdersDialogListener {
 
      private static final String SORTING_ORDER_1 = "newest_first";
      private static final String SORTING_ORDER_2 = "oldest_first";
@@ -92,7 +83,7 @@ public class PreviousOrdersFragment extends Fragment {
      private SharedPreferences sharedPreferences;
      private String sortingOrderType;
 
-     private Observer<List<PreviousOrderEntity>> observerForNewestFirst, observerForOldestFirst;
+     private Observer<List<PreviousOrderEntity>> observer;
 
      public PreviousOrdersFragment() {
           // Required empty public constructor
@@ -167,20 +158,6 @@ public class PreviousOrdersFragment extends Fragment {
           previousOrdersRecyclerView.setAdapter(adapter);
           previousOrdersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-//          previousOrderViewModel.getAllPreviousOrders().observe(getViewLifecycleOwner(), new Observer<List<PreviousOrderEntity>>() {
-//               @Override
-//               public void onChanged(List<PreviousOrderEntity> previousOrderEntities) {
-//                    if (previousOrderEntities.isEmpty()){
-//                         noPreviousOrdersTextView.setVisibility(View.VISIBLE);
-//                    }
-//                    else {
-//                         adapter.setPreviousOrders(previousOrderEntities);
-//                         noPreviousOrdersTextView.setVisibility(GONE);
-//                         handleLongClicks(v, previousOrderEntities);
-//                    }
-//               }
-//          });
-
           sortingOrderType = sharedPreferences.getString(SORTING_ORDER_TYPE_STORAGE_KEY, SORTING_ORDER_1);
 
           switch(sortingOrderType) {
@@ -194,6 +171,8 @@ public class PreviousOrdersFragment extends Fragment {
                     observeNewestFirst();
                     break;
           }
+
+
 
 
           fetchPreviousOrders(new LocalDatabaseCallbackInterface() {
@@ -213,7 +192,7 @@ public class PreviousOrdersFragment extends Fragment {
                          Long orderPlacedDate =Long.parseLong(u.getOrderPlacedDate());
                          Long orderDeliveredOrCancelledDate = Long.parseLong(u.getOrderDeliveredOrCancelledDate());
 
-                         ordersToAddInRoom.add(new PreviousOrderEntity(orderFruitList, status, "GrandTotal : " + grandTotal + " Rs.", orderPlacedDate, orderDeliveredOrCancelledDate,false));
+                         ordersToAddInRoom.add(new PreviousOrderEntity(orderFruitList, status, "GrandTotal : " + grandTotal + " Rs.", orderPlacedDate, orderDeliveredOrCancelledDate,"false"));
                     }
 
                     for(PreviousOrderEntity poe : ordersToAddInRoom){
@@ -228,39 +207,39 @@ public class PreviousOrdersFragment extends Fragment {
      }
 
      private void observeOldestFirst() {
-          observerForOldestFirst = new Observer<List<PreviousOrderEntity>>() {
+          observer = new Observer<List<PreviousOrderEntity>>() {
                @Override
                public void onChanged(List<PreviousOrderEntity> previousOrderEntities) {
                     if (previousOrderEntities.isEmpty()){
                          noPreviousOrdersTextView.setVisibility(View.VISIBLE);
                     }
                     else {
-                         adapter.setPreviousOrders(previousOrderEntities);
                          noPreviousOrdersTextView.setVisibility(GONE);
                          handleLongClicks();
                     }
+                    adapter.setPreviousOrders(previousOrderEntities);
                }
           };
 
-          previousOrderViewModel.getAllPreviousOrdersOldestFirst().observe(getViewLifecycleOwner(), observerForOldestFirst);
+          previousOrderViewModel.getAllPreviousOrdersOldestFirst().observe(getViewLifecycleOwner(), observer);
      }
 
      private void observeNewestFirst() {
-          observerForNewestFirst = new Observer<List<PreviousOrderEntity>>() {
+          observer = new Observer<List<PreviousOrderEntity>>() {
                @Override
                public void onChanged(List<PreviousOrderEntity> previousOrderEntities) {
                     if (previousOrderEntities.isEmpty()){
                          noPreviousOrdersTextView.setVisibility(View.VISIBLE);
                     }
                     else {
-                         adapter.setPreviousOrders(previousOrderEntities);
                          noPreviousOrdersTextView.setVisibility(GONE);
                          handleLongClicks();
                     }
+                    adapter.setPreviousOrders(previousOrderEntities);
                }
           };
 
-          previousOrderViewModel.getAllPreviousOrdersNewestFirst().observe(getViewLifecycleOwner(), observerForNewestFirst);
+          previousOrderViewModel.getAllPreviousOrdersNewestFirst().observe(getViewLifecycleOwner(), observer);
      }
 
      private void handleLongClicks() {
@@ -268,13 +247,13 @@ public class PreviousOrdersFragment extends Fragment {
                @Override
                public void onItemTouchHold(int position) {
                     PreviousOrderEntity poe = adapter.getOrderAtPosition(position);
-                    boolean isStarred = poe.getIsStarred();
+                    String isStarred = poe.getIsStarred();
 
-                    if(isStarred){
-                         poe.setIsStarred(false);
+                    if(isStarred.equals("true")){
+                         poe.setIsStarred("false");
                     }
                     else {
-                         poe.setIsStarred(true);
+                         poe.setIsStarred("true");
                     }
                     previousOrderViewModel.update(poe);
 
@@ -424,13 +403,8 @@ public class PreviousOrdersFragment extends Fragment {
           SharedPreferences.Editor editor = sharedPreferences.edit();
 
           switch(item.getItemId()){
-               //case R.id.sort_by_favorite_first:
-               //    return true;
+
                case R.id.sort_by_latest_first:
-                    //TODO check if the current sorting is not the one selected here
-                    // if not then only do the following
-                    // remove the current observer(if the data doesn't get removed then first empty the list and then remove the observer), and add the observer of this type of sorting
-                    // and update current sorting order in the sharedPreferences to this type.
                     if(!sortingOrderType.equals(SORTING_ORDER_1)) {
                          editor.putString(SORTING_ORDER_TYPE_STORAGE_KEY, SORTING_ORDER_1);
                          editor.apply();
@@ -439,7 +413,7 @@ public class PreviousOrdersFragment extends Fragment {
                               //then remove the observer for SORTING_ORDER_2
                               //previousOrderViewModel.getAllPreviousOrdersOldestFirst().removeObserver(observerForOldestFirst);
                               LiveData<List<PreviousOrderEntity>> observable = previousOrderViewModel.getAllPreviousOrdersOldestFirst();
-                              observable.removeObserver(observerForOldestFirst);
+                              observable.removeObserver(observer);
                          }
                          //else if (sortingOrderType.equals(some other sorting type)){}
 
@@ -457,7 +431,7 @@ public class PreviousOrdersFragment extends Fragment {
                               //then remove the observer for SORTING_ORDER_2
                               //previousOrderViewModel.getAllPreviousOrdersOldestFirst().removeObserver(observerForNewestFirst);
                               LiveData<List<PreviousOrderEntity>> observable = previousOrderViewModel.getAllPreviousOrdersNewestFirst();
-                              observable.removeObserver(observerForNewestFirst);
+                              observable.removeObserver(observer);
                          }
                          //else if (sortingOrderType.equals(some other sorting type)){}
 
@@ -466,10 +440,23 @@ public class PreviousOrdersFragment extends Fragment {
                     }
                     return true;
                case R.id.delete_all_previous_orders:
+                    DeletePreviousOrdersDialog dialog = new DeletePreviousOrdersDialog();
+                    dialog.setTargetFragment(this, 0);
+                    dialog.show(getParentFragmentManager(), "delete previous orders from the storage");
                     return true;
                default:
                     return super.onOptionsItemSelected(item);
           }
 
+     }
+
+     @Override
+     public void onDialogPositiveClick(boolean keepStarredOrders) {
+          if(keepStarredOrders){
+               previousOrderViewModel.deleteAllNotStarredPreviousOrders();
+          }
+          else {
+               previousOrderViewModel.deleteAllPreviousOrders();
+          }
      }
 }
