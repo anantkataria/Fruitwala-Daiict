@@ -10,6 +10,7 @@ public class FruitItem2 implements Parcelable {
      private ArrayList<String> quantities;
      private ArrayList<String> prices;
      private String availability;
+     private int image_resource;
 
      public FruitItem2(String fruitName, String availability, ArrayList<String> quantities, ArrayList<String> prices) {
           this.fruitName = fruitName;
@@ -35,6 +36,7 @@ public class FruitItem2 implements Parcelable {
           availability = in.readString();
           quantities = in.createStringArrayList();
           prices = in.createStringArrayList();
+          image_resource = in.readInt();
      }
 
      public static final Creator<FruitItem2> CREATOR = new Creator<FruitItem2>() {
@@ -81,6 +83,14 @@ public class FruitItem2 implements Parcelable {
           this.availability = availability;
      }
 
+     public int getImage_resource() {
+          return image_resource;
+     }
+
+     public void setImage_resource(int image_resource) {
+          this.image_resource = image_resource;
+     }
+
      @Override
      public int describeContents() {
           return 0;
@@ -92,5 +102,6 @@ public class FruitItem2 implements Parcelable {
           dest.writeString(availability);
           dest.writeStringList(quantities);
           dest.writeStringList(prices);
+          dest.writeInt(image_resource);
      }
 }

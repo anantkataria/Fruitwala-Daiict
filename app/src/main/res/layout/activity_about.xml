@@ -96,7 +96,13 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="32dp"
-            android:text="feedback"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@drawable/button_design_2"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/colorPrimary"
+            android:text="FEEDBACK"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

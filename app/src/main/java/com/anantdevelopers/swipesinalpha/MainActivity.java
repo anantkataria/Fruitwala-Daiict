@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      private ArrayList<FruitItem> receivedItems;
      private String selectedFruitName;
      private ArrayList<String> selectedFruitQtys, selectedFruitPrices;
+     private int selectedFruitImage;
 
      private BottomNavigationView bottomNavigationView;
      private FragmentContainerView navHostFragment;
@@ -255,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           this.selectedFruitName = item.getFruitName();
           this.selectedFruitPrices = item.getPrices();
           this.selectedFruitQtys = item.getQuantities();
+          this.selectedFruitImage = item.getImage_resource();
      }
 
      @Override
@@ -264,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           bundle.putString("fruitName", this.selectedFruitName);
           bundle.putStringArrayList("fruitQty", this.selectedFruitQtys);
           bundle.putStringArrayList("fruitPrice", this.selectedFruitPrices);
+          bundle.putInt("fruitImage", this.selectedFruitImage);
           //Log.e("MainActivity", this.selectedFruitName);
           customDialogFragment.setArguments(bundle);
           return customDialogFragment;

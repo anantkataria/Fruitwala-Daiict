@@ -32,7 +32,7 @@
 
     <TextView
         android:id="@+id/fruit_price"
-        tools:text="50 Rs."
+        tools:text="Rs. 50"
         android:textSize="35sp"
         android:textColor="@android:color/holo_green_dark"
         android:layout_marginTop="10dp"

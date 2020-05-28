@@ -52,7 +52,12 @@
 
     <Button
         android:id="@+id/requestCancellationButton"
-        android:text="Request Cancellation?"
+        android:text="REQUEST CANCELLATION?"
+        android:background="@drawable/button_design"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_margin="8dp"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

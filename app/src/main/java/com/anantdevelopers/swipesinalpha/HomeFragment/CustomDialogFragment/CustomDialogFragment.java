@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -25,11 +26,13 @@ public class CustomDialogFragment extends DialogFragment {
      private TextView fruitNameTxtView;
      private TextView fruitPriceTxtView;
      private Spinner fruitQtySpinner;
+     private ImageView fruitImageView;
 
      private OnFragmentInteractionListener mListener;
 
      private String receivedFruitName;
      private ArrayList<String> receivedFruitQtys, receivedFruitPrices;
+     private int receivedFruitImage;
 
      private String qty, updatedPrice; //used inside the spinner
 
@@ -46,6 +49,7 @@ public class CustomDialogFragment extends DialogFragment {
                this.receivedFruitName = bundle.getString("fruitName");
                this.receivedFruitPrices = bundle.getStringArrayList("fruitPrice");
                this.receivedFruitQtys = bundle.getStringArrayList("fruitQty");
+               this.receivedFruitImage = bundle.getInt("fruitImage");
           }
      }
 
@@ -61,6 +65,7 @@ public class CustomDialogFragment extends DialogFragment {
           fruitNameTxtView = v.findViewById(R.id.fruitName);
           fruitQtySpinner = v.findViewById(R.id.spinnerForQuantity);
           fruitPriceTxtView = v.findViewById(R.id.fruitTotalPrice);
+          fruitImageView = v.findViewById(R.id.fruit_image_view);
 
           setFruitParams();
           setSpinnerOptions();
@@ -106,6 +111,7 @@ public class CustomDialogFragment extends DialogFragment {
           if (!receivedFruitQtys.isEmpty() && !receivedFruitPrices.isEmpty() && !receivedFruitName.equals("")){
                fruitNameTxtView.setText(receivedFruitName);
                fruitPriceTxtView.setText(receivedFruitPrices.get(0));
+               fruitImageView.setImageResource(receivedFruitImage);
           }
      }
 
@@ -131,41 +137,6 @@ public class CustomDialogFragment extends DialogFragment {
           super.onDetach();
           mListener = null;
      }
-
-//     private void selectSpinnerArrayFromGivenFruitName(String fruitName) {
-//          switch(fruitName){
-//               case "Bananas":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForBananas;
-//                    break;
-//               case "Oranges":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForOranges;
-//                    break;
-//               case "Apple":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForApple;
-//                    break;
-//               case "Chico":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForChico;
-//                    break;
-//               case "Guava":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForGuava;
-//                    break;
-//               case "Kiwi":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForKiwi;
-//                    break;
-//               case "Papaya":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForPapaya;
-//                    break;
-//               case "Pears":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForPears;
-//                    break;
-//               case "Strawberry":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForStrawberry;
-//                    break;
-//               case "Mangoes":
-//                    SpinnerArrayTypeId = R.array.quantityTypesForMangoes;
-//                    break;
-//          }
-//     }
 
      public interface OnFragmentInteractionListener {
           void getItemFromDialogToMainActivity(String receivedFruitName, String receivedFruitQty, String receivedFruitPrice);

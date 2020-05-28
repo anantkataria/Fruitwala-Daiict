@@ -35,19 +35,35 @@
 
     <Button
         android:id="@+id/upiPaymentButton"
-        android:layout_width="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/colorPrimary"
+        android:layout_toStartOf="@+id/upiCheckImage"
+        android:background="@drawable/button_design_2"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:gravity="start|center"
         android:layout_height="wrap_content"
         android:layout_below="@+id/amountDisplayTextView"
         android:layout_margin="8dp"
-        android:text="Pay using UPI" />
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="PAY USING UPI" />
 
     <Button
         android:id="@+id/codButton"
-        android:layout_width="wrap_content"
+        android:layout_toStartOf="@+id/codCheckImage"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:background="@drawable/button_design_2"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:gravity="start|center"
         android:layout_below="@+id/upiPaymentButton"
         android:layout_margin="8dp"
-        android:text="cash on delivery" />
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="CASH ON DELIVERY" />
 
     <ImageView
         android:id="@+id/upiCheckImage"
@@ -65,10 +81,14 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:background="@drawable/button_design"
+        android:foreground="?android:attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="place order" />
+        android:text="PLACE ORDER" />
 
     <ImageView
         android:id="@+id/codCheckImage"

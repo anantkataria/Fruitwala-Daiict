@@ -29,6 +29,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class HomeFragment extends Fragment {
@@ -40,6 +42,8 @@ public class HomeFragment extends Fragment {
      private RecyclerView recyclerView;
      private RecyclerViewAdapterForHomeFragment adapter;
      private ProgressBar progressBar;
+
+     private Map<String, Integer> photoMapOfFruits;
 
      private OnFragmentInteractionListener mListener;
 
@@ -56,9 +60,32 @@ public class HomeFragment extends Fragment {
           super.onCreate(savedInstanceState);
 
           fruits = new ArrayList<>();
+          photoMapOfFruits = new HashMap<>();
 
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
+
+          setupPhotoMapOfFruits();
+
+     }
+
+     private void setupPhotoMapOfFruits() {
+          photoMapOfFruits.put("Apple", R.drawable.ic_apple);
+          photoMapOfFruits.put("Bananas", R.drawable.ic_bananas);
+          photoMapOfFruits.put("Chikoo", R.drawable.ic_chiku);
+          photoMapOfFruits.put("Grapes", R.drawable.ic_grapes);
+          photoMapOfFruits.put("Guava", R.drawable.ic_guava);
+          photoMapOfFruits.put("Kiwifruit", R.drawable.ic_kiwifruit);
+          photoMapOfFruits.put("Oranges", R.drawable.ic_oranges);
+          photoMapOfFruits.put("Pomegranate", R.drawable.ic_pomegranate);
+          photoMapOfFruits.put("Strawberries", R.drawable.ic_strawberry);
+          photoMapOfFruits.put("Watermelon", R.drawable.ic_watermelon);
+          photoMapOfFruits.put("Pears", R.drawable.ic_pears);
+          photoMapOfFruits.put("Mango", R.drawable.ic_mangoes);
+          photoMapOfFruits.put("Papaya", R.drawable.ic_papaya);
+          photoMapOfFruits.put("Pineapple", R.drawable.ic_pineapple);
+          photoMapOfFruits.put("CustardApple", R.drawable.ic_custard_apple);
+          photoMapOfFruits.put("Black Plum", R.drawable.ic_black_plum);
 
      }
 
@@ -135,6 +162,7 @@ public class HomeFragment extends Fragment {
                public void onItemClick(View view, int position) {
                     //Log.e("HomeFragment", fruits.get(position).getFruitName());
                     FruitItem2 selectedFruit = fruits.get(position);
+                    selectedFruit.setImage_resource(photoMapOfFruits.get(selectedFruit.getFruitName()));
                     if(selectedFruit.getAvailability().equals("Available")) {
                          mListener.sendToActivityfromHomeFragment(selectedFruit);
 

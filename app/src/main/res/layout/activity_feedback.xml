@@ -96,13 +96,17 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:gravity="center"
+            android:background="@drawable/button_design_2"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:paddingStart="64dp"
             android:paddingEnd="64dp"
             android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="64dp"
-            android:text="Next" />
+            android:textColor="@color/colorPrimary"
+            android:text="NEXT" />
 
     </LinearLayout>
 

@@ -70,7 +70,8 @@ public class CartFragment extends Fragment {
           proceedToCheckoutButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    if(fruits.isEmpty()) Toast.makeText(getContext(), "Add something to cart first!", Toast.LENGTH_SHORT).show();
+                    if(fruits.isEmpty())  Snackbar.make(parentLayout, "Add something to cart first!", Snackbar.LENGTH_SHORT).show();
+
                     else {
                          Intent checkoutFlowIntent = new Intent(getContext(), CheckoutFlow.class);
                          checkoutFlowIntent.putExtra("Fruits", fruits);
@@ -123,6 +124,7 @@ public class CartFragment extends Fragment {
           public void onClick(View v) {
                fruits.add(position, fruit);
                adapter.notifyItemInserted(position);
+               swipeToDeleteTextView.setVisibility(View.VISIBLE);
                countGrandTotal();
           }
      }
