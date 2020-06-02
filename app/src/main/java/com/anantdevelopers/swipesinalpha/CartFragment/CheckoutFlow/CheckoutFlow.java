@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -44,11 +46,15 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
      private ProgressBar progressBar;
      private TextView progressBarTextView;
      private ImageView upiCheckImage, codCheckImage;
+     private RelativeLayout parentLayout;
 
      private DatabaseReference databaseReference;
      private FirebaseAuth firebaseAuth;
 
+     private ValueEventListener listener;
+
      private String grandTotalPrice;  //grandTotal will be of form "Rs. 300", and grandTotalPrice will be of form "300"
+     private String authPhoneNumber;
 
      private ArrayList<FruitItem> fruits;
 
@@ -78,6 +84,7 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           progressBarTextView = findViewById(R.id.progressBarTextView);
           upiCheckImage = findViewById(R.id.upiCheckImage);
           codCheckImage = findViewById(R.id.codCheckImage);
+          parentLayout = findViewById(R.id.parent_layout);
 
           firebaseAuth = FirebaseAuth.getInstance();
 
@@ -118,6 +125,9 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
                     }
                }
           });
+
+          FirebaseUser user = firebaseAuth.getCurrentUser();
+          authPhoneNumber = user.getPhoneNumber();
      }
 
      private void payUsingCOD() {
@@ -182,10 +192,9 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
      }
 
      private void placeOrder(final String paymentMethod) {
-          FirebaseUser user = firebaseAuth.getCurrentUser();
-          final String authPhoneNumber = user.getPhoneNumber();
 
-          databaseReference.child("Users").child(authPhoneNumber).addListenerForSingleValueEvent(new ValueEventListener() {
+
+          listener = new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     User userDetails = dataSnapshot.getValue(User.class);
@@ -226,14 +235,59 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
 
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    //TODO : implement this
+                    parentLayout.setVisibility(View.INVISIBLE);
+
+                    switch(databaseError.getCode()) {
+                         case DatabaseError.DISCONNECTED :
+                         case DatabaseError.NETWORK_ERROR :
+                              Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.show();
+                              break;
+                         case DatabaseError.OPERATION_FAILED :
+                         case DatabaseError.UNKNOWN_ERROR:
+                              Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.show();
+                              break;
+                         case DatabaseError.PERMISSION_DENIED:
+                              Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.show();
+                              break;
+                         case DatabaseError.MAX_RETRIES:
+                              Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.show();
+                              break;
+                         default:
+                              Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.show();
+                              break;
+                    }
                }
-          });
+          };
+
+          databaseReference.child("Users").child(authPhoneNumber).addListenerForSingleValueEvent(listener);
      }
 
      @Override
      public boolean onSupportNavigateUp() {
           finish();
           return true;
+     }
+
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               CheckoutFlow.this.recreate();
+          }
+     }
+
+     @Override
+     protected void onDestroy() {
+          super.onDestroy();
+          if (listener != null) databaseReference.child("Users").child(authPhoneNumber).removeEventListener(listener);
      }
 }

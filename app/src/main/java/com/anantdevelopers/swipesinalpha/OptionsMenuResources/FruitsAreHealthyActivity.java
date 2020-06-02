@@ -13,7 +13,9 @@ import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,7 +26,7 @@ public class FruitsAreHealthyActivity extends AppCompatActivity {
 
      private WebView webView;
      private ProgressBar progressBar1, progressBarMain;
-     private RelativeLayout mainLayout;
+     private RelativeLayout parentLayout;
 
      private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
      private ValueEventListener listener;
@@ -38,19 +40,19 @@ public class FruitsAreHealthyActivity extends AppCompatActivity {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_fruits_are_healthy);
 
-          setTitle("Health tips");
+          setTitle("HEALTH TIPS");
           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
           webView = findViewById(R.id.web_view);
           progressBar1 = findViewById(R.id.progress_bar);
           progressBarMain = findViewById(R.id.progress_bar_main);
-          mainLayout = findViewById(R.id.main_layout);
+          parentLayout = findViewById(R.id.main_layout);
 
           getUrlFromDatabase(new AfterFetchFromDatabase() {
                @Override
                public void afterFetch(String url) {
                     progressBarMain.setVisibility(View.GONE);
-                    mainLayout.setVisibility(View.VISIBLE);
+                    parentLayout.setVisibility(View.VISIBLE);
                     loadUrlToWebview(url);
                }
           });
@@ -68,7 +70,37 @@ public class FruitsAreHealthyActivity extends AppCompatActivity {
 
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    parentLayout.setVisibility(View.INVISIBLE);
 
+                    switch(databaseError.getCode()) {
+                         case DatabaseError.DISCONNECTED :
+                         case DatabaseError.NETWORK_ERROR :
+                              Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.show();
+                              break;
+                         case DatabaseError.OPERATION_FAILED :
+                         case DatabaseError.UNKNOWN_ERROR:
+                              Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.show();
+                              break;
+                         case DatabaseError.PERMISSION_DENIED:
+                              Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.show();
+                              break;
+                         case DatabaseError.MAX_RETRIES:
+                              Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.show();
+                              break;
+                         default:
+                              Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.show();
+                              break;
+                    }
                }
           };
 
@@ -122,6 +154,13 @@ public class FruitsAreHealthyActivity extends AppCompatActivity {
      @Override
      protected void onDestroy() {
           super.onDestroy();
-          databaseReference.child("URLs").child("FruitsAreHealthy").removeEventListener(listener);
+          if (listener != null) databaseReference.child("URLs").child("FruitsAreHealthy").removeEventListener(listener);
+     }
+
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               FruitsAreHealthyActivity.this.recreate();
+          }
      }
 }

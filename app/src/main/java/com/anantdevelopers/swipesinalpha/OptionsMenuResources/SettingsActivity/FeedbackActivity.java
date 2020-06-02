@@ -3,14 +3,11 @@ package com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ShareCompat;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -20,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.google.android.material.snackbar.Snackbar;
@@ -30,14 +28,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FeedbackActivity extends AppCompatActivity {
 
      private EditText concernEditText;
      private ImageView imageView1, imageView2, imageView3;
-     private ScrollView scrollView;
+     private ScrollView parentLayout;
      private ProgressBar progressBar;
+
+     private ValueEventListener listener;
 
      private static final int REQUEST_IMAGE1_GET = 1;
      private static final int REQUEST_IMAGE2_GET = 2;
@@ -47,9 +46,9 @@ public class FeedbackActivity extends AppCompatActivity {
 
      private String authPhone;
 
-     private DatabaseReference databaseReference;
-
      private User user;
+
+     private DatabaseReference databaseReference;
 
      private interface fetchFromDatabase{
           void afterFetch();
@@ -60,12 +59,16 @@ public class FeedbackActivity extends AppCompatActivity {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_feedback);
 
-          setTitle("Feedback");
+          setTitle("FEEDBACK");
 
           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
           Intent intent = getIntent();
           authPhone = intent.getStringExtra("authPhone");
+          Log.e("96", authPhone);
+
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+          databaseReference = firebaseDatabase.getReference();
 
           user = new User();
 
@@ -74,7 +77,7 @@ public class FeedbackActivity extends AppCompatActivity {
           imageView2 = findViewById(R.id.image2_image_view);
           imageView3 = findViewById(R.id.image3_image_view);
           Button nextButton = findViewById(R.id.next_button);
-          scrollView = findViewById(R.id.scroll_view);
+          parentLayout = findViewById(R.id.scroll_view);
           progressBar = findViewById(R.id.progress_bar);
 
           imageView1.setOnClickListener(new View.OnClickListener() {
@@ -144,10 +147,12 @@ public class FeedbackActivity extends AppCompatActivity {
                @Override
                public void onClick(View v) {
                     final String concern = concernEditText.getText().toString();
+                    Log.e("69696969", "concern = " + concern);
+
                     if(concern.isEmpty()){
-                         Snackbar.make(scrollView, "Enter your concern first", Snackbar.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Enter your concern first", Snackbar.LENGTH_SHORT).show();
                     }else if(concern.length() <= 7){
-                         Snackbar.make(scrollView, "Write more", Snackbar.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Write more", Snackbar.LENGTH_SHORT).show();
                     }else {
                          progressBar.setVisibility(View.VISIBLE);
                          if(progressBar.getVisibility() == View.VISIBLE){
@@ -177,21 +182,16 @@ public class FeedbackActivity extends AppCompatActivity {
      private String getUserDetails() {
           String userDetails = "";
 
-          String[] buildings = {"Hor-Men", "Hor-Men New", "Hor-Women", "Faculty Block"};
-
           userDetails += "\nname : " + user.getUserName();
           userDetails += "\nphone1 : " + user.getPhoneNum1();
           userDetails += "\nphone2 : " + user.getPhoneNum2();
-          userDetails += "\nbuilding : " + buildings[Integer.parseInt(user.getBuilding())-1];
-          userDetails += "\nWing : " + user.getWing();
-          userDetails += "\nRoom : " + user.getRoom();
 
           return userDetails;
      }
 
      private void getUserFromDatabase(final fetchFromDatabase Interface) {
-          databaseReference = FirebaseDatabase.getInstance().getReference();
-          databaseReference.child("Users").child(authPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+
+          listener = new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     user = dataSnapshot.getValue(User.class);
@@ -201,9 +201,41 @@ public class FeedbackActivity extends AppCompatActivity {
 
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    parentLayout.setVisibility(View.INVISIBLE);
 
+                    switch(databaseError.getCode()) {
+                         case DatabaseError.DISCONNECTED :
+                         case DatabaseError.NETWORK_ERROR :
+                              Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.show();
+                              break;
+                         case DatabaseError.OPERATION_FAILED :
+                         case DatabaseError.UNKNOWN_ERROR:
+                              Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.show();
+                              break;
+                         case DatabaseError.PERMISSION_DENIED:
+                              Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.show();
+                              break;
+                         case DatabaseError.MAX_RETRIES:
+                              Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.show();
+                              break;
+                         default:
+                              Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.show();
+                              break;
+                    }
                }
-          });
+          };
+
+          databaseReference.child("Users").child(authPhone).addListenerForSingleValueEvent(listener);
      }
 
      private void composeEmail(String[] emails, String subject, String body, Uri uri1, Uri uri2, Uri uri3) {
@@ -234,10 +266,11 @@ public class FeedbackActivity extends AppCompatActivity {
 
 
           if(emailIntent.resolveActivity(getPackageManager()) != null){
-               startActivity(emailIntent);
+               //startActivity(emailIntent);
+               startActivityForResult(emailIntent, 69);
           }
           else {
-               Snackbar.make(scrollView, "Sorry, We couldn't find any email client apps!", Snackbar.LENGTH_SHORT).show();
+               Snackbar.make(parentLayout, "Sorry, We couldn't find any email client apps!", Snackbar.LENGTH_SHORT).show();
           }
      }
 
@@ -247,7 +280,7 @@ public class FeedbackActivity extends AppCompatActivity {
           if(intent.resolveActivity(getPackageManager()) != null){
                startActivityForResult(intent, REQUEST_IMAGE3_GET);
           }else {
-               Snackbar.make(scrollView, "No Application to perform this task!", Snackbar.LENGTH_SHORT).show();
+               Snackbar.make(parentLayout, "No Application to perform this task!", Snackbar.LENGTH_SHORT).show();
           }
      }
 
@@ -257,7 +290,7 @@ public class FeedbackActivity extends AppCompatActivity {
           if(intent.resolveActivity(getPackageManager()) != null){
                startActivityForResult(intent, REQUEST_IMAGE2_GET);
           }else {
-               Snackbar.make(scrollView, "No Application to perform this task!", Snackbar.LENGTH_SHORT).show();
+               Snackbar.make(parentLayout, "No Application to perform this task!", Snackbar.LENGTH_SHORT).show();
           }
      }
 
@@ -267,7 +300,7 @@ public class FeedbackActivity extends AppCompatActivity {
           if(intent.resolveActivity(getPackageManager()) != null){
                startActivityForResult(intent, REQUEST_IMAGE1_GET);
           }else {
-               Snackbar.make(scrollView, "No Application to perform this task!", Snackbar.LENGTH_SHORT).show();
+               Snackbar.make(parentLayout, "No Application to perform this task!", Snackbar.LENGTH_SHORT).show();
           }
      }
 
@@ -275,21 +308,60 @@ public class FeedbackActivity extends AppCompatActivity {
      protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
           super.onActivityResult(requestCode, resultCode, data);
 
-          if(requestCode == REQUEST_IMAGE1_GET && resultCode==RESULT_OK){
-               uri1 = data.getData();
-               imageView1.setImageURI(uri1);
-          }else if(requestCode == REQUEST_IMAGE2_GET && resultCode == RESULT_OK){
-               uri2 = data.getData();
-               imageView2.setImageURI(uri2);
-          }else if(requestCode == REQUEST_IMAGE3_GET && resultCode==RESULT_OK){
-               uri3 = data.getData();
-               imageView3.setImageURI(uri3);
+          switch (requestCode) {
+               case REQUEST_IMAGE1_GET:
+                    if(resultCode == RESULT_OK) {
+                         uri1 = data.getData();
+                         imageView1.setImageURI(uri1);
+                    }
+                    else if (resultCode == RESULT_CANCELED){
+                         Toast toast = Toast.makeText(FeedbackActivity.this, "try again", Toast.LENGTH_SHORT);
+                         toast.show();
+                    }
+                    break;
+               case REQUEST_IMAGE2_GET:
+                    if(resultCode == RESULT_OK) {
+                         uri2 = data.getData();
+                         imageView2.setImageURI(uri2);
+                    }
+                    else if (resultCode == RESULT_CANCELED){
+                         Toast toast = Toast.makeText(FeedbackActivity.this, "Try again", Toast.LENGTH_SHORT);
+                         toast.show();
+                    }
+                    break;
+               case REQUEST_IMAGE3_GET:
+                    if(resultCode == RESULT_OK) {
+                         uri3 = data.getData();
+                         imageView3.setImageURI(uri3);
+                    }
+                    else if (resultCode == RESULT_CANCELED){
+                         Toast toast = Toast.makeText(FeedbackActivity.this, "Try again", Toast.LENGTH_SHORT);
+                         toast.show();
+                    }
+                    break;
+               case 69:
+                    finish();
+                    break;
           }
+
      }
 
      @Override
      public boolean onSupportNavigateUp() {
           finish();
           return true;
+     }
+
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               FeedbackActivity.this.recreate();
+          }
+     }
+
+     @Override
+     protected void onDestroy() {
+          super.onDestroy();
+          if(listener != null) databaseReference.child("Users").child(authPhone).removeEventListener(listener);
      }
 }

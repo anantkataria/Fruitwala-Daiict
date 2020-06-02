@@ -13,9 +13,6 @@ import com.anantdevelopers.swipesinalpha.R;
 
 public class StoreClosedActivity extends AppCompatActivity {
 
-     private TextView openingAgainTimeTextView;
-     private Button feedbackButton;
-
      private String authPhone;
 
      @Override
@@ -27,8 +24,8 @@ public class StoreClosedActivity extends AppCompatActivity {
           String openingAgainTimeString = intent.getStringExtra("openingAgainTimeString");
           authPhone = intent.getStringExtra("authPhone");
 
-          openingAgainTimeTextView = findViewById(R.id.open_again_time_text_view);
-          feedbackButton = findViewById(R.id.feedback_btn);
+          TextView openingAgainTimeTextView = findViewById(R.id.open_again_time_text_view);
+          Button feedbackButton = findViewById(R.id.feedback_btn);
 
           openingAgainTimeTextView.setText(openingAgainTimeString);
 

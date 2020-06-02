@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:text="Do you want to continue using Cash on Delivery?"
+        android:text="Do you want to order using Cash On Delivery?"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:layout_margin="16dp"
         android:textColor="@android:color/black"

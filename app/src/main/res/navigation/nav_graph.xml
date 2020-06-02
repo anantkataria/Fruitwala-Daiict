@@ -8,16 +8,16 @@
     <fragment
         android:id="@+id/HomeFragment"
         android:name="com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment"
-        android:label="Home"
+        android:label="HOME"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/CartFragment"
         android:name="com.anantdevelopers.swipesinalpha.CartFragment.CartFragment"
-        android:label="Cart"
+        android:label="CART"
         tools:layout="@layout/fragment_cart" />
     <fragment
         android:id="@+id/PreviousOrdersFragment"
         android:name="com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrdersFragment"
-        android:label="Previous orders"
+        android:label="ORDERS"
         tools:layout="@layout/fragment_previous_orders" />
 </navigation>

@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -18,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
@@ -46,8 +43,9 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
 
      private ArrayList<String> buildingSpinnerArrayList, wingSpinnerArrayList;
 
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
+
+     private ValueEventListener listener;
 
      private interface DatabaseInterface{
           void afterFetch();
@@ -58,7 +56,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_profile);
 
-          setTitle("Profile");
+          setTitle("PROFILE");
           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
           Intent intent = getIntent();
@@ -69,7 +67,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           buildingSpinnerArrayList = new ArrayList<>();
           wingSpinnerArrayList = new ArrayList<>();
 
-          firebaseDatabase = FirebaseDatabase.getInstance();
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
 
           setIds();
@@ -93,9 +91,6 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           saveChangesButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    //TODO save the new user to the database and show progressbar during process
-                    //TODO disable screen functioning, and on success or failure, show SnackBar!
-                    //TODO on success close the profile activity
                     if(phone2EditText.getText().toString().length() < 10){
                          Snackbar.make(parentLayout, "Enter valid phone number", Snackbar.LENGTH_SHORT).show();
                     }else{
@@ -117,21 +112,52 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
           }
 
-          databaseReference.child("Users").child(authPhone).addListenerForSingleValueEvent(
-                  new ValueEventListener() {
-                       @Override
-                       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            user = dataSnapshot.getValue(User.class);
+          listener = new ValueEventListener() {
+               @Override
+               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    user = dataSnapshot.getValue(User.class);
 
-                            databaseInterface.afterFetch();
-                       }
+                    databaseInterface.afterFetch();
+               }
 
-                       @Override
-                       public void onCancelled(@NonNull DatabaseError databaseError) {
+               @Override
+               public void onCancelled(@NonNull DatabaseError databaseError) {
+                    parentLayout.setVisibility(View.INVISIBLE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                       }
-                  }
-          );
+                    switch(databaseError.getCode()) {
+                         case DatabaseError.DISCONNECTED :
+                         case DatabaseError.NETWORK_ERROR :
+                              Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.show();
+                              break;
+                         case DatabaseError.OPERATION_FAILED :
+                         case DatabaseError.UNKNOWN_ERROR:
+                              Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.show();
+                              break;
+                         case DatabaseError.PERMISSION_DENIED:
+                              Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.show();
+                              break;
+                         case DatabaseError.MAX_RETRIES:
+                              Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.show();
+                              break;
+                         default:
+                              Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.show();
+                              break;
+                    }
+               }
+          };
+
+          databaseReference.child("Users").child(authPhone).addListenerForSingleValueEvent(listener);
      }
 
      private void setIds() {
@@ -142,7 +168,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           buildingSpinner = findViewById(R.id.building_selection_spinner);
           wingSpinner = findViewById(R.id.wing_letter_spinner);
           saveChangesButton = findViewById(R.id.save_changes_button);
-          parentLayout = findViewById(R.id.parent_view);
+          parentLayout = findViewById(R.id.parent_layout);
           progressBar = findViewById(R.id.progress_bar);
      }
 
@@ -249,4 +275,17 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
 
      @Override
      public void onNothingSelected(AdapterView<?> parent) { }
+
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               ProfileActivity.this.recreate();
+          }
+     }
+
+     @Override
+     protected void onDestroy() {
+          super.onDestroy();
+          if (listener != null) databaseReference.child("Users").child(authPhone).removeEventListener(listener);
+     }
 }

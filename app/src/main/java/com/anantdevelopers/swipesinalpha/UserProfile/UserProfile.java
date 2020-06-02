@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,7 +36,10 @@ public class UserProfile extends AppCompatActivity {
 
      private TextView greetingName, savingDataTextView;
 
-     private EditText nameEditText, authenticatedPhoneNumber, phoneNumber2, roomNumber;
+     private LinearLayout parentLayout;
+     private EditText nameEditText;
+     private EditText phoneNumber2;
+     private EditText roomNumber;
      private Spinner wingLetter;
      private Button btnHorMen, btnHorMenNew, btnHorWomen, btnFB, saveAndContinueBtn;
 
@@ -46,17 +51,18 @@ public class UserProfile extends AppCompatActivity {
 
      private boolean isSavingSuccessful = false;
 
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
+     private ValueEventListener listener;
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_user_profile);
 
+          parentLayout = findViewById(R.id.parent_layout);
           greetingName = findViewById(R.id.userNameTextView);
           nameEditText = findViewById(R.id.nameEditText);
-          authenticatedPhoneNumber = findViewById(R.id.authenticatedPhoneNumber);
+          EditText authenticatedPhoneNumber = findViewById(R.id.authenticatedPhoneNumber);
           phoneNumber2 = findViewById(R.id.phoneNumber2);
           roomNumber = findViewById(R.id.roomNumber);
           wingLetter = findViewById(R.id.wingLetter);
@@ -72,7 +78,7 @@ public class UserProfile extends AppCompatActivity {
           phoneNum1 = intent.getStringExtra("authenticatedPhoneNumber");
           authenticatedPhoneNumber.setText(phoneNum1);
 
-          firebaseDatabase = FirebaseDatabase.getInstance();
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
 
      }
@@ -187,21 +193,51 @@ public class UserProfile extends AppCompatActivity {
                                       }
                                  });
 
-                         databaseReference.child("halfWayExit").child(phoneNum1).addListenerForSingleValueEvent(
-                                 new ValueEventListener() {
-                                      @Override
-                                      public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                           if(dataSnapshot.exists()){
-                                                databaseReference.child("halfWayExit").child(phoneNum1).setValue(null);
-                                           }
-                                      }
+                         listener = new ValueEventListener() {
+                              @Override
+                              public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                   if(dataSnapshot.exists()){
+                                        databaseReference.child("halfWayExit").child(phoneNum1).setValue(null);
+                                   }
+                              }
 
-                                      @Override
-                                      public void onCancelled(@NonNull DatabaseError databaseError) {
+                              @Override
+                              public void onCancelled(@NonNull DatabaseError databaseError) {
+                                   parentLayout.setVisibility(View.INVISIBLE);
 
-                                      }
-                                 }
-                         );
+                                   switch(databaseError.getCode()) {
+                                        case DatabaseError.DISCONNECTED :
+                                        case DatabaseError.NETWORK_ERROR :
+                                             Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
+                                             mySnackbar.setAction("RETRY", new MyRetryListener());
+                                             mySnackbar.show();
+                                             break;
+                                        case DatabaseError.OPERATION_FAILED :
+                                        case DatabaseError.UNKNOWN_ERROR:
+                                             Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                                             mySnackbar1.setAction("RETRY", new MyRetryListener());
+                                             mySnackbar1.show();
+                                             break;
+                                        case DatabaseError.PERMISSION_DENIED:
+                                             Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
+                                             mySnackbar2.setAction("RETRY", new MyRetryListener());
+                                             mySnackbar2.show();
+                                             break;
+                                        case DatabaseError.MAX_RETRIES:
+                                             Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
+                                             mySnackbar3.setAction("RETRY", new MyRetryListener());
+                                             mySnackbar3.show();
+                                             break;
+                                        default:
+                                             Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                                             mySnackbar4.setAction("RETRY", new MyRetryListener());
+                                             mySnackbar4.show();
+                                             break;
+                                   }
+                              }
+                         };
+
+                         databaseReference.child("halfWayExit").child(phoneNum1).addListenerForSingleValueEvent(listener);
                     }
                }
           });
@@ -234,6 +270,14 @@ public class UserProfile extends AppCompatActivity {
                databaseReference.child("halfWayExit").keepSynced(true);
                //now we will check particular number in database in mainactivity and if it is
                //halfway sign in then we send it to this activity.
+          }
+          if (listener != null) databaseReference.child("halfWayExit").child(phoneNum1).removeEventListener(listener);
+     }
+
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               UserProfile.this.recreate();
           }
      }
 }

@@ -1,14 +1,12 @@
 package com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
@@ -16,7 +14,6 @@ import com.anantdevelopers.swipesinalpha.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity implements LogoutDialog.logoutDialogListener {
 
@@ -26,14 +23,15 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
 
      private FirebaseAuth firebaseAuth;
 
-     private ListView listView;
-
      private ArrayList<ListItem> listItems = new ArrayList<>();
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_settings);
+
+          setTitle("SETTINGS");
+          getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
           listItems.add(new ListItem(R.drawable.ic_profile, "Profile", "name, address, phone number..."));
           listItems.add(new ListItem(R.drawable.ic_feedback, "Feedback", "write us your doubts, suggestions, complaints..."));
@@ -43,8 +41,9 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
           Intent intent = getIntent();
           userName = intent.getStringExtra("userName");
           authPhone = intent.getStringExtra("authPhone");
+          Log.e("SettingsActivity69", "userName = " + userName + ", authPhone = " + authPhone);
 
-          listView = findViewById(R.id.list_view);
+          ListView listView = findViewById(R.id.list_view);
           customListAdapter adapter = new customListAdapter(this, R.layout.list_item_settings, listItems);
           listView.setAdapter(adapter);
 
@@ -67,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
                          case 2 :
                               Intent intent2 = new Intent(SettingsActivity.this, AboutActivity.class);
                               intent2.putExtra("userName", userName);
+                              intent2.putExtra("authPhone", authPhone);
                               startActivity(intent2);
                               break;
                          case 3 :
@@ -76,10 +76,6 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
                     }
                }
           });
-
-          setTitle("Settings");
-
-          getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
           firebaseAuth = FirebaseAuth.getInstance();
      }

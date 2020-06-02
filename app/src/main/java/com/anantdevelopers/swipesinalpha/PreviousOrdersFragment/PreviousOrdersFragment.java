@@ -1,9 +1,7 @@
 package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment;
 
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -22,18 +20,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow.CheckoutUser;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderEntity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderViewModel;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.RecyclerViewAdapterForPreviousOrders;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -66,7 +67,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
      private ProgressBar currentOrderProgressBar;
      private TextView noCurrentOrdersTextView;
-
+     private LinearLayout parentLayout;
      private ProgressBar previousOrderProgressBar;
      private TextView noPreviousOrdersTextView;
 
@@ -75,7 +76,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
      private PreviousOrderViewModel previousOrderViewModel;
 
-     private ValueEventListener valueEventListener;
+     private ValueEventListener valueEventListener, valueEventListener2;
 
      private String authPhoneNumber;
      private String token;
@@ -134,6 +135,8 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           // Inflate the layout for this fragment
           View v = inflater.inflate(R.layout.fragment_previous_orders, container, false);
 
+          parentLayout = v.findViewById(R.id.parent_layout);
+
           currentOrderAffairs(v);
           previousOrderAffairs(v);
           return v;
@@ -142,7 +145,8 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      @Override
      public void onDestroy() {
           super.onDestroy();
-          databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeEventListener(valueEventListener);
+          if(valueEventListener != null) databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeEventListener(valueEventListener);
+          if(valueEventListener2 != null) databaseReference.child("Orders").child(authPhoneNumber).removeEventListener(valueEventListener2);
      }
 
 
@@ -286,12 +290,46 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    handleDatabaseError(databaseError);
                }
           };
 
           databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).addValueEventListener(valueEventListener);
 
+     }
+
+     private void handleDatabaseError(DatabaseError databaseError) {
+          parentLayout.setVisibility(View.INVISIBLE);
+
+          switch(databaseError.getCode()) {
+               case DatabaseError.DISCONNECTED :
+               case DatabaseError.NETWORK_ERROR :
+                    Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar.setAction("RETRY", new MyRetryListener());
+                    mySnackbar.show();
+                    break;
+               case DatabaseError.OPERATION_FAILED :
+               case DatabaseError.UNKNOWN_ERROR:
+                    Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar1.setAction("RETRY", new MyRetryListener());
+                    mySnackbar1.show();
+                    break;
+               case DatabaseError.PERMISSION_DENIED:
+                    Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar2.setAction("RETRY", new MyRetryListener());
+                    mySnackbar2.show();
+                    break;
+               case DatabaseError.MAX_RETRIES:
+                    Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar3.setAction("RETRY", new MyRetryListener());
+                    mySnackbar3.show();
+                    break;
+               default:
+                    Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar4.setAction("RETRY", new MyRetryListener());
+                    mySnackbar4.show();
+                    break;
+          }
      }
 
      private void currentOrderAffairs(View v) {
@@ -362,7 +400,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
           currentOrderProgressBar.setVisibility(View.VISIBLE);
 
-          databaseReference.child("Orders").child(authPhoneNumber).addValueEventListener(new ValueEventListener() {
+          valueEventListener2 = new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     currentOrderProgressBar.setVisibility(View.VISIBLE);
@@ -376,10 +414,11 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    //TODO implement this
-
+                    handleDatabaseError(databaseError);
                }
-          });
+          };
+
+          databaseReference.child("Orders").child(authPhoneNumber).addValueEventListener(valueEventListener2);
 
 
      }
@@ -449,6 +488,18 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           }
           else {
                previousOrderViewModel.deleteAllPreviousOrders();
+          }
+     }
+
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               //recreate the fragment
+               PreviousOrdersFragment fragment = (PreviousOrdersFragment) getParentFragmentManager().findFragmentById(R.id.nav_host_fragment);
+               getParentFragmentManager().beginTransaction()
+                       .detach(fragment)
+                       .attach(fragment)
+                       .commit();
           }
      }
 }

@@ -1,38 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clickable="true"
-    tools:context=".MainActivity">
+    android:layout_width="match_parent">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:visibility="invisible"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        app:menu="@menu/bottom_nav_menu" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        />
-
-    <androidx.fragment.app.FragmentContainerView
-        android:visibility = "invisible"
-        android:id="@+id/nav_host_fragment"
-        android:layout_above="@id/bottomNavigationView"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <RelativeLayout
+        android:id="@+id/parent_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph"
-        tools:layout_editor_absoluteX="0dp" />
+        android:clickable="true"
+        tools:context=".MainActivity">
 
-</RelativeLayout>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:visibility="invisible"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            app:menu="@menu/bottom_nav_menu" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:visibility = "invisible"
+            android:id="@+id/nav_host_fragment"
+            android:layout_above="@id/bottomNavigationView"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_graph"
+            tools:layout_editor_absoluteX="0dp" />
+
+    </RelativeLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

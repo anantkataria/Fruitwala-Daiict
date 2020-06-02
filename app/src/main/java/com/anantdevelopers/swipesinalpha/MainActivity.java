@@ -1,14 +1,3 @@
-//add a progress bar which will start loading from the start of the app
-//it will stop if user is not connected to internet
-//or when halfway exit is false and user is signed in properly
-//other two scenarios are 1) user is not authenticated
-//                    or  2) user is authenticated halfway
-//                    in both cases above, the user will get shifted to other activity via intent, so disable progressbar here too.
-
-
-//add fade screen when progressbar is running functionality.
-
-//add fruit price updation check functionality which will check wether fruit prices are changed
 package com.anantdevelopers.swipesinalpha;
 
 import androidx.annotation.NonNull;
@@ -27,7 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import com.anantdevelopers.swipesinalpha.Authentication.AuthActivity;
 import com.anantdevelopers.swipesinalpha.CartFragment.CartFragment;
@@ -41,6 +30,7 @@ import com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity.S
 import com.anantdevelopers.swipesinalpha.StoreClosed.StoreClosedActivity;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -63,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      private BottomNavigationView bottomNavigationView;
      private FragmentContainerView navHostFragment;
      private AppBarConfiguration appBarConfiguration;
+     private RelativeLayout parentLayout;
+
+     private ValueEventListener listener1, listener2, listener3;
 
      private boolean isSavingSuccessful = false;
 
@@ -96,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
           bottomNavigationView = findViewById(R.id.bottomNavigationView);
           navHostFragment = findViewById(R.id.nav_host_fragment);
+          parentLayout = findViewById(R.id.parent_layout);
 
           appBarConfiguration = new AppBarConfiguration.Builder(
                   R.id.HomeFragment, R.id.CartFragment, R.id.PreviousOrdersFragment
@@ -172,7 +166,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      }
 
      private void checkThatStoreIsOpenOrClose(final afterOpenOrClosedCheckedInterface Interface) {
-          databaseReference.child("OpenOrClose").addValueEventListener(new ValueEventListener() {
+
+          listener1 = new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     boolean isOpen = dataSnapshot.child("isOpen").getValue(Boolean.class);
@@ -183,15 +178,52 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    handleDatabaseError(databaseError);
                }
-          });
+          };
+
+          databaseReference.child("OpenOrClose").addValueEventListener(listener1);
+     }
+
+     private void handleDatabaseError(DatabaseError databaseError) {
+          parentLayout.setVisibility(View.INVISIBLE);
+          getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+          switch(databaseError.getCode()) {
+               case DatabaseError.DISCONNECTED :
+               case DatabaseError.NETWORK_ERROR :
+                    Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar.setAction("RETRY", new MyRetryListener());
+                    mySnackbar.show();
+                    break;
+               case DatabaseError.OPERATION_FAILED :
+               case DatabaseError.UNKNOWN_ERROR:
+                    Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar1.setAction("RETRY", new MyRetryListener());
+                    mySnackbar1.show();
+                    break;
+               case DatabaseError.PERMISSION_DENIED:
+                    Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar2.setAction("RETRY", new MyRetryListener());
+                    mySnackbar2.show();
+                    break;
+               case DatabaseError.MAX_RETRIES:
+                    Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar3.setAction("RETRY", new MyRetryListener());
+                    mySnackbar3.show();
+                    break;
+               default:
+                    Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                    mySnackbar4.setAction("RETRY", new MyRetryListener());
+                    mySnackbar4.show();
+                    break;
+          }
      }
 
      private void checkInDatabase(final afterDatabaseFetchingWorkInterface Interface) {
           if(!isSavingSuccessful) {
                //
-               databaseReference.child("halfWayExit").addListenerForSingleValueEvent(new ValueEventListener() {
+               listener2 = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                          //enable progress bar in main activity while this is being checked.
@@ -217,10 +249,11 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                         //Toast.makeText(MainActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
-                         Toast.makeText(MainActivity.this, "Something went really wrong!", Toast.LENGTH_SHORT).show();
+                         handleDatabaseError(databaseError);
                     }
-               });
+               };
+
+               databaseReference.child("halfWayExit").addListenerForSingleValueEvent(listener2);
           }
           else {
                //final String phoneNumber = user.getPhoneNumber();
@@ -235,20 +268,21 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      }
 
      private void getUser() {
-          databaseReference.child("Users").child(authPhone).child("userName").addListenerForSingleValueEvent(
-                  new ValueEventListener() {
-                       @Override
-                       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+          listener3 = new ValueEventListener() {
+               @Override
+               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 //                            user = dataSnapshot.getValue(User.class);
-                              userName = dataSnapshot.getValue(String.class);
-                       }
+                    userName = dataSnapshot.getValue(String.class);
+               }
 
-                       @Override
-                       public void onCancelled(@NonNull DatabaseError databaseError) {
+               @Override
+               public void onCancelled(@NonNull DatabaseError databaseError) {
+                    handleDatabaseError(databaseError);
+               }
+          };
 
-                       }
-                  }
-          );
+          databaseReference.child("Users").child(authPhone).child("userName").addListenerForSingleValueEvent(listener3);
      }
 
      @Override
@@ -295,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                case R.id.about_dest:
                     Intent intent3 = new Intent(MainActivity.this, AboutActivity.class);
                     intent3.putExtra("userName", userName);
+                    intent3.putExtra("authPhone", authPhone);
                     startActivity(intent3);
                     return true;
                default:
@@ -310,4 +345,18 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      @Override
      public ArrayList<FruitItem> getFruitsFromMainToCartFragment() { return receivedItems; }
 
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               MainActivity.this.recreate();
+          }
+     }
+
+     @Override
+     protected void onDestroy() {
+          super.onDestroy();
+          if (listener3 != null) databaseReference.child("Users").child(authPhone).child("userName").removeEventListener(listener3);
+          if (listener2 != null) databaseReference.child("halfWayExit").removeEventListener(listener2);
+          if (listener1 != null) databaseReference.child("OpenOrClose").removeEventListener(listener1);
+     }
 }

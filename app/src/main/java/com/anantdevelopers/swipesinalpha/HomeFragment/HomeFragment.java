@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.HomeFragment.CustomDialogFragment.CustomDialogFragment;
@@ -22,6 +23,7 @@ import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem2;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerItemClickListener;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerViewAdapterForHomeFragment;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,10 +44,13 @@ public class HomeFragment extends Fragment {
      private RecyclerView recyclerView;
      private RecyclerViewAdapterForHomeFragment adapter;
      private ProgressBar progressBar;
+     private RelativeLayout parentLayout;
 
      private Map<String, Integer> photoMapOfFruits;
 
      private OnFragmentInteractionListener mListener;
+
+     private ValueEventListener valueEventListener;
 
      public HomeFragment() {
           // Required empty public constructor
@@ -96,6 +101,7 @@ public class HomeFragment extends Fragment {
 
           progressBar = v.findViewById(R.id.progressBar);
           recyclerView = v.findViewById(R.id.recycler_view_home);
+          parentLayout = v.findViewById(R.id.parent_layout);
 
           getFruitsFromDatabase(new getFruitsInterface() {
                @Override
@@ -116,7 +122,7 @@ public class HomeFragment extends Fragment {
 
      private void getFruitsFromDatabase(final getFruitsInterface fruitsInterface) {
 
-          ValueEventListener valueEventListener = new ValueEventListener() {
+          valueEventListener = new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     // now for each fruit, make a new FruitItem2 object and add it in the
@@ -149,7 +155,37 @@ public class HomeFragment extends Fragment {
 
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    parentLayout.setVisibility(View.INVISIBLE);
 
+                    switch(databaseError.getCode()) {
+                         case DatabaseError.DISCONNECTED :
+                         case DatabaseError.NETWORK_ERROR :
+                              Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.show();
+                              break;
+                         case DatabaseError.OPERATION_FAILED :
+                         case DatabaseError.UNKNOWN_ERROR:
+                              Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.show();
+                              break;
+                         case DatabaseError.PERMISSION_DENIED:
+                              Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.show();
+                              break;
+                         case DatabaseError.MAX_RETRIES:
+                              Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.show();
+                              break;
+                         default:
+                              Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
+                              mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.show();
+                              break;
+                    }
                }
           };
 
@@ -200,4 +236,21 @@ public class HomeFragment extends Fragment {
           mListener = null;
      }
 
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               //recreate the fragment
+               HomeFragment fragment = (HomeFragment) getParentFragmentManager().findFragmentById(R.id.nav_host_fragment);
+               getParentFragmentManager().beginTransaction()
+                       .detach(fragment)
+                       .attach(fragment)
+                       .commit();
+          }
+     }
+
+     @Override
+     public void onDestroy() {
+          super.onDestroy();
+          if (valueEventListener != null) databaseReference.child("Fruits").removeEventListener(valueEventListener);
+     }
 }

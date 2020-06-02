@@ -1,6 +1,3 @@
-//add the textview saying swipe to delete at the bottom of listview/adapter
-
-
 package com.anantdevelopers.swipesinalpha.CartFragment;
 
 import android.content.Context;
@@ -20,8 +17,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow.CheckoutFlow;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerViewAdapterForCartfragment;
@@ -110,7 +105,7 @@ public class CartFragment extends Fragment {
           }
      };
 
-     public class MyUndoListener implements View.OnClickListener {
+     private class MyUndoListener implements View.OnClickListener {
 
           private int position;
           private FruitItem fruit;
