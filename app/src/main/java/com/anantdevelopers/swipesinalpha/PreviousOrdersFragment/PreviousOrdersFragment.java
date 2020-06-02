@@ -167,6 +167,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           switch(sortingOrderType) {
                case SORTING_ORDER_1:
                     observeNewestFirst();
+
                     break;
                case SORTING_ORDER_2:
                     observeOldestFirst();
