@@ -21,8 +21,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="GrandTotal"
+                android:textAllCaps="true"
                 android:layout_marginTop="10dp"
-                android:textSize="35sp"
                 android:textColor="@android:color/black"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:layout_marginStart="8dp"/>
@@ -32,8 +32,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="35sp"
                 android:gravity="end"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 tools:text="Rs. 200"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="30dp"/>

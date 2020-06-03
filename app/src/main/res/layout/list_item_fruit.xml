@@ -11,7 +11,7 @@
         android:hint="Fruit"
         tools:text = "Bananas"
         android:textColor="@android:color/black"
-        android:textSize="25sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:layout_width="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
@@ -27,13 +27,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="QTY"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         tools:text="QTY: 1.5 - 2 kg"
         android:textColor="@android:color/holo_red_light"/>
 
     <TextView
         android:id="@+id/fruit_price"
         tools:text="Rs. 50"
-        android:textSize="35sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@android:color/holo_green_dark"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="30dp"
