@@ -33,7 +33,7 @@ public class PreviousOrderEntity {
           return id;
      }
 
-     String getOrderFruitList() {
+     public String getOrderFruitList() {
           return orderFruitList;
      }
 

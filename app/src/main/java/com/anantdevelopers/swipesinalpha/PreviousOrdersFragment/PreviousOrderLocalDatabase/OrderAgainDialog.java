@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment;
+package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,19 +14,19 @@ import androidx.fragment.app.DialogFragment;
 
 import com.anantdevelopers.swipesinalpha.R;
 
-public class CancelCurrentOrderDialog extends DialogFragment {
+public class OrderAgainDialog extends DialogFragment {
 
      private int position;
 
-     CancelCurrentOrderDialog(int position){
+     public OrderAgainDialog(int position) {
           this.position = position;
      }
 
-     public interface cancelCurrentOrderDialogListener {
-          void onDialogPositiveClickForCancelOrder(int position);
+     public interface OrderAgainDialogListener {
+          void onDialogPositiveClickForOrderAgain(int position);
      }
 
-     private cancelCurrentOrderDialogListener listener;
+     private OrderAgainDialogListener listener;
 
      @NonNull
      @Override
@@ -34,17 +34,17 @@ public class CancelCurrentOrderDialog extends DialogFragment {
           AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
           LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-          View v = inflater.inflate(R.layout.dialog_cancel_current_order, null);
+          View v = inflater.inflate(R.layout.dialog_order_again, null);
 
           builder.setView(v)
-                  .setPositiveButton("YES PLEASE", new DialogInterface.OnClickListener() {
+                  .setPositiveButton("PROCEED", new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
-                            listener.onDialogPositiveClickForCancelOrder(position);
+                            listener.onDialogPositiveClickForOrderAgain(position);
                             dialog.dismiss();
                        }
                   })
-                  .setNegativeButton("NOPE", new DialogInterface.OnClickListener() {
+                  .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
@@ -59,9 +59,9 @@ public class CancelCurrentOrderDialog extends DialogFragment {
           super.onAttach(context);
 
           try {
-               listener = (cancelCurrentOrderDialogListener) getTargetFragment();
-          } catch (ClassCastException e){
-               throw new ClassCastException(getTargetFragment().toString() + " must implement cancelCurrentOrderDialogListener.");
+               listener = (OrderAgainDialogListener) getTargetFragment();
+          } catch (ClassCastException e) {
+               throw new ClassCastException(getTargetFragment().toString() + " must implement OrderAgainDialogListener.");
           }
      }
 }

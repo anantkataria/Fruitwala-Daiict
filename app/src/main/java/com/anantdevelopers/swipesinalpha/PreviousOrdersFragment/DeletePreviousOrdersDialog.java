@@ -20,7 +20,7 @@ public class DeletePreviousOrdersDialog extends DialogFragment {
      private CheckBox checkBox;
 
      public interface DeletePreviousOrdersDialogListener {
-          void onDialogPositiveClick(boolean keepStarredOrders);
+          void onDialogPositiveClickForDeletePreviousOrders(boolean keepStarredOrders);
      }
 
      private DeletePreviousOrdersDialogListener listener;
@@ -40,7 +40,7 @@ public class DeletePreviousOrdersDialog extends DialogFragment {
                        @Override
                        public void onClick(DialogInterface dialog, int which) {
                             boolean keepStarred = checkBox.isChecked();
-                            listener.onDialogPositiveClick(keepStarred);
+                            listener.onDialogPositiveClickForDeletePreviousOrders(keepStarred);
                             dialog.dismiss();
                        }
                   })

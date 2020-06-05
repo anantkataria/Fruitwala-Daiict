@@ -1,9 +1,13 @@
 package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,9 +22,15 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
 
      private List<PreviousOrderEntity> previousOrders = new ArrayList<>();
      private OnItemClickListener mListener;
+     private Context context;
 
      public interface OnItemClickListener {
           void onItemTouchHold(int position);
+          void onOrderAgainButtonClick(int position);
+     }
+
+     public RecyclerViewAdapterForPreviousOrders(Context context){
+          this.context = context;
      }
 
      public void setOnItemClickListener(OnItemClickListener listener){
@@ -38,6 +48,9 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
 
      @Override
      public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+//          holder.parentLayout.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation_2));
+
           PreviousOrderEntity current = previousOrders.get(position);
           holder.listOfFruitsTextView.setText(current.getOrderFruitList());
           holder.statusTextView.setText(current.getStatus());
@@ -72,12 +85,17 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
           private TextView grandTotalTextView;
           private ImageView starImageView;
 
+          private LinearLayout parentLayout;
+
           ViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
                super(itemView);
                listOfFruitsTextView = itemView.findViewById(R.id.listOfFruitsTextView);
                statusTextView = itemView.findViewById(R.id.PreviousOrderStatus);
                grandTotalTextView = itemView.findViewById(R.id.grandTotalTextView);
                starImageView = itemView.findViewById(R.id.star_image_view);
+               Button orderAgainButton = itemView.findViewById(R.id.orderAgainButton);
+
+               parentLayout = itemView.findViewById(R.id.parent_layout);
 
                itemView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
@@ -90,6 +108,18 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
                               }
                          }
                          return false;
+                    }
+               });
+
+               orderAgainButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                         if(listener != null){
+                              int position = getAdapterPosition();
+                              if(position != RecyclerView.NO_POSITION){
+                                   listener.onOrderAgainButtonClick(position);
+                              }
+                         }
                     }
                });
           }

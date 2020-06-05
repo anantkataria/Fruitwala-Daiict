@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow.CheckoutUser;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.MainActivity;
+import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.OrderAgainDialog;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderEntity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderViewModel;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.RecyclerViewAdapterForPreviousOrders;
@@ -48,11 +50,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static android.view.View.GONE;
 
 
-public class PreviousOrdersFragment extends Fragment implements DeletePreviousOrdersDialog.DeletePreviousOrdersDialogListener, CancelCurrentOrderDialog.cancelCurrentOrderDialogListener {
+public class PreviousOrdersFragment extends Fragment implements DeletePreviousOrdersDialog.DeletePreviousOrdersDialogListener, CancelCurrentOrderDialog.cancelCurrentOrderDialogListener, OrderAgainDialog.OrderAgainDialogListener {
 
      private static final String SORTING_ORDER_1 = "newest_first";
      private static final String SORTING_ORDER_2 = "oldest_first";
@@ -69,7 +72,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      private TextView noCurrentOrdersTextView;
      private LinearLayout parentLayout;
      private ProgressBar previousOrderProgressBar;
-     private TextView noPreviousOrdersTextView;
+     private TextView noPreviousOrdersTextView, pleaseWaitTextView;
 
      private RecyclerViewAdapterForCurrentOrders adapterForCurrentOrders;
      private RecyclerViewAdapterForPreviousOrders adapter;
@@ -88,6 +91,10 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
      public PreviousOrdersFragment() {
           // Required empty public constructor
+     }
+
+     private interface FruitsFromdatabase {
+          void afterFetch(Map<String, ArrayList<String>> latestQtyMap, Map<String, ArrayList<Integer>> latestPriceMap);
      }
 
      private interface DatabaseCallbackInterface { //interface is used to handle asynchronous calls of firebase
@@ -154,9 +161,10 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      private void previousOrderAffairs(final View v) {
           previousOrderProgressBar = v.findViewById(R.id.previousOrdersProgressBar);
           noPreviousOrdersTextView = v.findViewById(R.id.noPreviousOrdersTextView);
+          pleaseWaitTextView = v.findViewById(R.id.please_wait_text_view);
 
           RecyclerView previousOrdersRecyclerView = v.findViewById(R.id.previousOrdersRecyclerView);
-          adapter = new RecyclerViewAdapterForPreviousOrders();
+          adapter = new RecyclerViewAdapterForPreviousOrders(getContext());
 
           //setting the recycler view
           previousOrdersRecyclerView.setAdapter(adapter);
@@ -165,12 +173,10 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           sortingOrderType = sharedPreferences.getString(SORTING_ORDER_TYPE_STORAGE_KEY, SORTING_ORDER_1);
 
           switch(sortingOrderType) {
-               case SORTING_ORDER_1:
-                    observeNewestFirst();
-                    break;
                case SORTING_ORDER_2:
                     observeOldestFirst();
                     break;
+               case SORTING_ORDER_1:
                default:
                     observeNewestFirst();
                     break;
@@ -184,19 +190,18 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                public void fromOnChildManipulated(ArrayList<CheckoutUser> previousOrdersList) {
                     ArrayList<PreviousOrderEntity> ordersToAddInRoom = new ArrayList<>();
                     for(CheckoutUser u : previousOrdersList){
-                         String orderFruitList = "";
-                         String status = "";
+                         StringBuilder orderFruitList = new StringBuilder();
                          int grandTotal = 0;
-                         status = u.getStatus();
+                         String status = u.getStatus();
                          for(FruitItem f : u.getFruits()){
-                              orderFruitList += f.getFruitName() + ", " + f.getFruitQty() + ", " + f.getFruitPrice() + "\n";
-                              grandTotal += Integer.valueOf(f.getFruitPrice().replaceAll("[Rs.\\s]", ""));
+                              orderFruitList.append(f.getFruitName()).append(", ").append(f.getFruitQty()).append(", ").append(f.getFruitPrice()).append("\n");
+                              grandTotal += Integer.parseInt(f.getFruitPrice().replaceAll("[Rs.\\s]", ""));
                          }
 
                          Long orderPlacedDate =Long.parseLong(u.getOrderPlacedDate());
                          Long orderDeliveredOrCancelledDate = Long.parseLong(u.getOrderDeliveredOrCancelledDate());
 
-                         ordersToAddInRoom.add(new PreviousOrderEntity(orderFruitList, status, "GrandTotal : " + grandTotal + " Rs.", orderPlacedDate, orderDeliveredOrCancelledDate,"false"));
+                         ordersToAddInRoom.add(new PreviousOrderEntity(orderFruitList.toString(), status, "GrandTotal : " + grandTotal + " Rs.", orderPlacedDate, orderDeliveredOrCancelledDate,"false"));
                     }
 
                     for(PreviousOrderEntity poe : ordersToAddInRoom){
@@ -219,7 +224,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                     }
                     else {
                          noPreviousOrdersTextView.setVisibility(GONE);
-                         handleLongClicks();
+                         handleClicksForPreviousOrders();
                     }
                     adapter.setPreviousOrders(previousOrderEntities);
                }
@@ -237,7 +242,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                     }
                     else {
                          noPreviousOrdersTextView.setVisibility(GONE);
-                         handleLongClicks();
+                         handleClicksForPreviousOrders();
                     }
                     adapter.setPreviousOrders(previousOrderEntities);
                }
@@ -246,7 +251,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           previousOrderViewModel.getAllPreviousOrdersNewestFirst().observe(getViewLifecycleOwner(), observer);
      }
 
-     private void handleLongClicks() {
+     private void handleClicksForPreviousOrders() {
           adapter.setOnItemClickListener(new RecyclerViewAdapterForPreviousOrders.OnItemClickListener() {
                @Override
                public void onItemTouchHold(int position) {
@@ -261,6 +266,13 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                     }
                     previousOrderViewModel.update(poe);
 
+               }
+
+               @Override
+               public void onOrderAgainButtonClick(int position) {
+                    OrderAgainDialog dialog2 = new OrderAgainDialog(position);
+                    dialog2.setTargetFragment(PreviousOrdersFragment.this, 0);
+                    dialog2.show(getParentFragmentManager(), "ordering again from position " + position);
                }
           });
      }
@@ -371,7 +383,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      }
 
      @Override
-     public void onDialogPositiveClick(int position) {
+     public void onDialogPositiveClickForCancelOrder(int position) {
           CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
           currentOrderDetails.setStatus("CANCELLATION REQUESTED");
           currentOrderProgressBar.setVisibility(View.VISIBLE);
@@ -482,13 +494,120 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      }
 
      @Override
-     public void onDialogPositiveClick(boolean keepStarredOrders) {
+     public void onDialogPositiveClickForDeletePreviousOrders(boolean keepStarredOrders) {
           if(keepStarredOrders){
                previousOrderViewModel.deleteAllNotStarredPreviousOrders();
           }
           else {
                previousOrderViewModel.deleteAllPreviousOrders();
           }
+     }
+
+     @Override
+     public void onDialogPositiveClickForOrderAgain(int position) {
+
+          // first thing is we make map<string fruitname, int price> from the listoffruitsTextview of the
+          // current order item.
+          // Then we get map1<string fruitname, arraylist<string> fruitquantity> and map2<string fruitname, arraylist<int> fruitprices>
+          // from the database.
+          // Then pass all three maps to the viewmodel where we will start work in AsyncTask to calculate
+          // and make arraylist of FruitItem
+          // return this arraylist into this fragment from the viewmodel,
+          // and then send this array list into the mainActivity via interface.
+          previousOrderProgressBar.setVisibility(View.VISIBLE);
+
+          final Map<String, Integer> actualPriceMap = getActualPriceMap(position);
+
+          pleaseWaitTextView.setVisibility(View.VISIBLE);
+
+
+          fetchFruits(new FruitsFromdatabase() {
+               @Override
+               public void afterFetch(Map<String, ArrayList<String>> latestQtyMap, Map<String, ArrayList<Integer>> latestPriceMap) {
+                    pleaseWaitTextView.setText("FEW SECONDS LEFT...");
+                    // when making pleaseWaitTextView GONE, do not forget to set its text to the original again in CAPITAL letters
+
+                    //now we have got all three maps, the work here is done.
+                    //start implementing the viewmodelclass.
+                    /*StringBuilder actualPriceMapString = new StringBuilder();
+                    for(Map.Entry<String, Integer> entry: actualPriceMap.entrySet()){
+                         actualPriceMapString.append("key = ").append(entry.getKey()).append(", value = ").append(entry.getValue()).append("\n");
+                    }
+
+                    Log.e("6969", "actualPriceMap = " + actualPriceMapString);
+
+                    StringBuilder latestQtyMapString = new StringBuilder();
+                    for(Map.Entry<String, ArrayList<String>> entry: latestQtyMap.entrySet()){
+                         latestQtyMapString.append("key = ").append(entry.getKey()).append(", value = ").append(entry.getValue()).append("\n");
+                    }
+
+                    Log.e("6969", "latestQtyMapString = " + latestQtyMapString);
+
+                    StringBuilder latestPriceMapString = new StringBuilder();
+                    for(Map.Entry<String, ArrayList<Integer>> entry: latestPriceMap.entrySet()){
+                         latestPriceMapString.append("key = ").append(entry.getKey()).append(", value = ").append(entry.getValue()).append("\n");
+                    }
+
+                    Log.e("6969", "latestPriceMapString = " + latestPriceMapString);
+                    */
+
+
+               }
+          });
+
+     }
+
+     private Map<String, Integer> getActualPriceMap(int position) {
+          Map<String, Integer> actualPriceMap = new HashMap<>();
+          PreviousOrderEntity poe = adapter.getOrderAtPosition(position);
+          String text = poe.getOrderFruitList();
+
+          String[] substrings = text.split("\\n");
+          for (String s : substrings){
+               String[] substringsForAFruit = s.split("\\s*,\\s*");
+               int price = Integer.parseInt(substringsForAFruit[2].replaceAll("[Rs.\\s]", ""));
+               actualPriceMap.put(substringsForAFruit[0], price);
+          }
+
+          return actualPriceMap;
+     }
+
+     private void fetchFruits(final FruitsFromdatabase fruitsFromdatabase) {
+          databaseReference.child("Fruits").addListenerForSingleValueEvent(new ValueEventListener() {
+               @Override
+               public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    Map<String, ArrayList<String>> latestQtyMap = new HashMap<>();
+                    Map<String, ArrayList<Integer>> latestPriceMap = new HashMap<>();
+
+                    for (DataSnapshot d: dataSnapshot.getChildren()){
+                         if(Objects.equals(d.child("Availability").getValue(String.class), "Available")){
+
+                              ArrayList<String> qtys = new ArrayList<>();
+                              ArrayList<Integer> prices = new ArrayList<>();
+
+                              for(DataSnapshot d1: d.child("prices").getChildren()){
+                                   String priceString = d1.getValue(String.class);
+                                   prices.add(Integer.parseInt(priceString.replaceAll("[Rs.\\s]", "")));
+                              }
+
+                              for (DataSnapshot d2: d.child("qty").getChildren()){
+                                   qtys.add(d2.getValue(String.class));
+                              }
+
+                              latestPriceMap.put(d.getKey(), prices);
+                              latestQtyMap.put(d.getKey(), qtys);
+                         }
+                    }
+
+                    fruitsFromdatabase.afterFetch(latestQtyMap, latestPriceMap);
+               }
+
+               @Override
+               public void onCancelled(@NonNull DatabaseError databaseError) {
+                    handleDatabaseError(databaseError);
+               }
+          });
      }
 
      private class MyRetryListener implements View.OnClickListener {

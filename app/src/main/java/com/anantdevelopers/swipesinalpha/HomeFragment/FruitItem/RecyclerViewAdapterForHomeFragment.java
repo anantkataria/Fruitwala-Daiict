@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -13,21 +15,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.anantdevelopers.swipesinalpha.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<RecyclerViewAdapterForHomeFragment.ViewHolder>{
 
      private ArrayList<FruitItem2> fruits;
      private Context context;
+     private Map<String, Integer> photoMapOfFruits;
 
-     public RecyclerViewAdapterForHomeFragment(Context context, ArrayList<FruitItem2> fruits) {
+     public RecyclerViewAdapterForHomeFragment(Context context, ArrayList<FruitItem2> fruits, Map<String, Integer> photoMapOfFruits) {
           this.fruits = fruits;
           this.context = context;
+          this.photoMapOfFruits = photoMapOfFruits;
      }
 
      @NonNull
      @Override
      public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-          View view = LayoutInflater.from(context).inflate(R.layout.list_item_fruit
+          View view = LayoutInflater.from(context).inflate(R.layout.list_item_home_2
           , parent, false);
           return new ViewHolder(view);
      }
@@ -35,7 +41,12 @@ public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<Rec
      @Override
      public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
           FruitItem2 currentItem = fruits.get(position);
+
+          holder.fruitImageView.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_transition_animation));
+          holder.parentLayout.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation));
+
           holder.fruitName.setText(currentItem.getFruitName());
+          holder.fruitImageView.setImageResource(photoMapOfFruits.get(currentItem.getFruitName()));
           if(currentItem.getAvailability().equals("Available")){
                holder.fruitQty.setText(currentItem.getQuantities().get(0));
                holder.fruitPrice.setText(currentItem.getPrices().get(0));
@@ -52,21 +63,23 @@ public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<Rec
           return fruits.size();
      }
 
-     class ViewHolder extends RecyclerView.ViewHolder{
+     static class ViewHolder extends RecyclerView.ViewHolder{
           TextView fruitName;
           TextView fruitQty;
           TextView fruitPrice;
           TextView notAvailableTxtView;
+          ImageView fruitImageView;
 
           RelativeLayout parentLayout;
           ViewHolder(@NonNull View itemView) {
                super(itemView);
-               fruitName = itemView.findViewById(R.id.fruit_name);
-               fruitQty = itemView.findViewById(R.id.fruit_qty);
-               fruitPrice = itemView.findViewById(R.id.fruit_price);
+               fruitName = itemView.findViewById(R.id.fruit_name_text_view);
+               fruitQty = itemView.findViewById(R.id.fruit_qty_text_view);
+               fruitPrice = itemView.findViewById(R.id.fruit_price_text_view);
                notAvailableTxtView = itemView.findViewById(R.id.not_available_text_view);
+               fruitImageView = itemView.findViewById(R.id.fruit_image_view);
 
-               parentLayout = itemView.findViewById(R.id.parent_layout);
+               parentLayout = itemView.findViewById(R.id.relativeLayout);
           }
      }
 }

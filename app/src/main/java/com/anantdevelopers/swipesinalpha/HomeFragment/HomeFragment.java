@@ -24,6 +24,8 @@ import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerItemClickListener;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerViewAdapterForHomeFragment;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -109,7 +111,7 @@ public class HomeFragment extends Fragment {
                     //after fetching, we will show the recycler view and hide the progress bar
                     recyclerView.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
-                    adapter = new RecyclerViewAdapterForHomeFragment(getContext(), fruits);
+                    adapter = new RecyclerViewAdapterForHomeFragment(getContext(), fruits, photoMapOfFruits);
                     recyclerView.setAdapter(adapter);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -189,7 +191,10 @@ public class HomeFragment extends Fragment {
                }
           };
 
-          databaseReference.child("Fruits").addListenerForSingleValueEvent(valueEventListener);
+          FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+          if (user != null) {
+               databaseReference.child("Fruits").addListenerForSingleValueEvent(valueEventListener);
+          }
      }
 
      private void handleClickEvents() {

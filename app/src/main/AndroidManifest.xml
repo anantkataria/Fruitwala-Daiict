@@ -11,32 +11,34 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".StoreClosed.StoreClosedActivity"></activity>
-        <activity android:name=".OptionsMenuResources.SettingsActivity.FeedbackActivity" />
+        <activity android:name=".StoreClosed.StoreClosedActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".OptionsMenuResources.SettingsActivity.FeedbackActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".OptionsMenuResources.SettingsActivity.ProfileActivity"
-            android:screenOrientation="locked" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".OptionsMenuResources.AboutActivity"
-            android:screenOrientation="locked" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".OptionsMenuResources.FruitsAreHealthyActivity"
-            android:screenOrientation="locked" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".OptionsMenuResources.SettingsActivity.SettingsActivity"
-            android:screenOrientation="locked" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".CartFragment.CheckoutFlow.CheckoutFlow"
-            android:screenOrientation="locked" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".UserProfile.UserProfile"
-            android:screenOrientation="locked" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Authentication.AuthActivity"
-            android:screenOrientation="locked" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="locked"
+            android:screenOrientation="portrait"
             android:theme="@style/splashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
