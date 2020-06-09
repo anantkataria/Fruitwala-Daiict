@@ -26,9 +26,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anantdevelopers.swipesinalpha.CartFragment.CartFragment;
 import com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow.CheckoutUser;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
-import com.anantdevelopers.swipesinalpha.MainActivity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.OrderAgainDialog;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderEntity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderViewModel;
@@ -78,6 +78,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      private RecyclerViewAdapterForPreviousOrders adapter;
 
      private PreviousOrderViewModel previousOrderViewModel;
+     private OrderAgainViewModel orderAgainViewModel;
 
      private ValueEventListener valueEventListener, valueEventListener2;
 
@@ -88,6 +89,8 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      private String sortingOrderType;
 
      private Observer<List<PreviousOrderEntity>> observer;
+
+     private sendOrderAgainItemsToMainActivityListener mListener;
 
      public PreviousOrdersFragment() {
           // Required empty public constructor
@@ -123,7 +126,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           previousOrdersList = new ArrayList<>();
 
           previousOrderViewModel = new ViewModelProvider(this).get(PreviousOrderViewModel.class);
-
+          orderAgainViewModel = new ViewModelProvider(this).get(OrderAgainViewModel.class);
           getToken();
      }
 
@@ -182,6 +185,28 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                     break;
           }
 
+          orderAgainViewModel.getCartItems().observe(getViewLifecycleOwner(), new Observer<List<FruitItem>>() {
+               @Override
+               public void onChanged(List<FruitItem> fruitItems) {
+                    if(fruitItems.isEmpty()) {
+                         Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                         Log.e("observe", "fruitItems are empty");
+                    }
+                    else {
+                         //now make an interface that will send this items to the main activity and
+                         //in main activity, clear the arraylist that we will send to the cart and
+                         //set items of that arrayList to this arrayList. thats it.
+
+                         //after that interface,
+                         //set a toast that items added to the cart.
+                         Log.e("observe", "fruitItems are not empty");
+                         mListener.sendToMainFromPreviousOrderFragment(fruitItems);
+                         Toast.makeText(getContext(), "Fruits added to cart!", Toast.LENGTH_SHORT).show();
+                    }
+                    previousOrderProgressBar.setVisibility(GONE);
+                    pleaseWaitTextView.setVisibility(GONE);
+               }
+          });
 
 
 
@@ -525,32 +550,13 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                @Override
                public void afterFetch(Map<String, ArrayList<String>> latestQtyMap, Map<String, ArrayList<Integer>> latestPriceMap) {
                     pleaseWaitTextView.setText("FEW SECONDS LEFT...");
-                    // when making pleaseWaitTextView GONE, do not forget to set its text to the original again in CAPITAL letters
 
-                    //now we have got all three maps, the work here is done.
-                    //start implementing the viewmodelclass.
-                    /*StringBuilder actualPriceMapString = new StringBuilder();
-                    for(Map.Entry<String, Integer> entry: actualPriceMap.entrySet()){
-                         actualPriceMapString.append("key = ").append(entry.getKey()).append(", value = ").append(entry.getValue()).append("\n");
-                    }
+                    Log.e("afterfetch", "after ondatachange()");
+                    orderAgainViewModel.setActualPriceMap(actualPriceMap);
+                    orderAgainViewModel.setLatestPriceMap(latestPriceMap);
+                    orderAgainViewModel.setLatestQtyMap(latestQtyMap);
 
-                    Log.e("6969", "actualPriceMap = " + actualPriceMapString);
-
-                    StringBuilder latestQtyMapString = new StringBuilder();
-                    for(Map.Entry<String, ArrayList<String>> entry: latestQtyMap.entrySet()){
-                         latestQtyMapString.append("key = ").append(entry.getKey()).append(", value = ").append(entry.getValue()).append("\n");
-                    }
-
-                    Log.e("6969", "latestQtyMapString = " + latestQtyMapString);
-
-                    StringBuilder latestPriceMapString = new StringBuilder();
-                    for(Map.Entry<String, ArrayList<Integer>> entry: latestPriceMap.entrySet()){
-                         latestPriceMapString.append("key = ").append(entry.getKey()).append(", value = ").append(entry.getValue()).append("\n");
-                    }
-
-                    Log.e("6969", "latestPriceMapString = " + latestPriceMapString);
-                    */
-
+                    orderAgainViewModel.startCalculation();
 
                }
           });
@@ -579,6 +585,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
                     Map<String, ArrayList<String>> latestQtyMap = new HashMap<>();
                     Map<String, ArrayList<Integer>> latestPriceMap = new HashMap<>();
+                    Log.e("onDatachange", "method starting");
 
                     for (DataSnapshot d: dataSnapshot.getChildren()){
                          if(Objects.equals(d.child("Availability").getValue(String.class), "Available")){
@@ -620,5 +627,27 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                        .attach(fragment)
                        .commit();
           }
+     }
+
+     public interface sendOrderAgainItemsToMainActivityListener {
+          void sendToMainFromPreviousOrderFragment(List<FruitItem> cartItems);
+     }
+
+     @Override
+     public void onAttach(@NonNull Context context) {
+          super.onAttach(context);
+
+          if (context instanceof sendOrderAgainItemsToMainActivityListener) {
+               mListener = (sendOrderAgainItemsToMainActivityListener) context;
+          } else {
+               throw new RuntimeException(context.toString()
+                       + " must implement PreviousOrdersFragment.sendOrderAgainItemsToMainActivityListener");
+          }
+     }
+
+     @Override
+     public void onDetach() {
+          super.onDetach();
+          mListener = null;
      }
 }

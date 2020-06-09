@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -52,13 +51,13 @@ public class RecyclerViewAdapterForCurrentOrders extends RecyclerView.Adapter<Re
 
           ArrayList<FruitItem> fruitsForAnOrder = listItems.get(position).getFruits();
           String status = listItems.get(position).getStatus();
-          String FruitsList = "";
+          StringBuilder FruitsList = new StringBuilder();
           int totalPrice = 0;
           for(FruitItem f: fruitsForAnOrder){
-               FruitsList += f.getFruitName() + ", " + f.getFruitQty() + ", " + f.getFruitPrice() + "\n";
-               totalPrice += Integer.valueOf(f.getFruitPrice().replaceAll("[Rs.\\s]", ""));
+               FruitsList.append(f.getFruitName()).append(", ").append(f.getFruitQty()).append(", ").append(f.getFruitPrice()).append("\n");
+               totalPrice += Integer.parseInt(f.getFruitPrice().replaceAll("[Rs.\\s]", ""));
           }
-          holder.listOfFruitsTextView.setText(FruitsList);
+          holder.listOfFruitsTextView.setText(FruitsList.toString());
           holder.grandTotalTextView.setText("GrandTotal : "+totalPrice+" Rs.");
           holder.currentOrderStatus.setText(status);
 
@@ -79,8 +78,6 @@ public class RecyclerViewAdapterForCurrentOrders extends RecyclerView.Adapter<Re
           private TextView currentOrderStatus;
           private Button requestForCancelButton;
 
-          private LinearLayout parentLayout;
-
           public ViewHolder(@NonNull View itemView, final onButtonClickListener listener) {
                super(itemView);
                listOfFruitsTextView = itemView.findViewById(R.id.listOfFruitsTextView);
@@ -88,7 +85,7 @@ public class RecyclerViewAdapterForCurrentOrders extends RecyclerView.Adapter<Re
                currentOrderStatus = itemView.findViewById(R.id.CurrentOrderStatus);
                requestForCancelButton = itemView.findViewById(R.id.requestCancellationButton);
 
-               parentLayout = itemView.findViewById(R.id.parent_layout);
+               LinearLayout parentLayout = itemView.findViewById(R.id.parent_layout);
 
                requestForCancelButton.setOnClickListener(new View.OnClickListener() {
                     @Override

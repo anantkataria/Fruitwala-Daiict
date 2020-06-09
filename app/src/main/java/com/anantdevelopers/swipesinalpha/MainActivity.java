@@ -10,6 +10,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsAreHealthyActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity.SettingsActivity;
+import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrdersFragment;
 import com.anantdevelopers.swipesinalpha.StoreClosed.StoreClosedActivity;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -40,8 +42,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, CartFragment.OnFragmentInteractionListener, CustomDialogFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, CartFragment.OnFragmentInteractionListener, CustomDialogFragment.OnFragmentInteractionListener, PreviousOrdersFragment.sendOrderAgainItemsToMainActivityListener {
 
      private DatabaseReference databaseReference;
 
@@ -342,6 +345,13 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      @Override
      public void getItemFromDialogToMainActivity(String receivedFruitName, String receivedFruitQty, String receivedFruitPrice) {
           receivedItems.add(new FruitItem(receivedFruitName, receivedFruitQty, receivedFruitPrice));
+     }
+
+     @Override
+     public void sendToMainFromPreviousOrderFragment(List<FruitItem> cartItems) {
+          receivedItems.clear();
+          receivedItems = (ArrayList<FruitItem>) cartItems;
+          Log.e("MainActivityxx", "cartItems in main activity = " + cartItems);
      }
 
      @Override

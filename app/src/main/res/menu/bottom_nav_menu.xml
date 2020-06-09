@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/HomeFragment"
-        android:title="Home"
+        android:title="HOME"
         android:icon="@drawable/ic_home"/>
 
     <item
         android:id="@+id/CartFragment"
-        android:title="Cart"
+        android:title="CART"
         android:icon="@drawable/ic_add_shopping_cart"/>
 
     <item
         android:id="@+id/PreviousOrdersFragment"
-        android:title="Orders"
+        android:title="ORDERS"
         android:icon="@drawable/previous_orders"/>
 
 </menu>

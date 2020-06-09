@@ -62,13 +62,17 @@
     </ScrollView>
 
     <Button
+        android:textColor="@android:color/white"
+        android:background="@drawable/button_design"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="8dp"
         android:id="@+id/feedback_btn"
-        android:text="feedback / queries"
+        android:text="FEEDBACK / QUERIES"
         android:layout_centerHorizontal="true"
-        android:paddingStart="64dp"
-        android:paddingEnd="64dp"
+        android:paddingStart="48dp"
+        android:paddingEnd="48dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

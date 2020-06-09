@@ -67,7 +67,7 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_checkout_flow);
 
-          setTitle("Checkout");
+          setTitle("CHECKOUT");
           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
           Intent intent = getIntent();
