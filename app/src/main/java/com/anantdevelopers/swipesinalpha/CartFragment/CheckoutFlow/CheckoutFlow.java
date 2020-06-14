@@ -4,12 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -78,7 +77,7 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           Log.e("CheckoutFlow", "grandTotalPrice = " + grandTotalPrice);
 
           Button payWithUpiButton = findViewById(R.id.upiPaymentButton);
-          final Button codButton = findViewById(R.id.codButton);
+          Button codButton = findViewById(R.id.codButton);
           Button placeOrderButton = findViewById(R.id.placeOrderButton);
           progressBar = findViewById(R.id.progressBar);
           progressBarTextView = findViewById(R.id.progressBarTextView);
@@ -112,7 +111,11 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           placeOrderButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    if(paymentMethodNumber == 0) Toast.makeText(CheckoutFlow.this, "Choose payment method first", Toast.LENGTH_SHORT).show();
+                    if(paymentMethodNumber == 0) {
+                         Toast toast = Toast.makeText(CheckoutFlow.this, "Choose payment method first", Toast.LENGTH_SHORT);
+                         toast.setGravity(Gravity.CENTER, 0, 0);
+                         toast.show();
+                    }
 
                     if(paymentMethodNumber == 1) {
                          //start upi payment flow

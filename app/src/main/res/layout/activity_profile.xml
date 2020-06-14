@@ -2,7 +2,6 @@
 <RelativeLayout
     android:id="@+id/parent_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -28,7 +27,10 @@
                 android:layout_height="wrap_content"/>
 
             <EditText
+                android:hint="Your Name"
                 android:id="@+id/name_edit_text"
+                android:inputType="text"
+                android:autofillHints="username"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_width="match_parent"
@@ -48,6 +50,9 @@
             <EditText
                 android:id="@+id/phone1_edit_text"
                 android:layout_width="match_parent"
+                android:inputType="phone"
+                android:importantForAutofill="no"
+                android:hint="Phone Number"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_height="wrap_content"
@@ -67,6 +72,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:inputType="phone"
+                android:importantForAutofill="no"
+                android:hint="Spare Phone Number"
                 android:gravity="center_horizontal"
                 android:textColor="@android:color/black"
                 android:layout_width="match_parent"
@@ -85,7 +92,7 @@
                 android:id="@+id/building_selection_spinner"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_height="wrap_content"/>
+                android:layout_height="50dp"/>
 
             <TextView
                 android:text="Address"
@@ -112,8 +119,7 @@
 
                 <Spinner
                     android:id="@+id/wing_letter_spinner"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
                 <TextView
@@ -126,12 +132,14 @@
 
                 <EditText
                     android:id="@+id/room_no_edit_text"
-                    android:hint="110"
+                    android:hint="-"
+                    android:inputType="number"
                     android:gravity="center_horizontal"
                     android:textColor="@android:color/black"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:importantForAutofill="no"/>
             </LinearLayout>
         </LinearLayout>
 

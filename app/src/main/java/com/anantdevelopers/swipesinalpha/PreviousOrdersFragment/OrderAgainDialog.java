@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase;
+package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

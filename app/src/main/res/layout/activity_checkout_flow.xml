@@ -9,8 +9,8 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="invisible" />
 
@@ -23,7 +23,8 @@
         android:gravity="center_horizontal"
         android:text="Sending Your Order..."
         android:textColor="@android:color/holo_red_light"
-        android:textSize="20sp"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:visibility="invisible" />
 
     <TextView

@@ -10,16 +10,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
         android:text="LOGIN \nOR \nREGISTER"
         android:textColor="@android:color/white"
-        android:textSize="50dp"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="30dp"/>
+        android:textSize="50sp" />
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="invisible"/>
 
@@ -31,10 +31,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="OTP sent!"
-        android:textSize="20dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:visibility="invisible"/>
+
     <LinearLayout
         android:id="@+id/phoneNumberLayout"
         android:layout_above="@id/sendotpButton"
@@ -46,10 +46,11 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:text="  +91"
-            android:textSize="20dp"
-            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="6dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@android:color/white"/>
 
         <EditText
@@ -58,31 +59,38 @@
             android:layout_height="50dp"
             android:textColor="@android:color/white"
             android:hint="  Enter Phone Number"
-            android:inputType="number"
-            android:textColorHint="@android:color/white"/>
+            android:inputType="phone"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColorHint="@android:color/darker_gray"
+            android:importantForAutofill="no" />
 
     </LinearLayout>
 
     <EditText
         android:id="@+id/otpEditText"
-        android:layout_above="@id/sendotpButton"
-        android:hint="Enter OTP here!"
-        android:textColorHint="@android:color/white"
+        android:layout_above="@id/verifyOtpButton"
+        android:hint="OTP"
+        android:textColorHint="@android:color/darker_gray"
         android:inputType="number"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:textColor="@android:color/white"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:visibility="invisible"/>
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:visibility="gone"
+        android:maxLength="6"
+        android:letterSpacing="1.2"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/sendotpButton"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="send otp"
-        android:textSize="18sp"
+        android:text="SEND OTP"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@android:color/white"
         android:background="@color/colorPrimaryDark"
         android:layout_margin="8dp"/>
@@ -90,23 +98,23 @@
     <Button
         android:id="@+id/verifyOtpButton"
         android:layout_alignParentBottom="true"
-        android:text="verify otp"
+        android:text="VERIFY OTP"
         android:layout_margin="8dp"
         android:textColor="@android:color/holo_red_light"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:background="@color/colorPrimaryDark"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="invisible"/>
-
+        android:visibility="gone"/>
     <TextView
-        android:id="@+id/autoVerficationTextView"
-        android:layout_above="@id/phoneNumberLayout"
-        android:text="otp generation is processing"
-        android:visibility="invisible"
-        android:textStyle="bold"
-        android:gravity="center_horizontal"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="20dp"
+        android:id="@+id/enterNumberAgainText"
+        android:layout_above="@id/otpEditText"
+        android:text="ENTER NUMBER AGAIN"
+        android:visibility="gone"
+        android:textColor="@android:color/white"
+        android:gravity="end"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

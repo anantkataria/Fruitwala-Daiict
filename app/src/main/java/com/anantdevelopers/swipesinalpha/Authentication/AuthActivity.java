@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 public class AuthActivity extends AppCompatActivity {
 
      private ProgressBar progressBar;
-     private TextView otpSentTextView, autoVerificationTextView;
+     private TextView otpSentTextView, enterNumberAgainTextView;
      private LinearLayout phoneNumberLayout;
      private EditText phoneNumberEditText, otpEditText;
      private Button sendOtpButton, verifyOtpButton;
@@ -63,12 +63,12 @@ public class AuthActivity extends AppCompatActivity {
 
           progressBar = findViewById(R.id.progressBar);
           otpSentTextView = findViewById(R.id.otpSentTextView);
+          enterNumberAgainTextView = findViewById(R.id.enterNumberAgainText);
           phoneNumberLayout = findViewById(R.id.phoneNumberLayout);
           phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
           otpEditText = findViewById(R.id.otpEditText);
           sendOtpButton = findViewById(R.id.sendotpButton);
           verifyOtpButton = findViewById(R.id.verifyOtpButton);
-          autoVerificationTextView = findViewById(R.id.autoVerficationTextView);
           parentLayout = findViewById(R.id.parent_layout);
 
           firebaseAuth = FirebaseAuth.getInstance();
@@ -93,8 +93,8 @@ public class AuthActivity extends AppCompatActivity {
                     );
 
                     progressBar.setVisibility(View.VISIBLE);
-                    sendOtpButton.setVisibility(View.INVISIBLE);
-                    phoneNumberLayout.setVisibility(View.INVISIBLE);
+                    sendOtpButton.setVisibility(View.GONE);
+                    phoneNumberLayout.setVisibility(View.GONE);
                }
           });
 
@@ -109,18 +109,20 @@ public class AuthActivity extends AppCompatActivity {
                     if(e instanceof FirebaseNetworkException){
                          Toast.makeText(AuthActivity.this, "Check your Internet connection", Toast.LENGTH_SHORT).show();
                     }
-                    if (e instanceof FirebaseTooManyRequestsException) {
+                    else if (e instanceof FirebaseTooManyRequestsException) {
                          Toast.makeText(AuthActivity.this, "Your quota of getting otp is over because of too many requests", Toast.LENGTH_LONG).show();
                     }
-                    if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                    else if (e instanceof FirebaseAuthInvalidCredentialsException) {
                          Toast.makeText(AuthActivity.this, "Enter valid number", Toast.LENGTH_SHORT).show();
                          TextKeyListener.clear(phoneNumberEditText.getText());//user has typed number in the wrong way, so clear it
                     }
+
+
                     phoneNumberEditText.setEnabled(true);//and since user will type number again (in right format), we have to enable it(we disabled it in onclick of 'generate otp' button)
                     sendOtpButton.setEnabled(true);//we have to enable it again since we disabled it in onclick of 'generate otp' button
                     sendOtpButton.setVisibility(View.VISIBLE);
-                    autoVerificationTextView.setVisibility(View.INVISIBLE);
                     phoneNumberLayout.setVisibility(View.VISIBLE);
+
                     progressBar.setVisibility(View.INVISIBLE);
                }
 
@@ -129,6 +131,7 @@ public class AuthActivity extends AppCompatActivity {
                     super.onCodeSent(s, forceResendingToken);
                     verificationId = s;
 
+                    enterNumberAgainTextView.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.INVISIBLE);
                     verifyOtpButton.setVisibility(View.VISIBLE);
                     otpEditText.setVisibility(View.VISIBLE);
@@ -141,6 +144,13 @@ public class AuthActivity extends AppCompatActivity {
                }
           };
 
+          enterNumberAgainTextView.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                    AuthActivity.this.recreate();
+               }
+          });
+
           verifyOtpButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
@@ -148,6 +158,9 @@ public class AuthActivity extends AppCompatActivity {
 
                     if(otpCode.isEmpty()){
                          Toast.makeText(AuthActivity.this, "Please enter the OTP sent!", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (otpCode.length() < 6) {
+                         Toast.makeText(AuthActivity.this, "OTP should be 6 digits long!", Toast.LENGTH_SHORT).show();
                     }
                     else {
                          verifyOtpButton.setEnabled(false);
@@ -234,10 +247,15 @@ public class AuthActivity extends AppCompatActivity {
                             } else {
                                  if(task.getException() instanceof  FirebaseNetworkException){
                                       Toast.makeText(AuthActivity.this, "Check your Internet connection", Toast.LENGTH_SHORT).show();
-                                      phoneNumberEditText.setEnabled(true);//and since user will type number again (in right format), we have to enable it(we disabled it in onclick of 'generate otp' button)
-                                      sendOtpButton.setEnabled(true);//we have to enable it again since we disabled it in onclick of 'generate otp' button
-                                      sendOtpButton.setVisibility(View.VISIBLE);
-                                      phoneNumberLayout.setVisibility(View.VISIBLE);
+
+                                      if (verifyOtpButton.getVisibility() != View.VISIBLE) {
+                                           phoneNumberEditText.setEnabled(true);//and since user will type number again (in right format), we have to enable it(we disabled it in onclick of 'generate otp' button)
+                                           sendOtpButton.setEnabled(true);//we have to enable it again since we disabled it in onclick of 'generate otp' button
+                                           sendOtpButton.setVisibility(View.VISIBLE);
+                                           phoneNumberLayout.setVisibility(View.VISIBLE);
+                                      }
+                                      otpEditText.setEnabled(true);
+                                      verifyOtpButton.setEnabled(true);
                                       progressBar.setVisibility(View.INVISIBLE);
 
                                  }
@@ -265,7 +283,10 @@ public class AuthActivity extends AppCompatActivity {
      protected void onDestroy() {
           super.onDestroy();
 
-          String authenticatedPhoneNumber = firebaseAuth.getCurrentUser().getPhoneNumber();
-          if (listener != null) databaseReference.child("Users").child(authenticatedPhoneNumber).removeEventListener(listener);
+          String authenticatedPhoneNumber = null;
+          FirebaseUser user = null;
+          if (firebaseAuth != null) user = firebaseAuth.getCurrentUser();
+          if (user != null) authenticatedPhoneNumber = firebaseAuth.getCurrentUser().getPhoneNumber();
+          if (listener != null && authenticatedPhoneNumber != null) databaseReference.child("Users").child(authenticatedPhoneNumber).removeEventListener(listener);
      }
 }

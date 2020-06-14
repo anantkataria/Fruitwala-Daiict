@@ -1,187 +1,392 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_height="match_parent"
+<!--<ScrollView android:layout_height="match_parent"-->
+<!--    android:layout_width="match_parent"-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android" >-->
+
+<!--    <LinearLayout-->
+<!--        android:id="@+id/parent_layout"-->
+<!--        xmlns:tools="http://schemas.android.com/tools"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
+<!--        tools:context=".UserProfile.UserProfile">-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/userNameTextView"-->
+<!--            android:text="Hi there, What should i call you!"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:layout_marginEnd="8dp"-->
+<!--            android:layout_marginBottom="20dp"-->
+<!--            android:textSize="20sp"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            />-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_margin="8dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:id="@+id/nameLayout"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Name"-->
+<!--                android:textColor="@android:color/black"/>-->
+
+<!--            <EditText-->
+<!--                android:id="@+id/nameEditText"-->
+<!--                android:textSize="20sp"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="what should i call you?"-->
+<!--                android:textColor="@android:color/darker_gray"/>-->
+
+<!--        </LinearLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_weight="1"-->
+<!--            android:id="@+id/phoneNumberLayout"-->
+<!--            android:layout_margin="8dp"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Phone"-->
+<!--                android:textColor="@android:color/black"/>-->
+
+<!--            <EditText-->
+<!--                android:id="@+id/authenticatedPhoneNumber"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="authenticated phone number"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textColor="@android:color/darker_gray"-->
+<!--                android:enabled="false"/>-->
+
+<!--            <EditText-->
+<!--                android:id="@+id/phoneNumber2"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textSize="20sp"-->
+<!--                android:hint="phone number 2 (optional)"/>-->
+
+<!--        </LinearLayout>-->
+
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Address"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:textColor="@android:color/black"/>-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_weight="1"-->
+<!--            android:layout_margin="8dp"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <Spinner-->
+<!--                android:id="@+id/wingLetter"-->
+<!--                android:layout_width="100dp"-->
+<!--                android:layout_height="50dp"/>-->
+
+<!--            <EditText-->
+<!--                android:id="@+id/roomNumber"-->
+<!--                android:inputType="number"-->
+<!--                android:textSize="20sp"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@android:color/darker_gray"-->
+<!--                android:hint="Enter your room/office no."/>-->
+
+<!--        </LinearLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <Button-->
+<!--                android:id="@+id/btnHorMen"-->
+<!--                android:layout_margin="8dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="HOR\nMen"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textAllCaps="false"/>-->
+
+<!--            <Button-->
+<!--                android:id="@+id/btnHorMenNew"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="8dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="Hor\nMen\nNew"-->
+<!--                android:textAllCaps="false" />-->
+
+<!--            <Button-->
+<!--                android:id="@+id/btnHorWomen"-->
+<!--                android:layout_margin="8dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="HOR\nWomen"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textAllCaps="false"/>-->
+
+<!--            <Button-->
+<!--                android:id="@+id/btnFB"-->
+<!--                android:layout_margin="8dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="Faculty\nBlock"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textAllCaps="false"/>-->
+
+<!--        </LinearLayout>-->
+
+<!--        <ProgressBar-->
+<!--            android:id="@+id/progressBar"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_marginBottom="8dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:visibility="gone"-->
+<!--            />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/savingDataTextView"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textColor="@android:color/holo_green_light"-->
+<!--            android:gravity="center_horizontal"-->
+<!--            android:visibility="gone"-->
+<!--            android:text="saving data, please wait"/>-->
+
+<!--        <Button-->
+<!--            android:id="@+id/saveAndContinueBtn"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:layout_marginEnd="8dp"-->
+<!--            android:layout_marginTop="48dp"-->
+<!--            android:layout_marginBottom="16dp"-->
+<!--            android:background="@color/colorPrimaryDark"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:text="Save and Continue"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"/>-->
+
+<!--    </LinearLayout>-->
+
+<!--</ScrollView>-->
+
+<RelativeLayout
+    android:id="@+id/parent_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android" >
+    android:layout_height="match_parent"
+    tools:context=".OptionsMenuResources.SettingsActivity.ProfileActivity">
 
-    <LinearLayout
-        android:id="@+id/parent_layout"
-        xmlns:tools="http://schemas.android.com/tools"
+    <ScrollView
+        android:layout_above="@+id/hardcoded_text_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        tools:context=".UserProfile.UserProfile">
-
-        <TextView
-            android:id="@+id/userNameTextView"
-            android:text="Hi there, What should i call you!"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="20dp"
-            android:textSize="20sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:id="@+id/nameLayout"
+            android:id="@+id/linear_layout"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:text="Hello There, Please provide your"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
                 android:text="Name"
-                android:textColor="@android:color/black"/>
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <EditText
-                android:id="@+id/nameEditText"
-                android:textSize="20sp"
+                android:hint="Your Name"
+                android:id="@+id/name_edit_text"
+                android:inputType="text"
+                android:autofillHints="username"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="what should i call you?"
-                android:textColor="@android:color/darker_gray"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_weight="1"
-            android:id="@+id/phoneNumberLayout"
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+                android:gravity="center_horizontal"
+                android:textColor="@android:color/black"/>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_height="wrap_content"
-                android:text="Phone"
-                android:textColor="@android:color/black"/>
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:text="Phone-1"/>
 
             <EditText
-                android:id="@+id/authenticatedPhoneNumber"
+                android:id="@+id/phone1_edit_text"
                 android:layout_width="match_parent"
+                android:inputType="phone"
+                android:importantForAutofill="no"
+                android:enabled="false"
+                android:hint="Phone Number"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_height="wrap_content"
-                android:text="authenticated phone number"
-                android:textSize="20sp"
-                android:textColor="@android:color/darker_gray"
-                android:enabled="false"/>
+                android:gravity="center_horizontal"/>
+
+            <TextView
+                android:text="Phone-2"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <EditText
-                android:id="@+id/phoneNumber2"
+                android:id="@+id/phone2_edit_text"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:inputType="phone"
+                android:importantForAutofill="no"
+                android:hint="Spare Phone Number"
+                android:gravity="center_horizontal"
+                android:textColor="@android:color/black"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:hint="phone number 2 (optional)"/>
+                android:layout_height="wrap_content"/>
 
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Address"
-            android:layout_marginStart="8dp"
-            android:textColor="@android:color/black"/>
-
-        <LinearLayout
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            <TextView
+                android:text="Building"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <Spinner
-                android:id="@+id/wingLetter"
-                android:layout_width="100dp"
+                android:id="@+id/building_selection_spinner"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
                 android:layout_height="50dp"/>
 
-            <EditText
-                android:id="@+id/roomNumber"
-                android:inputType="number"
-                android:textSize="20sp"
+            <TextView
+                android:text="Address"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/darker_gray"
-                android:hint="Enter your room/office no."/>
+                android:layout_height="wrap_content"/>
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Wing"
+                    android:gravity="end"
+                    android:textColor="@android:color/black"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"/>
+
+                <Spinner
+                    android:id="@+id/wing_letter_spinner"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="Room"
+                    android:gravity="end"
+                    android:textColor="@android:color/black"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"/>
+
+                <EditText
+                    android:id="@+id/room_no_edit_text"
+                    android:hint="-"
+                    android:inputType="number"
+                    android:gravity="center_horizontal"
+                    android:textColor="@android:color/black"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:importantForAutofill="no"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+    </ScrollView>
 
-            <Button
-                android:id="@+id/btnHorMen"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:text="HOR\nMen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAllCaps="false"/>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
-            <Button
-                android:id="@+id/btnHorMenNew"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:text="Hor\nMen\nNew"
-                android:textAllCaps="false" />
+    <TextView
+        android:id="@+id/saving_data_text_view"
+        android:layout_below="@id/progress_bar"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/colorAccent"
+        android:text="Saving data, Please wait"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
-            <Button
-                android:id="@+id/btnHorWomen"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:text="HOR\nWomen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAllCaps="false"/>
+    <TextView
+        android:id="@+id/hardcoded_text_view"
+        android:layout_above="@+id/save_and_continue_button"
+        android:text="We will use this information to deliver order at your\ndorm/office"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-            <Button
-                android:id="@+id/btnFB"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:text="Faculty\nBlock"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAllCaps="false"/>
+    <Button
+        android:id="@+id/save_and_continue_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:text="SAVE AND CONTINUE"
+        android:background="@drawable/button_design"
+        android:textColor="@android:color/white"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-        </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="8dp"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            />
-
-        <TextView
-            android:id="@+id/savingDataTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/holo_green_light"
-            android:gravity="center_horizontal"
-            android:visibility="gone"
-            android:text="saving data, please wait"/>
-
-        <Button
-            android:id="@+id/saveAndContinueBtn"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="48dp"
-            android:layout_marginBottom="16dp"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"
-            android:text="Save and Continue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
-
-</ScrollView>
+</RelativeLayout>

@@ -10,7 +10,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -60,13 +59,12 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
      private ValueEventListener listener1, listener2, listener3;
 
-     private boolean isSavingSuccessful = false;
+     //private boolean isSavingSuccessful = false;
 
      private ProgressBar progressBar;
 
      private String userName = "User";
      private String authPhone = "";
-//     private User user;
 
      private interface afterDatabaseFetchingWorkInterface {
           void afterFetch();
@@ -83,14 +81,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_main);
 
-          Intent intent = getIntent();
-          isSavingSuccessful = intent.getBooleanExtra("isSavingSuccessful", false);
-
           progressBar = findViewById(R.id.progressBar);
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
-//          user = new User();
-
 
           bottomNavigationView = findViewById(R.id.bottomNavigationView);
           navHostFragment = findViewById(R.id.nav_host_fragment);
@@ -226,59 +219,24 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      }
 
      private void checkInDatabase(final afterDatabaseFetchingWorkInterface Interface) {
-          if(!isSavingSuccessful) {
-               //
-               listener2 = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                         //enable progress bar in main activity while this is being checked.
 
-                         //should rather use phone memory for seamless experience
-                         if (dataSnapshot.child(authPhone).exists()) {
-                              Intent intent = new Intent(MainActivity.this, UserProfile.class);
-                              intent.putExtra("authenticatedPhoneNumber", authPhone);
-                              startActivity(intent);
-                              finish();
-                         }
-                         else {
-                              final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
-                              NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
-                              NavigationUI.setupWithNavController(bottomNavigationView, navController);
-
-                              getUser();
-                         }
-
-                         //call the interface
-                         Interface.afterFetch();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                         handleDatabaseError(databaseError);
-                    }
-               };
-
-               databaseReference.child("halfWayExit").addListenerForSingleValueEvent(listener2);
-          }
-          else {
-               //final String phoneNumber = user.getPhoneNumber();
-               final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
-               NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
-               NavigationUI.setupWithNavController(bottomNavigationView, navController);
-
-               getUser();
-               Interface.afterFetch();
-          }
-
-     }
-
-     private void getUser() {
-
-          listener3 = new ValueEventListener() {
+          listener2 = new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                            user = dataSnapshot.getValue(User.class);
-                    userName = dataSnapshot.getValue(String.class);
+                    if (!dataSnapshot.exists()){
+                         Intent intent = new Intent(MainActivity.this, UserProfile.class);
+                         intent.putExtra("authenticatedPhoneNumber", authPhone);
+                         startActivity(intent);
+                         finish();
+                    }
+                    else {
+                         userName = dataSnapshot.child("userName").getValue(String.class);
+                         final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
+                         NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
+                         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+                    }
+
+                    Interface.afterFetch();
                }
 
                @Override
@@ -286,8 +244,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     handleDatabaseError(databaseError);
                }
           };
-
-          databaseReference.child("Users").child(authPhone).child("userName").addListenerForSingleValueEvent(listener3);
+          databaseReference.child("Users").child(authPhone).addListenerForSingleValueEvent(listener2);
      }
 
      @Override
@@ -306,7 +263,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           bundle.putStringArrayList("fruitQty", this.selectedFruitQtys);
           bundle.putStringArrayList("fruitPrice", this.selectedFruitPrices);
           bundle.putInt("fruitImage", this.selectedFruitImage);
-          //Log.e("MainActivity", this.selectedFruitName);
           customDialogFragment.setArguments(bundle);
           return customDialogFragment;
      }
@@ -351,7 +307,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      public void sendToMainFromPreviousOrderFragment(List<FruitItem> cartItems) {
           receivedItems.clear();
           receivedItems = (ArrayList<FruitItem>) cartItems;
-          Log.e("MainActivityxx", "cartItems in main activity = " + cartItems);
      }
 
      @Override

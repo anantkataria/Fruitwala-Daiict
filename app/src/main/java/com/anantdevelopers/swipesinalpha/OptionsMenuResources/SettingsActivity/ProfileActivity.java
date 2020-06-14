@@ -93,7 +93,8 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                public void onClick(View v) {
                     if(phone2EditText.getText().toString().length() < 10){
                          Snackbar.make(parentLayout, "Enter valid phone number", Snackbar.LENGTH_SHORT).show();
-                    }else{
+                    }
+                    else{
                          progressBar.setVisibility(View.VISIBLE);
                          if(progressBar.getVisibility() == View.VISIBLE){
                               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -222,7 +223,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
      private void setNewValuesToUserClass() {
           user.setUserName(nameEditText.getText().toString());
           user.setPhoneNum2(phone2EditText.getText().toString());
-          user.setBuilding(Integer.toString(buildingSpinnerArrayList.indexOf(buildingSpinner.getSelectedItem())+1));
+          user.setBuilding(Integer.toString(buildingSpinner.getSelectedItemPosition() + 1));
           user.setRoom(roomNoEditText.getText().toString());
           user.setWing(wingSpinner.getSelectedItem().toString());
      }
