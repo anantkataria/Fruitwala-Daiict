@@ -4,16 +4,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/item_home_bg"
+    android:layout_marginTop="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
         android:id="@+id/fruit_name"
+        android:layout_toStartOf="@+id/fruit_price"
         android:hint="Fruit"
         tools:text = "Bananas"
         android:textColor="@android:color/black"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_marginLeft="8dp"
+        android:layout_width="match_parent"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_height="wrap_content"/>
@@ -22,7 +26,6 @@
         android:id="@+id/fruit_qty"
         android:layout_below="@+id/fruit_name"
         android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
         android:layout_marginBottom="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,9 +37,9 @@
     <TextView
         android:id="@+id/fruit_price"
         tools:text="Rs. 50"
+        android:layout_centerVertical="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@android:color/holo_green_dark"
-        android:layout_marginTop="10dp"
         android:layout_marginEnd="30dp"
         android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"

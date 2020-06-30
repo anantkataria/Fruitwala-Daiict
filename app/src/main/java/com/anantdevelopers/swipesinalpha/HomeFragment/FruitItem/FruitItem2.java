@@ -11,8 +11,9 @@ public class FruitItem2 implements Parcelable {
      private ArrayList<String> prices;
      private String availability;
      private int image_resource;
+     private Integer fruitRank = Integer.MAX_VALUE;
 
-     public FruitItem2(String fruitName, String availability, ArrayList<String> quantities, ArrayList<String> prices) {
+     public FruitItem2(String fruitName, String availability, ArrayList<String> quantities, ArrayList<String> prices, int fruitRank) {
           this.fruitName = fruitName;
           this.availability = availability;
           this.quantities = quantities;
@@ -21,22 +22,23 @@ public class FruitItem2 implements Parcelable {
 
      public FruitItem2() {}
 
-     public void addToQuantitiesAndPrices(String qty, String price){
-          quantities.add(qty);
-          prices.add(price);
-     }
-
-     public void removeFromQuantitiesAndPrices(int position){
-          quantities.remove(position);
-          prices.remove(position);
-     }
-
-     private FruitItem2(Parcel in) {
+     protected FruitItem2(Parcel in) {
           fruitName = in.readString();
-          availability = in.readString();
           quantities = in.createStringArrayList();
           prices = in.createStringArrayList();
+          availability = in.readString();
           image_resource = in.readInt();
+          fruitRank = in.readInt();
+     }
+
+     @Override
+     public void writeToParcel(Parcel dest, int flags) {
+          dest.writeString(fruitName);
+          dest.writeStringList(quantities);
+          dest.writeStringList(prices);
+          dest.writeString(availability);
+          dest.writeInt(image_resource);
+          dest.writeInt(fruitRank);
      }
 
      public static final Creator<FruitItem2> CREATOR = new Creator<FruitItem2>() {
@@ -50,6 +52,16 @@ public class FruitItem2 implements Parcelable {
                return new FruitItem2[size];
           }
      };
+
+     public void addToQuantitiesAndPrices(String qty, String price){
+          quantities.add(qty);
+          prices.add(price);
+     }
+
+     public void removeFromQuantitiesAndPrices(int position){
+          quantities.remove(position);
+          prices.remove(position);
+     }
 
      public String getFruitName() {
           return fruitName;
@@ -91,17 +103,17 @@ public class FruitItem2 implements Parcelable {
           this.image_resource = image_resource;
      }
 
+     public Integer getFruitRank() {
+          return fruitRank;
+     }
+
+     public void setFruitRank(int fruitRank) {
+          this.fruitRank = fruitRank;
+     }
+
      @Override
      public int describeContents() {
           return 0;
      }
 
-     @Override
-     public void writeToParcel(Parcel dest, int flags) {
-          dest.writeString(fruitName);
-          dest.writeString(availability);
-          dest.writeStringList(quantities);
-          dest.writeStringList(prices);
-          dest.writeInt(image_resource);
-     }
 }

@@ -51,19 +51,6 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp" />
 
-        <TextView
-            android:id="@+id/not_available_text_view"
-            tools:text="N/A"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/holo_red_dark"
-            android:visibility="gone"
-            android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp" />
-
     </RelativeLayout>
 
     <ImageView

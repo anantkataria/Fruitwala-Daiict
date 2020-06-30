@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
-import com.anantdevelopers.swipesinalpha.MainActivity;
+import com.anantdevelopers.swipesinalpha.Main.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.google.android.gms.tasks.OnFailureListener;

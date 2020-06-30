@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 
 import com.anantdevelopers.swipesinalpha.R;
@@ -39,6 +40,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
      private Spinner buildingSpinner, wingSpinner;
      private Button saveChangesButton;
      private RelativeLayout parentLayout;
+     private ScrollView parentLayout2;
      private ProgressBar progressBar;
 
      private ArrayList<String> buildingSpinnerArrayList, wingSpinnerArrayList;
@@ -75,6 +77,8 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           getUserFromDatabase(new DatabaseInterface() {
                @Override
                public void afterFetch() {
+                    parentLayout2.setVisibility(View.VISIBLE);
+                    saveChangesButton.setVisibility(View.VISIBLE);
                     setTexts();
                     addTextChangeListenersToEditTexts(); //this method will ensure that save changes button is enabled when user changes anything in the edittext
                     addItemSelectedListenersToSpinners();//above method for spinners
@@ -92,7 +96,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                @Override
                public void onClick(View v) {
                     if(phone2EditText.getText().toString().length() < 10){
-                         Snackbar.make(parentLayout, "Enter valid phone number", Snackbar.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout2, "Enter valid phone number", Snackbar.LENGTH_SHORT).show();
                     }
                     else{
                          progressBar.setVisibility(View.VISIBLE);
@@ -109,6 +113,8 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
 
      private void getUserFromDatabase(final DatabaseInterface databaseInterface) {
           progressBar.setVisibility(View.VISIBLE);
+          parentLayout2.setVisibility(View.INVISIBLE);
+          saveChangesButton.setVisibility(View.INVISIBLE);
           if(progressBar.getVisibility() == View.VISIBLE){
                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
           }
@@ -170,6 +176,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           wingSpinner = findViewById(R.id.wing_letter_spinner);
           saveChangesButton = findViewById(R.id.save_changes_button);
           parentLayout = findViewById(R.id.parent_layout);
+          parentLayout2 = findViewById(R.id.parent_layout_2);
           progressBar = findViewById(R.id.progress_bar);
      }
 
@@ -233,7 +240,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                   new OnSuccessListener<Void>() {
                        @Override
                        public void onSuccess(Void aVoid) {
-                            Snackbar.make(parentLayout, "Saved Successfully", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(parentLayout2, "Saved Successfully", Snackbar.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                             if (progressBar.getVisibility() == View.GONE) {
                                  getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -243,7 +250,7 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           ).addOnFailureListener(new OnFailureListener() {
                @Override
                public void onFailure(@NonNull Exception e) {
-                    Snackbar.make(parentLayout, "Something went wrong, Try again", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(parentLayout2, "Something went wrong, Try again", Snackbar.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     if (progressBar.getVisibility() == View.GONE) {
                          getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);

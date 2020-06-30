@@ -40,27 +40,29 @@ public class OrderAgainAsyncTask extends AsyncTask<Void, Integer, Void> {
                ArrayList<Integer> fruitPriceNew = latestPriceMap.get(fruitName);
                ArrayList<String> fruitQtyNew = latestQtyMap.get(fruitName);
 
-               if (fruitPriceNew.contains(fruitPriceOld)){
-                    int index = fruitPriceNew.indexOf(fruitPriceOld);
-                    String qty = fruitQtyNew.get(index);
-                    String price = "Rs. " + fruitPriceOld;
-                    FruitItem fruitItem = new FruitItem(fruitName, qty, price);
-                    cartItemsList.add(fruitItem);
-               }else {
-                    int index = -1;
-                    int minimum_difference = Integer.MAX_VALUE;
+               if(fruitPriceNew != null && fruitQtyNew != null && !fruitPriceNew.isEmpty() && !fruitQtyNew.isEmpty()){
+                    if (fruitPriceNew.contains(fruitPriceOld)){
+                         int index = fruitPriceNew.indexOf(fruitPriceOld);
+                         String qty = fruitQtyNew.get(index);
+                         String price = "Rs. " + fruitPriceOld;
+                         FruitItem fruitItem = new FruitItem(fruitName, qty, price);
+                         cartItemsList.add(fruitItem);
+                    }else {
+                         int index = -1;
+                         int minimum_difference = Integer.MAX_VALUE;
 
-                    for (int i=0; i<fruitPriceNew.size(); i++) {
-                         int current_min = Math.abs(fruitPriceNew.get(i) - fruitPriceOld);
-                         if (current_min < minimum_difference) {
-                              minimum_difference = current_min;
-                              index = i;
+                         for (int i=0; i<fruitPriceNew.size(); i++) {
+                              int current_min = Math.abs(fruitPriceNew.get(i) - fruitPriceOld);
+                              if (current_min < minimum_difference) {
+                                   minimum_difference = current_min;
+                                   index = i;
+                              }
                          }
-                    }
 
-                    String qty = fruitQtyNew.get(index);
-                    String price = "Rs. " + fruitPriceNew.get(index);
-                    cartItemsList.add(new FruitItem(fruitName, qty, price));
+                         String qty = fruitQtyNew.get(index);
+                         String price = "Rs. " + fruitPriceNew.get(index);
+                         cartItemsList.add(new FruitItem(fruitName, qty, price));
+                    }
                }
           }
 

@@ -15,7 +15,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.anantdevelopers.swipesinalpha.MainActivity;
+import com.anantdevelopers.swipesinalpha.Main.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

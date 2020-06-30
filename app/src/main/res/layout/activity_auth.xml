@@ -59,7 +59,7 @@
             android:layout_height="50dp"
             android:textColor="@android:color/white"
             android:hint="  Enter Phone Number"
-            android:inputType="phone"
+            android:inputType="number"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColorHint="@android:color/darker_gray"
             android:importantForAutofill="no" />

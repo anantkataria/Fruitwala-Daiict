@@ -37,7 +37,7 @@
             android:name=".Authentication.AuthActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Main.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/splashTheme">
             <intent-filter>

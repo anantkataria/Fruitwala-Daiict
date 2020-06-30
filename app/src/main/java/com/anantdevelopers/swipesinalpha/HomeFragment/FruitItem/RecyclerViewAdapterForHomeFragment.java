@@ -1,6 +1,7 @@
 package com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.anantdevelopers.swipesinalpha.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<RecyclerViewAdapterForHomeFragment.ViewHolder>{
@@ -45,16 +45,17 @@ public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<Rec
           holder.fruitImageView.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_transition_animation));
           holder.parentLayout.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation));
 
+          Integer photo = photoMapOfFruits.get(currentItem.getFruitName());
           holder.fruitName.setText(currentItem.getFruitName());
-          holder.fruitImageView.setImageResource(photoMapOfFruits.get(currentItem.getFruitName()));
+          holder.fruitImageView.setImageResource(photo);
           if(currentItem.getAvailability().equals("Available")){
                holder.fruitQty.setText(currentItem.getQuantities().get(0));
+               holder.fruitPrice.setVisibility(View.VISIBLE);
                holder.fruitPrice.setText(currentItem.getPrices().get(0));
           }
           else {
-               holder.fruitPrice.setVisibility(View.GONE);
-               holder.fruitQty.setText(" - - ");
-               holder.notAvailableTxtView.setVisibility(View.VISIBLE);
+               holder.fruitPrice.setVisibility(View.INVISIBLE);
+               holder.fruitQty.setText(" - - N/A - - ");
           }
      }
 
@@ -67,7 +68,6 @@ public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<Rec
           TextView fruitName;
           TextView fruitQty;
           TextView fruitPrice;
-          TextView notAvailableTxtView;
           ImageView fruitImageView;
 
           RelativeLayout parentLayout;
@@ -76,7 +76,6 @@ public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<Rec
                fruitName = itemView.findViewById(R.id.fruit_name_text_view);
                fruitQty = itemView.findViewById(R.id.fruit_qty_text_view);
                fruitPrice = itemView.findViewById(R.id.fruit_price_text_view);
-               notAvailableTxtView = itemView.findViewById(R.id.not_available_text_view);
                fruitImageView = itemView.findViewById(R.id.fruit_image_view);
 
                parentLayout = itemView.findViewById(R.id.relativeLayout);

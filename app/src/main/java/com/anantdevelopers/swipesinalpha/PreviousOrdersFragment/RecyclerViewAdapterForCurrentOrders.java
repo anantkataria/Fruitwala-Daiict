@@ -65,6 +65,10 @@ public class RecyclerViewAdapterForCurrentOrders extends RecyclerView.Adapter<Re
                holder.requestForCancelButton.setVisibility(View.GONE);
                holder.currentOrderStatus.setTextColor(Color.parseColor("#cc0000"));
           }
+          if (status.equals("ORDER ON WAY!")){
+               holder.requestForCancelButton.setBackgroundResource(R.drawable.button_design_3);
+               holder.currentOrderStatus.setTextColor(Color.parseColor("#3498db"));
+          }
      }
 
      @Override
@@ -85,7 +89,7 @@ public class RecyclerViewAdapterForCurrentOrders extends RecyclerView.Adapter<Re
                currentOrderStatus = itemView.findViewById(R.id.CurrentOrderStatus);
                requestForCancelButton = itemView.findViewById(R.id.requestCancellationButton);
 
-               LinearLayout parentLayout = itemView.findViewById(R.id.parent_layout);
+               //LinearLayout parentLayout = itemView.findViewById(R.id.parent_layout);
 
                requestForCancelButton.setOnClickListener(new View.OnClickListener() {
                     @Override

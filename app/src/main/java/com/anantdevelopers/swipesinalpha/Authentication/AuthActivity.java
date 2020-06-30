@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.anantdevelopers.swipesinalpha.MainActivity;
+import com.anantdevelopers.swipesinalpha.Main.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -60,6 +60,8 @@ public class AuthActivity extends AppCompatActivity {
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_auth);
+
+          getWindow().setNavigationBarColor(getResources().getColor(R.color.colorPrimary));
 
           progressBar = findViewById(R.id.progressBar);
           otpSentTextView = findViewById(R.id.otpSentTextView);

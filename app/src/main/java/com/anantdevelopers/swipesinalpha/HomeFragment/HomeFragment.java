@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,6 +113,16 @@ public class HomeFragment extends Fragment {
                @Override
                public void afterFetching() {
                     //after fetching, we will show the recycler view and hide the progress bar
+                    Collections.sort(fruits, new Comparator<FruitItem2>() {
+                         @Override
+                         public int compare(FruitItem2 o1, FruitItem2 o2) {
+                              return o1.getFruitRank().compareTo(o2.getFruitRank());
+                         }
+                    });
+                    Log.e("SAVAGE", "after sort");
+                    for(FruitItem2 f : fruits) {
+                         Log.e("SAVAGE", "fruitname = " + f.getFruitName() + ", rank = " + f.getFruitRank() + "\n");
+                    }
                     recyclerView.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                     adapter = new RecyclerViewAdapterForHomeFragment(getContext(), fruits, photoMapOfFruits);
@@ -137,18 +151,22 @@ public class HomeFragment extends Fragment {
                               ArrayList<String> quantities = new ArrayList<>();
                               ArrayList<String> prices = new ArrayList<>();
 
+
                               newFruit.setFruitName(d.getKey());
                               newFruit.setAvailability(d.child("Availability").getValue(String.class));
+                              newFruit.setFruitRank(d.child("rank").getValue(Integer.class));
                               for (DataSnapshot d1 : d.child("qty").getChildren()) {
                                    quantities.add(d1.getValue(String.class));
                               }
                               for (DataSnapshot d2 : d.child("prices").getChildren()) {
                                    prices.add(d2.getValue(String.class));
                               }
-                              newFruit.setQuantities(quantities);
-                              newFruit.setPrices(prices);
+                              if(!quantities.isEmpty() && !prices.isEmpty()) {
+                                   newFruit.setQuantities(quantities);
+                                   newFruit.setPrices(prices);
 
-                              fruits.add(newFruit);
+                                   fruits.add(newFruit);
+                              }
                          }
                     }
 
@@ -213,7 +231,9 @@ public class HomeFragment extends Fragment {
                     }
                     else {
                          //Snackbar.make(getView(), "Fruit Not available!", Snackbar.LENGTH_SHORT);
-                         Toast.makeText(getContext(), "Sorry, Fruit not Available", Toast.LENGTH_SHORT).show();
+                         Toast toast = Toast.makeText(getContext(), "Sorry, Fruit not Available", Toast.LENGTH_SHORT);
+                         toast.setGravity(Gravity.CENTER, 0, 0);
+                         toast.show();
                     }
                }
           }));

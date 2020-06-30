@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -187,7 +188,8 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                @Override
                public void onChanged(List<FruitItem> fruitItems) {
                     if(fruitItems.isEmpty()) {
-                         Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                         //Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                         Toast.makeText(getContext(), "Fruit may not be available!", Toast.LENGTH_LONG).show();
                          Log.e("observe", "fruitItems are empty");
                     }
                     else {
@@ -398,9 +400,19 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           adapterForCurrentOrders.setOnButtonClickListener(new RecyclerViewAdapterForCurrentOrders.onButtonClickListener() {
                @Override
                public void onButtonClick(final int position) {
-                    CancelCurrentOrderDialog dialog1 = new CancelCurrentOrderDialog(position);
-                    dialog1.setTargetFragment(PreviousOrdersFragment.this, 0);
-                    dialog1.show(getParentFragmentManager(), "cancelling order at position " + position);
+                    CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
+
+                    if(currentOrderDetails.getStatus().equals("ORDER ON WAY!")){
+//                         Toast toast = Toast.makeText(getContext(), "Sorry, Cannot CANCEL order when it is On The Way!", Toast.LENGTH_LONG);
+//                         toast.setGravity(Gravity.CENTER, 0, 0);
+//                         toast.show();
+                         Snackbar.make(parentLayout, "Sorry, Cannot CANCEL order when it is On The Way!", Snackbar.LENGTH_LONG).show();
+                    }
+                    else {
+                         CancelCurrentOrderDialog dialog1 = new CancelCurrentOrderDialog(position);
+                         dialog1.setTargetFragment(PreviousOrdersFragment.this, 0);
+                         dialog1.show(getParentFragmentManager(), "cancelling order at position " + position);
+                    }
                }
           });
      }
@@ -408,26 +420,25 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      @Override
      public void onDialogPositiveClickForCancelOrder(int position) {
           CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
+
           currentOrderDetails.setStatus("CANCELLATION REQUESTED");
           currentOrderProgressBar.setVisibility(View.VISIBLE);
           String firebaseKey = currentOrderDetails.getFirebaseDatabaseKey();
 
           Map<String, Object> map = new HashMap<>();
-          map.put( "/Orders/" + authPhoneNumber + "/" + firebaseKey, currentOrderDetails);
+          map.put("/Orders/" + authPhoneNumber + "/" + firebaseKey, currentOrderDetails);
           map.put("/tokens/" + authPhoneNumber, token);
 
           databaseReference.updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                @Override
-               public void onSuccess(Void aVoid) {
-                    currentOrderProgressBar.setVisibility(GONE);
-                    Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_SHORT).show();
+               public void onSuccess(Void aVoid) { currentOrderProgressBar.setVisibility(GONE);
+               Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_LONG).show();
                }
           }).addOnFailureListener(new OnFailureListener() {
                @Override
                public void onFailure(@NonNull Exception e) {
                     currentOrderProgressBar.setVisibility(GONE);
-                    Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_SHORT).show();
-               }
+                    Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_LONG).show(); }
           });
      }
 

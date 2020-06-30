@@ -1,4 +1,4 @@
-package com.anantdevelopers.swipesinalpha;
+package com.anantdevelopers.swipesinalpha.Main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +28,7 @@ import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsAreHealthyActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity.SettingsActivity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrdersFragment;
+import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.StoreClosed.StoreClosedActivity;
 import com.anantdevelopers.swipesinalpha.UserProfile.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -80,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_main);
+
+          //getWindow().setNavigationBarColor(getResources().getColor(R.color.white));
 
           progressBar = findViewById(R.id.progressBar);
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
