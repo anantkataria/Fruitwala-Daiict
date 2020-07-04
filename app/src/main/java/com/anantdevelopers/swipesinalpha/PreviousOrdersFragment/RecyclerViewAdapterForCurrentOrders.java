@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,7 +48,7 @@ public class RecyclerViewAdapterForCurrentOrders extends RecyclerView.Adapter<Re
      @Override
      public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-//          holder.parentLayout.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation_2));
+          holder.parentLayout.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation));
 
           ArrayList<FruitItem> fruitsForAnOrder = listItems.get(position).getFruits();
           String status = listItems.get(position).getStatus();
@@ -82,14 +83,14 @@ public class RecyclerViewAdapterForCurrentOrders extends RecyclerView.Adapter<Re
           private TextView currentOrderStatus;
           private Button requestForCancelButton;
 
+          private LinearLayout parentLayout = itemView.findViewById(R.id.parent_layout);
+
           public ViewHolder(@NonNull View itemView, final onButtonClickListener listener) {
                super(itemView);
                listOfFruitsTextView = itemView.findViewById(R.id.listOfFruitsTextView);
                grandTotalTextView = itemView.findViewById(R.id.grandTotalTextView);
                currentOrderStatus = itemView.findViewById(R.id.CurrentOrderStatus);
                requestForCancelButton = itemView.findViewById(R.id.requestCancellationButton);
-
-               //LinearLayout parentLayout = itemView.findViewById(R.id.parent_layout);
 
                requestForCancelButton.setOnClickListener(new View.OnClickListener() {
                     @Override

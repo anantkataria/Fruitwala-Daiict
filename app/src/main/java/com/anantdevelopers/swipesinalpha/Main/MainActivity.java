@@ -3,6 +3,8 @@ package com.anantdevelopers.swipesinalpha.Main;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      private AppBarConfiguration appBarConfiguration;
      private RelativeLayout parentLayout;
 
+//     private InternetConnectionViewModel internetConnectionViewModel;
+//     private Snackbar noInternetSnackbar;
+
      private ValueEventListener listener1, listener2, listener3;
 
      //private boolean isSavingSuccessful = false;
@@ -83,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           setContentView(R.layout.activity_main);
 
           //getWindow().setNavigationBarColor(getResources().getColor(R.color.white));
+//          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+//          observeConnectivity();
+//          startCheckingNetworkConnectivity();
 
           progressBar = findViewById(R.id.progressBar);
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -95,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           appBarConfiguration = new AppBarConfiguration.Builder(
                   R.id.HomeFragment, R.id.CartFragment, R.id.PreviousOrdersFragment
           ).build();
+
+
 
           FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
@@ -109,13 +119,35 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
      }
 
+//     private void startCheckingNetworkConnectivity() {
+//          internetConnectionViewModel.startConnectivityCheck();
+//     }
+
+//     private void observeConnectivity() {
+//          internetConnectionViewModel.getIsConnected().observe(this, new Observer<Boolean>() {
+//               @Override
+//               public void onChanged(Boolean isConnected) {
+//                    noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+//                    //noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+//                    if(!isConnected){
+//                        //not connected, show SnackBar of retry
+//                        //and retry is recreate the activity here
+//                        noInternetSnackbar.show();
+//                    }
+//                    else {
+//                         noInternetSnackbar.dismiss();
+//                    }
+//               }
+//          });
+//     }
+
      FirebaseAuth.AuthStateListener buildAuthStateListener(){
 
           FirebaseAuth.AuthStateListener authStateListener;
 
-          authStateListener = new FirebaseAuth.AuthStateListener() {
+          authStateListener = new com.google.firebase.auth.FirebaseAuth.AuthStateListener() {
                @Override
-               public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+               public void onAuthStateChanged(@NonNull com.google.firebase.auth.FirebaseAuth firebaseAuth) {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     if(user != null){  //means user is signed in
 

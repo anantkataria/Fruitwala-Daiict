@@ -30,6 +30,9 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_settings);
 
+          firebaseAuth = FirebaseAuth.getInstance();
+          authPhone = firebaseAuth.getCurrentUser().getPhoneNumber();
+
           setTitle("SETTINGS");
           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -41,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
           Intent intent = getIntent();
           userName = intent.getStringExtra("userName");
           authPhone = intent.getStringExtra("authPhone");
-          Log.e("SettingsActivity69", "userName = " + userName + ", authPhone = " + authPhone);
+          //Log.e("SettingsActivity69", "userName = " + userName + ", authPhone = " + authPhone);
 
           ListView listView = findViewById(R.id.list_view);
           customListAdapter adapter = new customListAdapter(this, R.layout.list_item_settings, listItems);
@@ -76,8 +79,6 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
                     }
                }
           });
-
-          firebaseAuth = FirebaseAuth.getInstance();
      }
 
      private void initiateLogoutProcess() {

@@ -3,12 +3,15 @@ package com.anantdevelopers.swipesinalpha.HomeFragment.CustomDialogFragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,6 +37,8 @@ public class CustomDialogFragment extends DialogFragment {
      private ArrayList<String> receivedFruitQtys, receivedFruitPrices;
      private int receivedFruitImage;
 
+     private Vibrator vibrator;
+
      private String qty, updatedPrice; //used inside the spinner
 
      public CustomDialogFragment() {
@@ -43,6 +48,9 @@ public class CustomDialogFragment extends DialogFragment {
      @Override
      public void onCreate(@Nullable Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
+
+          if(getActivity() != null)
+          vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
 
           Bundle bundle = this.getArguments();
           if(bundle != null){
@@ -96,6 +104,15 @@ public class CustomDialogFragment extends DialogFragment {
           addToCartButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
+                    if (vibrator != null) {
+                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                              VibrationEffect vibrationEffect = VibrationEffect.createOneShot(25, VibrationEffect.DEFAULT_AMPLITUDE);
+                              vibrator.vibrate(vibrationEffect);
+                         }
+                         else {
+                              vibrator.vibrate(25);
+                         }
+                    }
                     mListener.getItemFromDialogToMainActivity(receivedFruitName, qty, updatedPrice);
                     dismiss();
                }
