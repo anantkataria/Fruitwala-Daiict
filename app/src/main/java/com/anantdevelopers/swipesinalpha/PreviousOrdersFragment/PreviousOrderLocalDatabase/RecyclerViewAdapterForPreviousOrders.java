@@ -8,6 +8,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -85,7 +86,7 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
           private TextView grandTotalTextView;
           private ImageView starImageView;
 
-          private LinearLayout parentLayout;
+          //private LinearLayout parentLayout;
 
           ViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
                super(itemView);
@@ -94,8 +95,8 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
                grandTotalTextView = itemView.findViewById(R.id.grandTotalTextView);
                starImageView = itemView.findViewById(R.id.star_image_view);
                Button orderAgainButton = itemView.findViewById(R.id.orderAgainButton);
-
-               parentLayout = itemView.findViewById(R.id.parent_layout);
+               final ProgressBar progressBarForThisOrder = itemView.findViewById(R.id.progress_bar_for_this_order);
+               //parentLayout = itemView.findViewById(R.id.parent_layout);
 
                itemView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
@@ -114,6 +115,7 @@ public class RecyclerViewAdapterForPreviousOrders extends RecyclerView.Adapter<R
                orderAgainButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                         //progressBarForThisOrder.setVisibility(View.VISIBLE);
                          if(listener != null){
                               int position = getAdapterPosition();
                               if(position != RecyclerView.NO_POSITION){

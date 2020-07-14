@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -153,6 +155,8 @@ public class FeedbackActivity extends AppCompatActivity {
                     }else if(concern.length() <= 7){
                          Snackbar.make(parentLayout, "Write more", Snackbar.LENGTH_SHORT).show();
                     }else {
+                         hideKeyboard(FeedbackActivity.this);
+
                          progressBar.setVisibility(View.VISIBLE);
                          if(progressBar.getVisibility() == View.VISIBLE){
                               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -167,7 +171,7 @@ public class FeedbackActivity extends AppCompatActivity {
                                    }
 
                                    String userdetails = getUserDetails();
-                                   String[] emails = {"savage9ishere@gmail.com", "katariaanant4@gmail.com"};
+                                   String[] emails = {"feedback.fruitwala@gmail.com"};
                                    String subject = "FruitWala Customer Feedback";
                                    String body = concern + "\n\n" + userdetails;
                                    composeEmail(emails, subject, body, uri1, uri2, uri3);
@@ -176,6 +180,17 @@ public class FeedbackActivity extends AppCompatActivity {
                     }
                }
           });
+     }
+
+     public static void hideKeyboard(Activity activity) {
+          InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+          //Find the currently focused view, so we can grab the correct window token from it.
+          View view = activity.getCurrentFocus();
+          //If no view currently has focus, create a new one, just so we can grab a window token from it
+          if (view == null) {
+               view = new View(activity);
+          }
+          imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
      }
 
      private String getUserDetails() {

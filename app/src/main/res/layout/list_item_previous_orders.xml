@@ -68,17 +68,30 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/orderAgainButton"
-        android:text="ORDER AGAIN?"
-        android:textColor="@color/colorPrimary"
-        android:background="@drawable/button_design_2"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:layout_margin="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
+        <ProgressBar
+            android:id="@+id/progress_bar_for_this_order"
+            android:layout_margin="8dp"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/orderAgainButton"
+            android:text="ORDER AGAIN?"
+            android:textColor="@color/colorPrimary"
+            android:background="@drawable/button_design_2"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_margin="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 <!--    add a review system, or rating the delivery system-->
 
 </LinearLayout>

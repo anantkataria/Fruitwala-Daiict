@@ -3,12 +3,14 @@ package com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
@@ -91,24 +94,54 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
 
 
           //saveChangesButton.setVisibility(View.GONE);
-
           saveChangesButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    if(phone2EditText.getText().toString().length() < 10){
-                         Snackbar.make(parentLayout2, "Enter valid phone number", Snackbar.LENGTH_SHORT).show();
+
+                    String name = nameEditText.getText().toString();
+                    String phone2 = phone2EditText.getText().toString();
+                    String roomNo = roomNoEditText.getText().toString();
+
+                    if(phone2.isEmpty()){
+                         phone2 = "num2 not given";
+                    }
+
+
+                    if(name.isEmpty()){
+                         Snackbar.make(parentLayout, "Enter Your Name", Snackbar.LENGTH_SHORT).show();
+                    }
+                    else if(name.matches("\\d+")){
+                         Snackbar.make(parentLayout, "Enter Valid Name", Snackbar.LENGTH_SHORT).show();
+                    }
+                    else if(roomNo.isEmpty()){
+                         Snackbar.make(parentLayout, "Enter Room-Number", Snackbar.LENGTH_SHORT).show();
+                    }
+                    else if(roomNo.matches("[0]+")){
+                         Snackbar.make(parentLayout, "Enter Valid Room-Number", Snackbar.LENGTH_SHORT).show();
                     }
                     else{
+                         hideKeyboard(ProfileActivity.this);
                          progressBar.setVisibility(View.VISIBLE);
                          if(progressBar.getVisibility() == View.VISIBLE){
                               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                          }
 
-                         setNewValuesToUserClass();
+                         setNewValuesToUserClass(name, phone2, roomNo);
                          saveChangesInDatabase();
                     }
                }
           });
+     }
+
+     public static void hideKeyboard(Activity activity) {
+          InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+          //Find the currently focused view, so we can grab the correct window token from it.
+          View view = activity.getCurrentFocus();
+          //If no view currently has focus, create a new one, just so we can grab a window token from it
+          if (view == null) {
+               view = new View(activity);
+          }
+          imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
      }
 
      private void getUserFromDatabase(final DatabaseInterface databaseInterface) {
@@ -227,11 +260,11 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           wingSpinner.setOnItemSelectedListener(this);
      }
 
-     private void setNewValuesToUserClass() {
-          user.setUserName(nameEditText.getText().toString());
-          user.setPhoneNum2(phone2EditText.getText().toString());
+     private void setNewValuesToUserClass(String name, String phone2, String roomNo) {
+          user.setUserName(name);
+          user.setPhoneNum2(phone2);
           user.setBuilding(Integer.toString(buildingSpinner.getSelectedItemPosition() + 1));
-          user.setRoom(roomNoEditText.getText().toString());
+          user.setRoom(roomNo);
           user.setWing(wingSpinner.getSelectedItem().toString());
      }
 

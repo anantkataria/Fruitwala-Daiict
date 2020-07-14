@@ -3,9 +3,11 @@ package com.anantdevelopers.swipesinalpha.UserProfile;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -92,19 +94,26 @@ public class UserProfile extends AppCompatActivity {
                          phoneNum2 = "num2 not given";
                     }
                     if (userName.isEmpty()) {
-                         Toast.makeText(UserProfile.this, "Please Enter your name", Toast.LENGTH_SHORT).show();
+                         Toast.makeText(UserProfile.this, "Please Enter Your Name", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(userName.matches("\\d+")){
+                         Toast.makeText(UserProfile.this, "Enter Valid Name", Toast.LENGTH_SHORT).show();
                     }
                     else if (room.isEmpty()) {
-                         Toast.makeText(UserProfile.this, "Please Enter your room/office number", Toast.LENGTH_SHORT).show();
+                         Toast.makeText(UserProfile.this, "Please Enter Your Room/Office number", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(room.matches("[0]+")){
+                         Toast.makeText(UserProfile.this, "Enter Valid Room-Number", Toast.LENGTH_SHORT).show();
                     }
                     else if (wingLetterSpinner.getSelectedItemPosition() == 0) {
-                         Toast.makeText(UserProfile.this, "Please select your wing letter", Toast.LENGTH_SHORT).show();
+                         Toast.makeText(UserProfile.this, "Please Select Your Wing Letter", Toast.LENGTH_SHORT).show();
                     }
                     else if (buildingLetterSpinner.getSelectedItemPosition() == 0) {
-                         Toast.makeText(UserProfile.this, "Please select your building", Toast.LENGTH_SHORT).show();
+                         Toast.makeText(UserProfile.this, "Please Select Your Building", Toast.LENGTH_SHORT).show();
                     }
                     else {
                          //now user has given every information needed so proceed to sending data at server and take user back to MainActivity.
+                         hideKeyboard(UserProfile.this);
                          Map<String, Object> map = new HashMap<>();
                          map.put("userName", userName);
                          map.put("phoneNum1", phoneNum1);
@@ -151,6 +160,17 @@ public class UserProfile extends AppCompatActivity {
           });
 
 
+     }
+
+     public static void hideKeyboard(Activity activity) {
+          InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+          //Find the currently focused view, so we can grab the correct window token from it.
+          View view = activity.getCurrentFocus();
+          //If no view currently has focus, create a new one, just so we can grab a window token from it
+          if (view == null) {
+               view = new View(activity);
+          }
+          imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
      }
 
      private void setSpinnerOptions() {

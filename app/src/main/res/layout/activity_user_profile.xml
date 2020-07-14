@@ -9,7 +9,7 @@
     tools:context=".OptionsMenuResources.SettingsActivity.ProfileActivity">
 
     <ScrollView
-        android:layout_above="@+id/hardcoded_text_view"
+        android:layout_above="@+id/save_and_continue_button"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -157,6 +157,18 @@
                     android:layout_height="wrap_content"
                     android:importantForAutofill="no"/>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/hardcoded_text_view"
+                android:layout_marginTop="32dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="*We will use this information to deliver order at your dorm/office"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
     </ScrollView>
@@ -178,14 +190,6 @@
         android:text="Saving data, Please wait"
         android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <TextView
-        android:id="@+id/hardcoded_text_view"
-        android:layout_above="@+id/save_and_continue_button"
-        android:text="We will use this information to deliver order at your\ndorm/office"
-        android:gravity="center"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <Button

@@ -1,7 +1,6 @@
 package com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ public class RecyclerViewAdapterForHomeFragment extends RecyclerView.Adapter<Rec
      @NonNull
      @Override
      public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-          View view = LayoutInflater.from(context).inflate(R.layout.list_item_home_2
+          View view = LayoutInflater.from(context).inflate(R.layout.list_item_home
           , parent, false);
           return new ViewHolder(view);
      }

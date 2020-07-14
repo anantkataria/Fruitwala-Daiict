@@ -1,17 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
+<RelativeLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <ListView
         android:id="@+id/list_view"
+        android:layout_above="@+id/logout_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="#000"
         android:dividerHeight="0.5dp"
-        xmlns:tools="http://schemas.android.com/tools"
         tools:listitem="@layout/list_item_settings"
-        xmlns:android="http://schemas.android.com/apk/res/android" />
+        xmlns:tools="http://schemas.android.com/tools"
+        />
 
-</LinearLayout>
+    <RelativeLayout
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/logout_layout"
+        android:layout_marginBottom="64dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@android:color/white"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/img"
+            android:layout_centerVertical="true"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_logout"/>
+
+        <TextView
+            android:id="@+id/name_txt"
+            android:layout_toEndOf="@+id/img"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:text="LOGOUT"
+            android:textColor="@android:color/black"
+            />
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

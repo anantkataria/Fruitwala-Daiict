@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,11 +70,10 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      private ArrayList<CheckoutUser> currentOrdersList;
      private ArrayList<CheckoutUser> previousOrdersList; //for local database
 
-     private ProgressBar currentOrderProgressBar;
+     private ProgressBar currentOrderProgressBar, previousOrderProgressBar, parentParentProgressBar;
      private TextView noCurrentOrdersTextView;
      private LinearLayout parentLayout;
-     private ProgressBar previousOrderProgressBar;
-     private TextView noPreviousOrdersTextView, pleaseWaitTextView;
+     private TextView noPreviousOrdersTextView;
 
      private RecyclerViewAdapterForCurrentOrders adapterForCurrentOrders;
      private RecyclerViewAdapterForPreviousOrders adapter;
@@ -145,6 +147,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           View v = inflater.inflate(R.layout.fragment_previous_orders, container, false);
 
           parentLayout = v.findViewById(R.id.parent_layout);
+          parentParentProgressBar = v.findViewById(R.id.parent_parent_progress_bar);
 
           currentOrderAffairs(v);
           previousOrderAffairs(v);
@@ -163,7 +166,6 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      private void previousOrderAffairs(final View v) {
           previousOrderProgressBar = v.findViewById(R.id.previousOrdersProgressBar);
           noPreviousOrdersTextView = v.findViewById(R.id.noPreviousOrdersTextView);
-          pleaseWaitTextView = v.findViewById(R.id.please_wait_text_view);
 
           RecyclerView previousOrdersRecyclerView = v.findViewById(R.id.previousOrdersRecyclerView);
           adapter = new RecyclerViewAdapterForPreviousOrders(getContext());
@@ -203,8 +205,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                          mListener.sendToMainFromPreviousOrderFragment(fruitItems);
                          Toast.makeText(getContext(), "Fruits added to cart!", Toast.LENGTH_SHORT).show();
                     }
-                    previousOrderProgressBar.setVisibility(GONE);
-                    pleaseWaitTextView.setVisibility(GONE);
+                    previousOrderProgressBar.setVisibility(View.INVISIBLE);
                }
           });
 
@@ -233,9 +234,14 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                          previousOrderViewModel.insert(poe);
                     }
 
-                    previousOrderProgressBar.setVisibility(GONE);
+                    previousOrderProgressBar.setVisibility(View.INVISIBLE);
 
-                    databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeValue();
+                    databaseReference.child("Delivered or Cancelled").child(authPhoneNumber).removeValue().addOnFailureListener(new OnFailureListener() {
+                         @Override
+                         public void onFailure(@NonNull Exception e) {
+                              Toast.makeText(getContext(), "Operation Failed : " + e.getMessage(), Toast.LENGTH_LONG).show();
+                         }
+                    });
                }
           });
      }
@@ -320,7 +326,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
                     }
                     else{
-                         previousOrderProgressBar.setVisibility(GONE);
+                         previousOrderProgressBar.setVisibility(View.INVISIBLE);
                          //no delivered/cancelled orders remaining to read from database
                     }
                }
@@ -378,11 +384,18 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           fetchCurrentOrders(new DatabaseCallbackInterface() {
                @Override
                public void fromOnChildManipulated(ArrayList<CheckoutUser> currentOrdersList) {
+                    Collections.sort(currentOrdersList, new Comparator<CheckoutUser>() {
+                         @Override
+                         public int compare(CheckoutUser o1, CheckoutUser o2) {
+                              return -1*o1.getOrderPlacedDate().compareTo(o2.getOrderPlacedDate());
+                         }
+                    });
+                    parentLayout.setVisibility(View.VISIBLE);
+                    parentParentProgressBar.setVisibility(GONE);
                     if(currentOrdersList.isEmpty()){
                          noCurrentOrdersTextView.setVisibility(View.VISIBLE);
                     }
                     else {
-                         currentOrdersRecyclerView.setVisibility(View.VISIBLE);
                          adapterForCurrentOrders = new RecyclerViewAdapterForCurrentOrders(getContext(), currentOrdersList);
                          currentOrdersRecyclerView.setAdapter(adapterForCurrentOrders);
                          currentOrdersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -390,8 +403,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
                          handleCurrentOrderButtonClicks();
                     }
-
-                    currentOrderProgressBar.setVisibility(GONE);
+                    currentOrderProgressBar.setVisibility(View.INVISIBLE);
                }
           });
      }
@@ -406,7 +418,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 //                         Toast toast = Toast.makeText(getContext(), "Sorry, Cannot CANCEL order when it is On The Way!", Toast.LENGTH_LONG);
 //                         toast.setGravity(Gravity.CENTER, 0, 0);
 //                         toast.show();
-                         Snackbar.make(parentLayout, "Sorry, Cannot CANCEL order when it is On The Way!", Snackbar.LENGTH_LONG).show();
+                         Snackbar.make(parentLayout, "Unable Cancel order when it is On The Way", Snackbar.LENGTH_LONG).show();
                     }
                     else {
                          CancelCurrentOrderDialog dialog1 = new CancelCurrentOrderDialog(position);
@@ -420,6 +432,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
      @Override
      public void onDialogPositiveClickForCancelOrder(int position) {
           CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
+          //CheckoutUser curr = new CheckoutUser(currentOrderDetails.getUser(), currentOrderDetails.getFruits(), currentOrderDetails.getPaymentMethod(), currentOrderDetails.getStatus(), currentOrderDetails.getFirebaseDatabaseKey(), currentOrderDetails.getOrderPlacedDate());
 
           currentOrderDetails.setStatus("CANCELLATION REQUESTED");
           currentOrderProgressBar.setVisibility(View.VISIBLE);
@@ -431,13 +444,14 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
           databaseReference.updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                @Override
-               public void onSuccess(Void aVoid) { currentOrderProgressBar.setVisibility(GONE);
-               Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_LONG).show();
+               public void onSuccess(Void aVoid) {
+                    currentOrderProgressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_LONG).show();
                }
           }).addOnFailureListener(new OnFailureListener() {
                @Override
                public void onFailure(@NonNull Exception e) {
-                    currentOrderProgressBar.setVisibility(GONE);
+                    currentOrderProgressBar.setVisibility(View.INVISIBLE);
                     Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_LONG).show(); }
           });
      }
@@ -449,7 +463,6 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           valueEventListener2 = new ValueEventListener() {
                @Override
                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    currentOrderProgressBar.setVisibility(View.VISIBLE);
                     currentOrdersList.clear();
                     for(DataSnapshot data : dataSnapshot.getChildren()){
                          currentOrdersList.add(data.getValue(CheckoutUser.class));
@@ -552,13 +565,13 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
           final Map<String, Integer> actualPriceMap = getActualPriceMap(position);
 
-          pleaseWaitTextView.setVisibility(View.VISIBLE);
+          //pleaseWaitTextView.setVisibility(View.VISIBLE);
 
 
           fetchFruits(new FruitsFromdatabase() {
                @Override
                public void afterFetch(Map<String, ArrayList<String>> latestQtyMap, Map<String, ArrayList<Integer>> latestPriceMap) {
-                    pleaseWaitTextView.setText("FEW SECONDS LEFT...");
+                    //pleaseWaitTextView.setText("FEW SECONDS LEFT...");
 
                     Log.e("afterfetch", "after ondatachange()");
                     orderAgainViewModel.setActualPriceMap(actualPriceMap);

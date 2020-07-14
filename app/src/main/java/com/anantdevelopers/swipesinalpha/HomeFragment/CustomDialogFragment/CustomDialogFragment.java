@@ -106,11 +106,11 @@ public class CustomDialogFragment extends DialogFragment {
                public void onClick(View v) {
                     if (vibrator != null) {
                          if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                              VibrationEffect vibrationEffect = VibrationEffect.createOneShot(25, VibrationEffect.DEFAULT_AMPLITUDE);
+                              VibrationEffect vibrationEffect = VibrationEffect.createOneShot(15, VibrationEffect.DEFAULT_AMPLITUDE);
                               vibrator.vibrate(vibrationEffect);
                          }
                          else {
-                              vibrator.vibrate(25);
+                              vibrator.vibrate(15);
                          }
                     }
                     mListener.getItemFromDialogToMainActivity(receivedFruitName, qty, updatedPrice);
