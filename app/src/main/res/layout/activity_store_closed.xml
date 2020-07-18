@@ -1,66 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout android:layout_height="match_parent"
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
     android:background="@android:color/white"
     android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <ScrollView
-        android:layout_above="@id/feedback_btn"
-        android:layout_height="match_parent"
+    <ImageView
+        android:id="@+id/img_view"
+        android:src="@drawable/ic_store_closed"
         android:layout_width="match_parent"
-        xmlns:android="http://schemas.android.com/apk/res/android" >
+        android:layout_height="wrap_content"/>
 
-        <RelativeLayout
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:context=".StoreClosed.StoreClosedActivity">
-
-            <TextView
-                android:id="@+id/hardcoded_text_view_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:fontFamily="@font/almendra_sc"
-                android:gravity="center"
-                android:text="Closed Today"
-                android:textColor="@android:color/holo_red_light"
-                android:textSize="50sp" />
-
-            <TextView
-                android:id="@+id/hardcoded_text_view_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/hardcoded_text_view_1"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:fontFamily="@font/roboto_italic"
-                android:gravity="center"
-                android:text="We are extremely sorry for the inconvenience"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-            <TextView
-                android:id="@+id/open_again_time_text_view"
-                android:layout_below="@+id/hardcoded_text_view_2"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/roboto_italic"
-                android:textColor="@android:color/holo_green_dark"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:hint="Services will be resumed from tomorrow as normal"
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-        </RelativeLayout>
-
-    </ScrollView>
+    <TextView
+        android:id="@+id/open_again_time_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/feedback_btn"
+        android:layout_margin="8dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        tools:text="Will be opened by tomorrow morning" />
 
     <Button
         android:textColor="@android:color/white"

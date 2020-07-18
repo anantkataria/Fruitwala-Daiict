@@ -32,8 +32,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDialog.cashOnDeliveryDialogListener {
 
@@ -56,6 +60,8 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
      private String authPhoneNumber;
 
      private ArrayList<FruitItem> fruits;
+
+     private String token;
 
      private int paymentMethodNumber = 0; //should either be 1 or 2  1-indicates upi payment, 2-indicates cod payment
 
@@ -84,6 +90,8 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           upiCheckImage = findViewById(R.id.upiCheckImage);
           codCheckImage = findViewById(R.id.codCheckImage);
           parentLayout = findViewById(R.id.parent_layout);
+
+          getToken();
 
           firebaseAuth = FirebaseAuth.getInstance();
 
@@ -131,6 +139,15 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
 
           FirebaseUser user = firebaseAuth.getCurrentUser();
           authPhoneNumber = user.getPhoneNumber();
+     }
+
+     private void getToken() {
+          FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+               @Override
+               public void onSuccess(InstanceIdResult instanceIdResult) {
+                    token = instanceIdResult.getToken();
+               }
+          });
      }
 
      private void payUsingCOD() {
@@ -215,7 +232,11 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
                     String key = databaseReference.child("Orders").child(authPhoneNumber).push().getKey();
                     checkoutUser.setFirebaseDatabaseKey(key);
 
-                    databaseReference.child("Orders").child(authPhoneNumber).child(key).setValue(checkoutUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("/Orders/" + authPhoneNumber + "/" + key, checkoutUser);
+                    map.put("/tokens/" + authPhoneNumber, token);
+
+                    databaseReference.updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                          @Override
                          public void onSuccess(Void aVoid) {
                               Toast.makeText(CheckoutFlow.this, "Order Sent Successfully!", Toast.LENGTH_SHORT).show();

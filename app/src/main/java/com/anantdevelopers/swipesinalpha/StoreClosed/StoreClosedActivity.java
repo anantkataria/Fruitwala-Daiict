@@ -17,6 +17,7 @@ public class StoreClosedActivity extends AppCompatActivity {
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
+          setTheme(R.style.StoreClosedAppTheme);
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_store_closed);
 
