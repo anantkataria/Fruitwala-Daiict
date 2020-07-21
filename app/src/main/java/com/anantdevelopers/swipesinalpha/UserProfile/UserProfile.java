@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +22,9 @@ import com.anantdevelopers.swipesinalpha.Main.MainActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseNetworkException;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -31,7 +34,10 @@ import java.util.Map;
 
 public class UserProfile extends AppCompatActivity {
 
+     private RelativeLayout parentLayout;
+
      private TextView savingDataTextView;
+     private TextView changeNumberTextView;
 
      private LinearLayout linearLayout;
      private EditText nameEditText;
@@ -47,14 +53,17 @@ public class UserProfile extends AppCompatActivity {
      private ProgressBar progressBar;
 
      private DatabaseReference databaseReference;
+     private FirebaseAuth firebaseAuth;
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_user_profile);
 
+          parentLayout = findViewById(R.id.parent_layout);
           linearLayout = findViewById(R.id.linear_layout);
           nameEditText = findViewById(R.id.name_edit_text);
+          changeNumberTextView = findViewById(R.id.change_number_text_view);
           EditText authenticatedPhoneNumber = findViewById(R.id.phone1_edit_text);
           phoneNumber2 = findViewById(R.id.phone2_edit_text);
           roomNumber = findViewById(R.id.room_no_edit_text);
@@ -70,6 +79,7 @@ public class UserProfile extends AppCompatActivity {
 
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
+          firebaseAuth = FirebaseAuth.getInstance();
 
      }
 
@@ -81,6 +91,13 @@ public class UserProfile extends AppCompatActivity {
           wingSpinnerArrayList = new ArrayList<>();
 
           setSpinnerOptions(); //set up spinner
+
+          changeNumberTextView.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                    firebaseAuth.signOut();
+               }
+          });
 
           saveAndContinueBtn.setOnClickListener(new View.OnClickListener() {
                @Override
@@ -94,22 +111,28 @@ public class UserProfile extends AppCompatActivity {
                          phoneNum2 = "num2 not given";
                     }
                     if (userName.isEmpty()) {
-                         Toast.makeText(UserProfile.this, "Please Enter Your Name", Toast.LENGTH_SHORT).show();
+                         //Toast.makeText(UserProfile.this, "Please Enter Your Name", Toast.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Please Enter Your Name", Snackbar.LENGTH_SHORT).show();
                     }
                     else if(userName.matches("\\d+")){
-                         Toast.makeText(UserProfile.this, "Enter Valid Name", Toast.LENGTH_SHORT).show();
+//                         Toast.makeText(UserProfile.this, "Enter Valid Name", Toast.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Enter Valid Name", Snackbar.LENGTH_SHORT).show();
                     }
                     else if (room.isEmpty()) {
-                         Toast.makeText(UserProfile.this, "Please Enter Your Room/Office number", Toast.LENGTH_SHORT).show();
+//                         Toast.makeText(UserProfile.this, "Please Enter Your Room/Office number", Toast.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Please Enter Your Room/Office Number", Snackbar.LENGTH_SHORT).show();
                     }
                     else if(room.matches("[0]+")){
-                         Toast.makeText(UserProfile.this, "Enter Valid Room-Number", Toast.LENGTH_SHORT).show();
+//                         Toast.makeText(UserProfile.this, "Enter Valid Room-Number", Toast.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Enter Valid Room-Number", Snackbar.LENGTH_SHORT).show();
                     }
                     else if (wingLetterSpinner.getSelectedItemPosition() == 0) {
-                         Toast.makeText(UserProfile.this, "Please Select Your Wing Letter", Toast.LENGTH_SHORT).show();
+//                         Toast.makeText(UserProfile.this, "Please Select Your Wing Letter", Toast.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Please Select You Wing/Block Letter", Snackbar.LENGTH_SHORT).show();
                     }
                     else if (buildingLetterSpinner.getSelectedItemPosition() == 0) {
-                         Toast.makeText(UserProfile.this, "Please Select Your Building", Toast.LENGTH_SHORT).show();
+//                         Toast.makeText(UserProfile.this, "Please Select Your Building", Toast.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Please Select Your Building", Snackbar.LENGTH_SHORT).show();
                     }
                     else {
                          //now user has given every information needed so proceed to sending data at server and take user back to MainActivity.

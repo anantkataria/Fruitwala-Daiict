@@ -115,10 +115,10 @@
         android:text="ENTER NUMBER AGAIN"
         android:visibility="gone"
         android:textColor="@android:color/white"
-        android:gravity="end"
+        android:layout_alignParentEnd="true"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
 </RelativeLayout>

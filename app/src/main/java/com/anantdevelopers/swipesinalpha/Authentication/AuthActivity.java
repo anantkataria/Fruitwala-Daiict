@@ -195,16 +195,18 @@ public class AuthActivity extends AppCompatActivity {
 
                                                 Intent intent = new Intent(AuthActivity.this, MainActivity.class);
                                                 intent.putExtra("isSavingSuccessful", true);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                 startActivity(intent);
-                                                finish();
+//                                                finish();
 
                                            }
                                            else {
                                                 //take user first to the profile and finish this activity
                                                 Intent intent = new Intent(AuthActivity.this, UserProfile.class);
                                                 intent.putExtra("authenticatedPhoneNumber", authenticatedPhoneNumber);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                 startActivity(intent);
-                                                finish();//finishing AuthActivity.java
+                                                //finish();//finishing AuthActivity.java
                                            }
                                       }
 

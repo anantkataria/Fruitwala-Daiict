@@ -191,7 +191,8 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                public void onChanged(List<FruitItem> fruitItems) {
                     if(fruitItems.isEmpty()) {
                          //Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
-                         Toast.makeText(getContext(), "Fruit may not be available!", Toast.LENGTH_LONG).show();
+                         //Toast.makeText(getContext(), "Fruit may not be available!", Toast.LENGTH_LONG).show();
+                         Snackbar.make(parentLayout, "Fruit May Not Be Available!", Snackbar.LENGTH_SHORT).show();
                          Log.e("observe", "fruitItems are empty");
                     }
                     else {
@@ -203,7 +204,8 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                          //set a toast that items added to the cart.
                          Log.e("observe", "fruitItems are not empty");
                          mListener.sendToMainFromPreviousOrderFragment(fruitItems);
-                         Toast.makeText(getContext(), "Fruits added to cart!", Toast.LENGTH_SHORT).show();
+                         //Toast.makeText(getContext(), "Fruits added to cart!", Toast.LENGTH_SHORT).show();
+                         Snackbar.make(parentLayout, "Fruits Added To Cart!", Snackbar.LENGTH_SHORT).show();
                     }
                     previousOrderProgressBar.setVisibility(View.INVISIBLE);
                }
@@ -418,7 +420,7 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 //                         Toast toast = Toast.makeText(getContext(), "Sorry, Cannot CANCEL order when it is On The Way!", Toast.LENGTH_LONG);
 //                         toast.setGravity(Gravity.CENTER, 0, 0);
 //                         toast.show();
-                         Snackbar.make(parentLayout, "Unable Cancel order when it is On The Way", Snackbar.LENGTH_LONG).show();
+                         Snackbar.make(parentLayout, "Unable To Cancel Order When It Is On The Way", Snackbar.LENGTH_LONG).show();
                     }
                     else {
                          CancelCurrentOrderDialog dialog1 = new CancelCurrentOrderDialog(position);
@@ -446,13 +448,16 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                @Override
                public void onSuccess(Void aVoid) {
                     currentOrderProgressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_LONG).show();
+                    Snackbar.make(parentLayout, "Cancellation Requested Successfully", Snackbar.LENGTH_SHORT).show();
                }
           }).addOnFailureListener(new OnFailureListener() {
                @Override
                public void onFailure(@NonNull Exception e) {
                     currentOrderProgressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_LONG).show(); }
+                    //Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_LONG).show();
+                    Snackbar.make(parentLayout, "Something Went Wrong! Try Again", Snackbar.LENGTH_SHORT).show();
+               }
           });
      }
 

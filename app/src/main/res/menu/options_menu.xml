@@ -5,8 +5,8 @@
         android:title="Settings"/>
 
     <item
-        android:id="@+id/fruits_are_healthy_dest"
-        android:title="Fruits are Healthy"/>
+        android:id="@+id/share_dest"
+        android:title="Share"/>
 
     <item
         android:id="@+id/about_dest"

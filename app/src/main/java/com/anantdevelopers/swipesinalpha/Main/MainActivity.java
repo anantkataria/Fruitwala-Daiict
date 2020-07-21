@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.anantdevelopers.swipesinalpha.Authentication.AuthActivity;
+import com.anantdevelopers.swipesinalpha.BuildConfig;
 import com.anantdevelopers.swipesinalpha.CartFragment.CartFragment;
 import com.anantdevelopers.swipesinalpha.HomeFragment.CustomDialogFragment.CustomDialogFragment;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                          Intent Authintent = new Intent(MainActivity.this, AuthActivity.class);
                          Authintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                          startActivity(Authintent);
-                         finish();
+//                         finish();
                     }
                }
           };
@@ -261,8 +262,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     if (!dataSnapshot.exists()){
                          Intent intent = new Intent(MainActivity.this, UserProfile.class);
                          intent.putExtra("authenticatedPhoneNumber", authPhone);
+                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                          startActivity(intent);
-                         finish();
+                         //finish();
                     }
                     else {
                          userName = dataSnapshot.child("userName").getValue(String.class);
@@ -318,9 +320,14 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     intent.putExtra("authPhone", authPhone);
                     startActivity(intent);
                     return true;
-               case R.id.fruits_are_healthy_dest:
-                    Intent intent1 = new Intent(MainActivity.this, FruitsAreHealthyActivity.class);
-                    startActivity(intent1);
+               case R.id.share_dest:
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, "FruitWala");
+                    String shareMessage = "\nOrder fresh fruits online and get it delivered to your dorm number.\nTry using fruitwala to order fruits.\n\n";
+                    shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID +"\n\n";
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+                    startActivity(Intent.createChooser(shareIntent, "Share with"));
                     return true;
                case R.id.about_dest:
                     Intent intent3 = new Intent(MainActivity.this, AboutActivity.class);

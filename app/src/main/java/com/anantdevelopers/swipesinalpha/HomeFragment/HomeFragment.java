@@ -230,10 +230,10 @@ public class HomeFragment extends Fragment {
                          customDialogFragment.show(ft, "position of fruit is" + position);
                     }
                     else {
-                         //Snackbar.make(getView(), "Fruit Not available!", Snackbar.LENGTH_SHORT);
-                         Toast toast = Toast.makeText(getContext(), "Sorry, Fruit not Available", Toast.LENGTH_SHORT);
-                         toast.setGravity(Gravity.CENTER, 0, 0);
-                         toast.show();
+                         Snackbar.make(parentLayout, "Sorry,That Fruit Is Not Available", Snackbar.LENGTH_SHORT).show();
+//                         Toast toast = Toast.makeText(getContext(), "Sorry, Fruit not Available", Toast.LENGTH_SHORT);
+//                         toast.setGravity(Gravity.CENTER, 0, 0);
+//                         toast.show();
                     }
                }
           }));
