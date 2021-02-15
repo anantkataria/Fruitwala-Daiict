@@ -10,7 +10,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface PreviousOrderDao {
+interface PreviousOrderDao {
 
      @Insert
      void insert(PreviousOrderEntity poe);

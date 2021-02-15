@@ -2,10 +2,11 @@ package com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -14,10 +15,10 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.BuildConfig;
-import com.anantdevelopers.swipesinalpha.Main.MainActivity;
+import com.anantdevelopers.swipesinalpha.Main.InternetConnectionViewModel;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsAreHealthyActivity;
-import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.DeletePreviousOrdersDialog;
+import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderViewModel;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,7 +37,6 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
      private String authPhone = "";
 
      private FirebaseAuth firebaseAuth;
-     private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
 
      private RelativeLayout logoutLayout;
@@ -44,6 +44,11 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
      private ProgressBar progressBar;
 
      private ArrayList<ListItem> listItems = new ArrayList<>();
+
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private boolean isItConnected;
+
+     private PreviousOrderViewModel deletePreviousOrderViewModel;
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +60,13 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
 
           firebaseAuth = FirebaseAuth.getInstance();
           authPhone = firebaseAuth.getCurrentUser().getPhoneNumber();
-          firebaseDatabase = FirebaseDatabase.getInstance();
+          FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
+
+          deletePreviousOrderViewModel = new ViewModelProvider(this).get(PreviousOrderViewModel.class);
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
 
           setTitle("SETTINGS");
           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -70,8 +80,7 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
 
           Intent intent = getIntent();
           userName = intent.getStringExtra("userName");
-          authPhone = intent.getStringExtra("authPhone");
-          //Log.e("SettingsActivity69", "userName = " + userName + ", authPhone = " + authPhone);
+          //authPhone = intent.getStringExtra("authPhone");
 
           listView = findViewById(R.id.list_view);
           customListAdapter adapter = new customListAdapter(this, R.layout.list_item_settings, listItems);
@@ -104,13 +113,17 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
                               startActivity(intent3);
                               break;
                          case 4:
-                              //todo initiate share with friends function
                               shareWithFriends();
                               break;
                          case 5:
-                              //todo initiate whole account deletion
-                              DeleteAccountDialog deleteAccountDialog = new DeleteAccountDialog();
-                              deleteAccountDialog.show(getSupportFragmentManager(), "Account-Deletion process starting");
+                              if(!isItConnected){
+                                   Toast.makeText(SettingsActivity.this, "Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                              }else {
+
+
+                                   DeleteAccountDialog deleteAccountDialog = new DeleteAccountDialog();
+                                   deleteAccountDialog.show(getSupportFragmentManager(), "Account-Deletion process starting");
+                              }
                               break;
 
                     }
@@ -120,7 +133,26 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
           logoutLayout.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    initiateLogoutProcess();
+                    if(!isItConnected){
+                         Toast.makeText(SettingsActivity.this, "Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                         initiateLogoutProcess();
+                    }
+               }
+          });
+     }
+
+
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
+
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(this, new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    isItConnected = isConnected;
                }
           });
      }
@@ -136,6 +168,8 @@ public class SettingsActivity extends AppCompatActivity implements LogoutDialog.
           listView.setVisibility(View.INVISIBLE);
           logoutLayout.setVisibility(View.INVISIBLE);
           progressBar.setVisibility(View.VISIBLE);
+
+          deletePreviousOrderViewModel.deleteAllPreviousOrders();
 
           Map<String, Object> deletionMap = new HashMap<>();
           deletionMap.put("/Delivered or Cancelled/" + authPhone, null);

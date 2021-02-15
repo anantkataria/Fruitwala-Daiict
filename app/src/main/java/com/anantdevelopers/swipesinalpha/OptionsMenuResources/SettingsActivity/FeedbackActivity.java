@@ -3,14 +3,14 @@ package com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.anantdevelopers.swipesinalpha.Main.InternetConnectionViewModel;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.google.android.material.snackbar.Snackbar;
@@ -38,6 +39,9 @@ public class FeedbackActivity extends AppCompatActivity {
      private ProgressBar progressBar;
 
      private ValueEventListener listener;
+
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private Snackbar noInternetSnackbar;
 
      private static final int REQUEST_IMAGE1_GET = 1;
      private static final int REQUEST_IMAGE2_GET = 2;
@@ -66,7 +70,6 @@ public class FeedbackActivity extends AppCompatActivity {
 
           Intent intent = getIntent();
           authPhone = intent.getStringExtra("authPhone");
-          Log.e("96", authPhone);
 
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
           databaseReference = firebaseDatabase.getReference();
@@ -77,7 +80,7 @@ public class FeedbackActivity extends AppCompatActivity {
           imageView1 = findViewById(R.id.image1_image_view);
           imageView2 = findViewById(R.id.image2_image_view);
           imageView3 = findViewById(R.id.image3_image_view);
-          Button nextButton = findViewById(R.id.next_button);
+          final Button nextButton = findViewById(R.id.next_button);
           parentLayout = findViewById(R.id.scroll_view);
           progressBar = findViewById(R.id.progress_bar);
 
@@ -101,6 +104,14 @@ public class FeedbackActivity extends AppCompatActivity {
                     selectImage3();
                }
           });
+
+          noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+          noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+          noInternetSnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
+
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
 
           imageView1.setOnLongClickListener(new View.OnLongClickListener() {
                @Override
@@ -148,7 +159,6 @@ public class FeedbackActivity extends AppCompatActivity {
                @Override
                public void onClick(View v) {
                     final String concern = concernEditText.getText().toString();
-                    Log.e("69696969", "concern = " + concern);
 
                     if(concern.isEmpty()){
                          Snackbar.make(parentLayout, "Enter your concern first", Snackbar.LENGTH_SHORT).show();
@@ -158,17 +168,19 @@ public class FeedbackActivity extends AppCompatActivity {
                          hideKeyboard(FeedbackActivity.this);
 
                          progressBar.setVisibility(View.VISIBLE);
-                         if(progressBar.getVisibility() == View.VISIBLE){
-                              getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                         }
+//                         if(progressBar.getVisibility() == View.VISIBLE){
+//                              getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//                         }
+                         nextButton.setEnabled(false);
 
                          getUserFromDatabase(new fetchFromDatabase() {
                               @Override
                               public void afterFetch() {
                                    progressBar.setVisibility(View.GONE);
-                                   if (progressBar.getVisibility() == View.GONE) {
-                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                                   }
+//                                   if (progressBar.getVisibility() == View.GONE) {
+//                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//                                   }
+                                   nextButton.setEnabled(true);
 
                                    String userdetails = getUserDetails();
                                    String[] emails = {"feedback.fruitwala@gmail.com"};
@@ -177,6 +189,26 @@ public class FeedbackActivity extends AppCompatActivity {
                                    composeEmail(emails, subject, body, uri1, uri2, uri3);
                               }
                          });
+                    }
+               }
+          });
+     }
+
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
+
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(this, new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    if(!isConnected){
+                         //not connected, show SnackBar of retry
+                         //and retry is recreate the activity here
+                         noInternetSnackbar.show();
+                    }
+                    else {
+                         noInternetSnackbar.dismiss();
                     }
                }
           });
@@ -222,27 +254,32 @@ public class FeedbackActivity extends AppCompatActivity {
                          case DatabaseError.NETWORK_ERROR :
                               Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar.show();
                               break;
                          case DatabaseError.OPERATION_FAILED :
                          case DatabaseError.UNKNOWN_ERROR:
                               Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar1.show();
                               break;
                          case DatabaseError.PERMISSION_DENIED:
                               Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar2.show();
                               break;
                          case DatabaseError.MAX_RETRIES:
                               Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar3.show();
                               break;
                          default:
                               Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar4.show();
                               break;
                     }

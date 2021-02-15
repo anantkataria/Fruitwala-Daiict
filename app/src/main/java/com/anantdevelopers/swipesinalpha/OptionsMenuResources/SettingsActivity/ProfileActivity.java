@@ -2,6 +2,8 @@ package com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +11,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,8 +20,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
+import com.anantdevelopers.swipesinalpha.Main.InternetConnectionViewModel;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -52,6 +53,9 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
 
      private ValueEventListener listener;
 
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private Snackbar noInternetSnackbar;
+
      private interface DatabaseInterface{
           void afterFetch();
      }
@@ -77,6 +81,15 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
 
           setIds();
           setSpinners();
+
+          noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+          noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+          noInternetSnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
+
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
+
           getUserFromDatabase(new DatabaseInterface() {
                @Override
                public void afterFetch() {
@@ -86,9 +99,9 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                     addTextChangeListenersToEditTexts(); //this method will ensure that save changes button is enabled when user changes anything in the edittext
                     addItemSelectedListenersToSpinners();//above method for spinners
                     progressBar.setVisibility(View.GONE);
-                    if (progressBar.getVisibility() == View.GONE) {
-                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    }
+//                    if (progressBar.getVisibility() == View.GONE) {
+//                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//                    }
                }
           });
 
@@ -122,12 +135,32 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                     else{
                          hideKeyboard(ProfileActivity.this);
                          progressBar.setVisibility(View.VISIBLE);
-                         if(progressBar.getVisibility() == View.VISIBLE){
-                              getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                         }
+//                         if(progressBar.getVisibility() == View.VISIBLE){
+//                              getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//                         }
 
                          setNewValuesToUserClass(name, phone2, roomNo);
                          saveChangesInDatabase();
+                    }
+               }
+          });
+     }
+
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
+
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(this, new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    if(!isConnected){
+                         //not connected, show SnackBar of retry
+                         //and retry is recreate the activity here
+                         noInternetSnackbar.show();
+                    }
+                    else {
+                         noInternetSnackbar.dismiss();
                     }
                }
           });
@@ -148,9 +181,9 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
           progressBar.setVisibility(View.VISIBLE);
           parentLayout2.setVisibility(View.INVISIBLE);
           saveChangesButton.setVisibility(View.INVISIBLE);
-          if(progressBar.getVisibility() == View.VISIBLE){
-               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-          }
+//          if(progressBar.getVisibility() == View.VISIBLE){
+//               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//          }
 
           listener = new ValueEventListener() {
                @Override
@@ -163,34 +196,39 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
                     parentLayout.setVisibility(View.INVISIBLE);
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                     switch(databaseError.getCode()) {
                          case DatabaseError.DISCONNECTED :
                          case DatabaseError.NETWORK_ERROR :
                               Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar.show();
                               break;
                          case DatabaseError.OPERATION_FAILED :
                          case DatabaseError.UNKNOWN_ERROR:
                               Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar1.show();
                               break;
                          case DatabaseError.PERMISSION_DENIED:
                               Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar2.show();
                               break;
                          case DatabaseError.MAX_RETRIES:
                               Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar3.show();
                               break;
                          default:
                               Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar4.show();
                               break;
                     }
@@ -275,9 +313,9 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                        public void onSuccess(Void aVoid) {
                             Snackbar.make(parentLayout2, "Saved Successfully", Snackbar.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
-                            if (progressBar.getVisibility() == View.GONE) {
-                                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                            }
+//                            if (progressBar.getVisibility() == View.GONE) {
+//                                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//                            }
                        }
                   }
           ).addOnFailureListener(new OnFailureListener() {
@@ -285,9 +323,9 @@ public class ProfileActivity extends AppCompatActivity implements TextWatcher, A
                public void onFailure(@NonNull Exception e) {
                     Snackbar.make(parentLayout2, "Something went wrong, Try again", Snackbar.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
-                    if (progressBar.getVisibility() == View.GONE) {
-                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    }
+//                    if (progressBar.getVisibility() == View.GONE) {
+//                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//                    }
                }
           });
      }

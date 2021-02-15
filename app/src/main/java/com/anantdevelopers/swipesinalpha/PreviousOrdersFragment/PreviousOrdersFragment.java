@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,12 +23,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow.CheckoutUser;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.Main.InternetConnectionViewModel;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderEntity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.PreviousOrderViewModel;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrderLocalDatabase.RecyclerViewAdapterForPreviousOrders;
@@ -93,6 +92,11 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
      private sendOrderAgainItemsToMainActivityListener mListener;
 
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private Snackbar noInternetSnackbar;
+
+     private Boolean isItConnected;
+
      public PreviousOrdersFragment() {
           // Required empty public constructor
      }
@@ -149,9 +153,38 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
           parentLayout = v.findViewById(R.id.parent_layout);
           parentParentProgressBar = v.findViewById(R.id.parent_parent_progress_bar);
 
+          noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+          noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+          noInternetSnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
+
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
+
           currentOrderAffairs(v);
           previousOrderAffairs(v);
           return v;
+     }
+
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
+
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    isItConnected = isConnected;
+                    if(!isConnected){
+                         //not connected, show SnackBar of retry
+                         //and retry is recreate the activity here
+                         noInternetSnackbar.show();
+                    }
+                    else {
+                         noInternetSnackbar.dismiss();
+                    }
+               }
+          });
      }
 
      @Override
@@ -193,7 +226,6 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                          //Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
                          //Toast.makeText(getContext(), "Fruit may not be available!", Toast.LENGTH_LONG).show();
                          Snackbar.make(parentLayout, "Fruit May Not Be Available!", Snackbar.LENGTH_SHORT).show();
-                         Log.e("observe", "fruitItems are empty");
                     }
                     else {
                          //now make an interface that will send this items to the main activity and
@@ -202,7 +234,6 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
                          //after that interface,
                          //set a toast that items added to the cart.
-                         Log.e("observe", "fruitItems are not empty");
                          mListener.sendToMainFromPreviousOrderFragment(fruitItems);
                          //Toast.makeText(getContext(), "Fruits added to cart!", Toast.LENGTH_SHORT).show();
                          Snackbar.make(parentLayout, "Fruits Added To Cart!", Snackbar.LENGTH_SHORT).show();
@@ -351,27 +382,32 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                case DatabaseError.NETWORK_ERROR :
                     Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar.setAction("RETRY", new MyRetryListener());
+                    mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar.show();
                     break;
                case DatabaseError.OPERATION_FAILED :
                case DatabaseError.UNKNOWN_ERROR:
                     Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar1.setAction("RETRY", new MyRetryListener());
+                    mySnackbar1.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar1.show();
                     break;
                case DatabaseError.PERMISSION_DENIED:
                     Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar2.setAction("RETRY", new MyRetryListener());
+                    mySnackbar2.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar2.show();
                     break;
                case DatabaseError.MAX_RETRIES:
                     Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar3.setAction("RETRY", new MyRetryListener());
+                    mySnackbar3.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar3.show();
                     break;
                default:
                     Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar4.setAction("RETRY", new MyRetryListener());
+                    mySnackbar4.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar4.show();
                     break;
           }
@@ -416,49 +452,61 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                public void onButtonClick(final int position) {
                     CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
 
-                    if(currentOrderDetails.getStatus().equals("ORDER ON WAY!")){
-//                         Toast toast = Toast.makeText(getContext(), "Sorry, Cannot CANCEL order when it is On The Way!", Toast.LENGTH_LONG);
-//                         toast.setGravity(Gravity.CENTER, 0, 0);
-//                         toast.show();
+//                    try {
+//                         Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                         e.printStackTrace();
+//                    }
+                    internetConnectionViewModel.startConnectivityCheck();
+
+
+                    if (currentOrderDetails.getStatus().equals("ORDER ON WAY!")) {
+//                       Toast toast = Toast.makeText(getContext(), "Sorry, Cannot CANCEL order when it is On The Way!", Toast.LENGTH_LONG);
+//                       toast.setGravity(Gravity.CENTER, 0, 0);
+//                       toast.show();
                          Snackbar.make(parentLayout, "Unable To Cancel Order When It Is On The Way", Snackbar.LENGTH_LONG).show();
-                    }
-                    else {
+                    } else {
                          CancelCurrentOrderDialog dialog1 = new CancelCurrentOrderDialog(position);
                          dialog1.setTargetFragment(PreviousOrdersFragment.this, 0);
                          dialog1.show(getParentFragmentManager(), "cancelling order at position " + position);
                     }
+
                }
           });
      }
 
      @Override
      public void onDialogPositiveClickForCancelOrder(int position) {
-          CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
-          //CheckoutUser curr = new CheckoutUser(currentOrderDetails.getUser(), currentOrderDetails.getFruits(), currentOrderDetails.getPaymentMethod(), currentOrderDetails.getStatus(), currentOrderDetails.getFirebaseDatabaseKey(), currentOrderDetails.getOrderPlacedDate());
+          if(!isItConnected){
+               Toast.makeText(getContext(), "Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+          }else {
+               CheckoutUser currentOrderDetails =  currentOrdersList.get(position);
+               //CheckoutUser curr = new CheckoutUser(currentOrderDetails.getUser(), currentOrderDetails.getFruits(), currentOrderDetails.getPaymentMethod(), currentOrderDetails.getStatus(), currentOrderDetails.getFirebaseDatabaseKey(), currentOrderDetails.getOrderPlacedDate());
 
-          currentOrderDetails.setStatus("CANCELLATION REQUESTED");
-          currentOrderProgressBar.setVisibility(View.VISIBLE);
-          String firebaseKey = currentOrderDetails.getFirebaseDatabaseKey();
+               currentOrderDetails.setStatus("CANCELLATION REQUESTED");
+               currentOrderProgressBar.setVisibility(View.VISIBLE);
+               String firebaseKey = currentOrderDetails.getFirebaseDatabaseKey();
 
-          Map<String, Object> map = new HashMap<>();
-          map.put("/Orders/" + authPhoneNumber + "/" + firebaseKey, currentOrderDetails);
-          map.put("/tokens/" + authPhoneNumber, token);
+               Map<String, Object> map = new HashMap<>();
+               map.put("/Orders/" + authPhoneNumber + "/" + firebaseKey, currentOrderDetails);
+               map.put("/tokens/" + authPhoneNumber, token);
 
-          databaseReference.updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-               @Override
-               public void onSuccess(Void aVoid) {
-                    currentOrderProgressBar.setVisibility(View.INVISIBLE);
-                    //Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_LONG).show();
-                    Snackbar.make(parentLayout, "Cancellation Requested Successfully", Snackbar.LENGTH_SHORT).show();
-               }
-          }).addOnFailureListener(new OnFailureListener() {
-               @Override
-               public void onFailure(@NonNull Exception e) {
-                    currentOrderProgressBar.setVisibility(View.INVISIBLE);
-                    //Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_LONG).show();
-                    Snackbar.make(parentLayout, "Something Went Wrong! Try Again", Snackbar.LENGTH_SHORT).show();
-               }
-          });
+               databaseReference.updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                         currentOrderProgressBar.setVisibility(View.INVISIBLE);
+                         //Toast.makeText(getContext(), "Requested cancellation successfully", Toast.LENGTH_LONG).show();
+                         Snackbar.make(parentLayout, "Cancellation Requested Successfully", Snackbar.LENGTH_SHORT).show();
+                    }
+               }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                         currentOrderProgressBar.setVisibility(View.INVISIBLE);
+                         //Toast.makeText(getContext(), "Something went wrong! try again", Toast.LENGTH_LONG).show();
+                         Snackbar.make(parentLayout, "Something Went Wrong! Try Again", Snackbar.LENGTH_SHORT).show();
+                    }
+               });
+          }
      }
 
      private void fetchCurrentOrders(final DatabaseCallbackInterface Interface) {
@@ -577,8 +625,6 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
                @Override
                public void afterFetch(Map<String, ArrayList<String>> latestQtyMap, Map<String, ArrayList<Integer>> latestPriceMap) {
                     //pleaseWaitTextView.setText("FEW SECONDS LEFT...");
-
-                    Log.e("afterfetch", "after ondatachange()");
                     orderAgainViewModel.setActualPriceMap(actualPriceMap);
                     orderAgainViewModel.setLatestPriceMap(latestPriceMap);
                     orderAgainViewModel.setLatestQtyMap(latestQtyMap);
@@ -612,7 +658,6 @@ public class PreviousOrdersFragment extends Fragment implements DeletePreviousOr
 
                     Map<String, ArrayList<String>> latestQtyMap = new HashMap<>();
                     Map<String, ArrayList<Integer>> latestPriceMap = new HashMap<>();
-                    Log.e("onDatachange", "method starting");
 
                     for (DataSnapshot d: dataSnapshot.getChildren()){
                          if(Objects.equals(d.child("Availability").getValue(String.class), "Available")){

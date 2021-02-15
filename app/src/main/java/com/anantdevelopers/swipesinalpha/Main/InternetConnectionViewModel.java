@@ -17,5 +17,4 @@ public class InternetConnectionViewModel extends ViewModel {
           InternetConnectionAsyncTask asyncTask = new InternetConnectionAsyncTask(isConnected);
           asyncTask.execute();
      }
-
 }

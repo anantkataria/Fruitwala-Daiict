@@ -1,7 +1,5 @@
 package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -36,7 +34,6 @@ public class OrderAgainViewModel extends ViewModel {
      }
 
      public void startCalculation() {
-          Log.e("startCalculation", "inside OrderAgainViewModel..");
           OrderAgainAsyncTask asyncTask = new OrderAgainAsyncTask(cartItems, actualPriceMap, latestQtyMap, latestPriceMap);
           asyncTask.execute();
      }

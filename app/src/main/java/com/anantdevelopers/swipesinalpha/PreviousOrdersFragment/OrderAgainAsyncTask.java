@@ -1,9 +1,7 @@
 package com.anantdevelopers.swipesinalpha.PreviousOrdersFragment;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
@@ -21,7 +19,6 @@ public class OrderAgainAsyncTask extends AsyncTask<Void, Integer, Void> {
      private Map<String, ArrayList<Integer>> latestPriceMap;
 
      public OrderAgainAsyncTask(MutableLiveData<List<FruitItem>> cartItems, Map<String, Integer> actualPriceMap, Map<String, ArrayList<String>> latestQtyMap, Map<String, ArrayList<Integer>> latestPriceMap) {
-          Log.e("OrderAgainAsyncTask", "inside constructor");
           this.cartItems = cartItems;
           this.actualPriceMap = actualPriceMap;
           this.latestQtyMap = latestQtyMap;
@@ -31,7 +28,6 @@ public class OrderAgainAsyncTask extends AsyncTask<Void, Integer, Void> {
 
      @Override
      protected Void doInBackground(Void... voids) {
-          Log.e("OrderAgainAsyncTask", "inside doInBackground");
           for(Map.Entry<String, Integer> entry : actualPriceMap.entrySet()){
 
                String fruitName = entry.getKey();
@@ -73,7 +69,6 @@ public class OrderAgainAsyncTask extends AsyncTask<Void, Integer, Void> {
      protected void onPostExecute(Void aVoid) {
           super.onPostExecute(aVoid);
           cartItems.setValue(cartItemsList);
-          Log.e("OrderAgainAsyncTask", "inside onPostExecute()");
           //take this arraylist and set it to the livedata
      }
 }

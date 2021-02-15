@@ -8,20 +8,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.HomeFragment.CustomDialogFragment.CustomDialogFragment;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem2;
+import com.anantdevelopers.swipesinalpha.Main.InternetConnectionViewModel;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerItemClickListener;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerViewAdapterForHomeFragment;
@@ -57,6 +57,9 @@ public class HomeFragment extends Fragment {
      private OnFragmentInteractionListener mListener;
 
      private ValueEventListener valueEventListener;
+
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private Snackbar noInternetSnackbar;
 
      public HomeFragment() {
           // Required empty public constructor
@@ -109,6 +112,14 @@ public class HomeFragment extends Fragment {
           recyclerView = v.findViewById(R.id.recycler_view_home);
           parentLayout = v.findViewById(R.id.parent_layout);
 
+          noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+          noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+          noInternetSnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
+
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
+
           getFruitsFromDatabase(new getFruitsInterface() {
                @Override
                public void afterFetching() {
@@ -119,10 +130,7 @@ public class HomeFragment extends Fragment {
                               return o1.getFruitRank().compareTo(o2.getFruitRank());
                          }
                     });
-                    Log.e("SAVAGE", "after sort");
-                    for(FruitItem2 f : fruits) {
-                         Log.e("SAVAGE", "fruitname = " + f.getFruitName() + ", rank = " + f.getFruitRank() + "\n");
-                    }
+
                     recyclerView.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                     adapter = new RecyclerViewAdapterForHomeFragment(getContext(), fruits, photoMapOfFruits);
@@ -134,6 +142,27 @@ public class HomeFragment extends Fragment {
           });
 
           return v;
+     }
+
+
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
+
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    if(!isConnected){
+                         //not connected, show SnackBar of retry
+                         //and retry is recreate the activity here
+                         noInternetSnackbar.show();
+                    }
+                    else {
+                         noInternetSnackbar.dismiss();
+                    }
+               }
+          });
      }
 
      private void getFruitsFromDatabase(final getFruitsInterface fruitsInterface) {
@@ -182,27 +211,32 @@ public class HomeFragment extends Fragment {
                          case DatabaseError.NETWORK_ERROR :
                               Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar.show();
                               break;
                          case DatabaseError.OPERATION_FAILED :
                          case DatabaseError.UNKNOWN_ERROR:
                               Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar1.show();
                               break;
                          case DatabaseError.PERMISSION_DENIED:
                               Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar2.show();
                               break;
                          case DatabaseError.MAX_RETRIES:
                               Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar3.show();
                               break;
                          default:
                               Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar4.show();
                               break;
                     }
@@ -219,7 +253,6 @@ public class HomeFragment extends Fragment {
           recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                @Override
                public void onItemClick(View view, int position) {
-                    //Log.e("HomeFragment", fruits.get(position).getFruitName());
                     FruitItem2 selectedFruit = fruits.get(position);
                     selectedFruit.setImage_resource(photoMapOfFruits.get(selectedFruit.getFruitName()));
                     if(selectedFruit.getAvailability().equals("Available")) {

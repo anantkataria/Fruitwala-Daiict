@@ -219,27 +219,32 @@ public class AuthActivity extends AppCompatActivity {
                                                 case DatabaseError.NETWORK_ERROR :
                                                      Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
                                                      mySnackbar.setAction("RETRY", new MyRetryListener());
+                                                     mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                                                      mySnackbar.show();
                                                      break;
                                                 case DatabaseError.OPERATION_FAILED :
                                                 case DatabaseError.UNKNOWN_ERROR:
                                                      Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
                                                      mySnackbar1.setAction("RETRY", new MyRetryListener());
+                                                     mySnackbar1.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                                                      mySnackbar1.show();
                                                      break;
                                                 case DatabaseError.PERMISSION_DENIED:
                                                      Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
                                                      mySnackbar2.setAction("RETRY", new MyRetryListener());
+                                                     mySnackbar2.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                                                      mySnackbar2.show();
                                                      break;
                                                 case DatabaseError.MAX_RETRIES:
                                                      Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
                                                      mySnackbar3.setAction("RETRY", new MyRetryListener());
+                                                     mySnackbar3.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                                                      mySnackbar3.show();
                                                      break;
                                                 default:
                                                      Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
                                                      mySnackbar4.setAction("RETRY", new MyRetryListener());
+                                                     mySnackbar4.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                                                      mySnackbar4.show();
                                                      break;
                                            }

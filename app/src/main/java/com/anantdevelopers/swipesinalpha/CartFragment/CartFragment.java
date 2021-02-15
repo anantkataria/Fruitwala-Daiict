@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,9 +19,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow.CheckoutFlow;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.RecyclerViewAdapterForCartfragment;
+import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
+import com.anantdevelopers.swipesinalpha.Main.InternetConnectionViewModel;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -34,7 +40,12 @@ public class CartFragment extends Fragment {
      private TextView grandTotal, swipeToDeleteTextView;
      private RelativeLayout parentLayout;
 
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private Snackbar noInternetSnackbar;
+
      private OnFragmentInteractionListener mListener;
+
+     private boolean isItConnected;
 
      public CartFragment() {
           // Required empty public constructor
@@ -54,6 +65,14 @@ public class CartFragment extends Fragment {
           swipeToDeleteTextView = v.findViewById(R.id.hardcoded_text_view);
           parentLayout = v.findViewById(R.id.parent_layout);
 
+          noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+          noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+          noInternetSnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
+
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
+
           if(!fruits.isEmpty()){
                swipeToDeleteTextView.setVisibility(View.VISIBLE);
           }
@@ -65,13 +84,19 @@ public class CartFragment extends Fragment {
           proceedToCheckoutButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                    if(fruits.isEmpty())  Snackbar.make(parentLayout, "Add something to cart first!", Snackbar.LENGTH_SHORT).show();
-
+                    if(!isItConnected){
+                         Toast.makeText(getContext(), "Check Your Internet Connection", Toast.LENGTH_LONG).show();
+                    }
                     else {
-                         Intent checkoutFlowIntent = new Intent(getContext(), CheckoutFlow.class);
-                         checkoutFlowIntent.putExtra("Fruits", fruits);
-                         checkoutFlowIntent.putExtra("grandTotal", grandTotal.getText());
-                         startActivity(checkoutFlowIntent);
+                         if (fruits.isEmpty())
+                              Snackbar.make(parentLayout, "Add something to cart first!", Snackbar.LENGTH_SHORT).show();
+
+                         else {
+                              Intent checkoutFlowIntent = new Intent(getContext(), CheckoutFlow.class);
+                              checkoutFlowIntent.putExtra("Fruits", fruits);
+                              checkoutFlowIntent.putExtra("grandTotal", grandTotal.getText());
+                              startActivity(checkoutFlowIntent);
+                         }
                     }
                }
           });
@@ -82,6 +107,27 @@ public class CartFragment extends Fragment {
           recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
           return v;
+     }
+
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
+
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    isItConnected = isConnected;
+                    if(!isConnected){
+                         //not connected, show SnackBar of retry
+                         //and retry is recreate the activity here
+                         noInternetSnackbar.show();
+                    }
+                    else {
+                         noInternetSnackbar.dismiss();
+                    }
+               }
+          });
      }
 
      private ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
@@ -127,6 +173,7 @@ public class CartFragment extends Fragment {
      private void showSnackbar(int position, FruitItem fruit) {
           Snackbar mySnackbar = Snackbar.make(parentLayout, "1 Item removed", Snackbar.LENGTH_SHORT);
           mySnackbar.setAction("undo", new MyUndoListener(position, fruit));
+          mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
           mySnackbar.show();
      }
 
@@ -160,6 +207,18 @@ public class CartFragment extends Fragment {
 
      public interface OnFragmentInteractionListener {
           ArrayList<FruitItem> getFruitsFromMainToCartFragment();
+     }
+
+     private class MyRetryListener implements View.OnClickListener {
+          @Override
+          public void onClick(View v) {
+               //recreate the fragment
+               CartFragment fragment = (CartFragment) getParentFragmentManager().findFragmentById(R.id.nav_host_fragment);
+               getParentFragmentManager().beginTransaction()
+                       .detach(fragment)
+                       .attach(fragment)
+                       .commit();
+          }
      }
 
 }

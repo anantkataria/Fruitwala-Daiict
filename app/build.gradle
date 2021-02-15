@@ -1,15 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "com.anantdevelopers.swipesinalpha"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
+        versionName "1.2.0"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -40,9 +42,9 @@ dependencies {
 
     implementation 'androidx.navigation:navigation-ui:2.2.2'
 
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation "androidx.room:room-ktx:2.2.6"
 
-    implementation 'com.razorpay:checkout:1.5.15'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     //room persistance
     implementation 'androidx.room:room-runtime:2.2.5'

@@ -2,6 +2,8 @@ package com.anantdevelopers.swipesinalpha.OptionsMenuResources;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.anantdevelopers.swipesinalpha.Main.InternetConnectionViewModel;
 import com.anantdevelopers.swipesinalpha.R;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
@@ -30,6 +33,9 @@ public class FruitsAreHealthyActivity extends AppCompatActivity {
      private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
      private ValueEventListener listener;
 
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private Snackbar noInternetSnackbar;
+
      private interface AfterFetchFromDatabase{
           void afterFetch(String url);
      }
@@ -42,10 +48,20 @@ public class FruitsAreHealthyActivity extends AppCompatActivity {
           setTitle("HEALTH TIPS");
           getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+          WebView.setWebContentsDebuggingEnabled(false);
+
           webView = findViewById(R.id.web_view);
           progressBar1 = findViewById(R.id.progress_bar);
           progressBarMain = findViewById(R.id.progress_bar_main);
           parentLayout = findViewById(R.id.main_layout);
+
+          noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+          noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+          noInternetSnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
+
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
 
           getUrlFromDatabase(new AfterFetchFromDatabase() {
                @Override
@@ -56,6 +72,26 @@ public class FruitsAreHealthyActivity extends AppCompatActivity {
                }
           });
 
+     }
+
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
+
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(this, new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    if(!isConnected){
+                         //not connected, show SnackBar of retry
+                         //and retry is recreate the activity here
+                         noInternetSnackbar.show();
+                    }
+                    else {
+                         noInternetSnackbar.dismiss();
+                    }
+               }
+          });
      }
 
      private void getUrlFromDatabase(final AfterFetchFromDatabase Interface){
@@ -76,27 +112,32 @@ public class FruitsAreHealthyActivity extends AppCompatActivity {
                          case DatabaseError.NETWORK_ERROR :
                               Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar.show();
                               break;
                          case DatabaseError.OPERATION_FAILED :
                          case DatabaseError.UNKNOWN_ERROR:
                               Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar1.show();
                               break;
                          case DatabaseError.PERMISSION_DENIED:
                               Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar2.show();
                               break;
                          case DatabaseError.MAX_RETRIES:
                               Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar3.show();
                               break;
                          default:
                               Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar4.show();
                               break;
                     }

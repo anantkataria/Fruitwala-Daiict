@@ -18,14 +18,14 @@
             android:id="@+id/grand_total_layout">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="GrandTotal"
-                android:textAllCaps="true"
-                android:layout_marginTop="10dp"
-                android:textColor="@android:color/black"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:layout_marginStart="8dp"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GrandTotal"
+            android:textAllCaps="true"
+            android:layout_marginTop="10dp"
+            android:textColor="@android:color/black"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginStart="8dp"/>
 
             <TextView
                 android:id="@+id/grand_total_text"

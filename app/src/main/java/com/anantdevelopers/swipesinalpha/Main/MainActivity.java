@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -16,9 +17,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.anantdevelopers.swipesinalpha.Authentication.AuthActivity;
 import com.anantdevelopers.swipesinalpha.BuildConfig;
@@ -28,7 +30,6 @@ import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem2;
 import com.anantdevelopers.swipesinalpha.HomeFragment.HomeFragment;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.AboutActivity;
-import com.anantdevelopers.swipesinalpha.OptionsMenuResources.FruitsAreHealthyActivity;
 import com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity.SettingsActivity;
 import com.anantdevelopers.swipesinalpha.PreviousOrdersFragment.PreviousOrdersFragment;
 import com.anantdevelopers.swipesinalpha.R;
@@ -61,8 +62,12 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
      private AppBarConfiguration appBarConfiguration;
      private RelativeLayout parentLayout;
 
-//     private InternetConnectionViewModel internetConnectionViewModel;
-//     private Snackbar noInternetSnackbar;
+     private ImageView noInternetImage;
+     private TextView noConnectionHardCoded;
+     private TextView retryTextView;
+
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private Snackbar noInternetSnackbar;
 
      private ValueEventListener listener1, listener2, listener3;
 
@@ -89,9 +94,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           setContentView(R.layout.activity_main);
 
           //getWindow().setNavigationBarColor(getResources().getColor(R.color.white));
-//          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
-//          observeConnectivity();
-//          startCheckingNetworkConnectivity();
 
           progressBar = findViewById(R.id.progressBar);
           FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -101,11 +103,21 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           navHostFragment = findViewById(R.id.nav_host_fragment);
           parentLayout = findViewById(R.id.parent_layout);
 
+          noInternetImage = findViewById(R.id.no_internet_connection_image);
+          noConnectionHardCoded = findViewById(R.id.hardcoded1);
+          retryTextView = findViewById(R.id.retry_text_view);
+
           appBarConfiguration = new AppBarConfiguration.Builder(
                   R.id.HomeFragment, R.id.CartFragment, R.id.PreviousOrdersFragment
           ).build();
 
+//          noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+//          noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+//          noInternetSnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
 
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
 
           FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
@@ -114,33 +126,46 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
           receivedItems = new ArrayList<>();
 
           progressBar.setVisibility(View.VISIBLE);
-          if(progressBar.getVisibility() == View.VISIBLE){
-               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-          }
+//          if(progressBar.getVisibility() == View.VISIBLE){
+//               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//          }
+
+          retryTextView.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                    MainActivity.this.recreate();
+               }
+          });
 
      }
 
-//     private void startCheckingNetworkConnectivity() {
-//          internetConnectionViewModel.startConnectivityCheck();
-//     }
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
 
-//     private void observeConnectivity() {
-//          internetConnectionViewModel.getIsConnected().observe(this, new Observer<Boolean>() {
-//               @Override
-//               public void onChanged(Boolean isConnected) {
-//                    noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
-//                    //noInternetSnackbar.setAction("RETRY", new MyRetryListener());
-//                    if(!isConnected){
-//                        //not connected, show SnackBar of retry
-//                        //and retry is recreate the activity here
-//                        noInternetSnackbar.show();
-//                    }
-//                    else {
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(this, new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    if(!isConnected){
+                        //not connected, show SnackBar of retry
+                        //and retry is recreate the activity here
+                        //noInternetSnackbar.show();
+                         progressBar.setVisibility(View.GONE);
+                         noInternetImage.setVisibility(View.VISIBLE);
+                         noConnectionHardCoded.setVisibility(View.VISIBLE);
+                         retryTextView.setVisibility(View.VISIBLE);
+                    }
+                    else {
 //                         noInternetSnackbar.dismiss();
-//                    }
-//               }
-//          });
-//     }
+                         progressBar.setVisibility(View.VISIBLE);
+                         noInternetImage.setVisibility(View.GONE);
+                         noConnectionHardCoded.setVisibility(View.GONE);
+                         retryTextView.setVisibility(View.GONE);
+                    }
+               }
+          });
+     }
 
      FirebaseAuth.AuthStateListener buildAuthStateListener(){
 
@@ -174,9 +199,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                               @Override
                               public void afterFetch() {
                                    progressBar.setVisibility(View.GONE);
-                                   if (progressBar.getVisibility() == View.GONE) {
-                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                                   }
+//                                   if (progressBar.getVisibility() == View.GONE) {
+//                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//                                   }
 
                                    bottomNavigationView.setVisibility(View.VISIBLE);
                                    navHostFragment.setVisibility(View.VISIBLE);
@@ -221,34 +246,39 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
      private void handleDatabaseError(DatabaseError databaseError) {
           parentLayout.setVisibility(View.INVISIBLE);
-          getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//          getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
           switch(databaseError.getCode()) {
                case DatabaseError.DISCONNECTED :
                case DatabaseError.NETWORK_ERROR :
                     Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar.setAction("RETRY", new MyRetryListener());
+                    mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar.show();
                     break;
                case DatabaseError.OPERATION_FAILED :
                case DatabaseError.UNKNOWN_ERROR:
                     Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar1.setAction("RETRY", new MyRetryListener());
+                    mySnackbar1.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar1.show();
                     break;
                case DatabaseError.PERMISSION_DENIED:
                     Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar2.setAction("RETRY", new MyRetryListener());
+                    mySnackbar2.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar2.show();
                     break;
                case DatabaseError.MAX_RETRIES:
                     Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar3.setAction("RETRY", new MyRetryListener());
+                    mySnackbar3.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar3.show();
                     break;
                default:
                     Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
                     mySnackbar4.setAction("RETRY", new MyRetryListener());
+                    mySnackbar4.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                     mySnackbar4.show();
                     break;
           }
@@ -269,6 +299,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     else {
                          userName = dataSnapshot.child("userName").getValue(String.class);
                          final NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
+//                         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+//                                 .findFragmentById(R.id.nav_host_fragment);
+//                         NavController navController = navHostFragment.getNavController();
                          NavigationUI.setupActionBarWithNavController(MainActivity.this, navController, appBarConfiguration);
                          NavigationUI.setupWithNavController(bottomNavigationView, navController);
                     }
@@ -317,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                case R.id.settings_dest:
                     Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                     intent.putExtra("userName", userName);
-                    intent.putExtra("authPhone", authPhone);
+                    //intent.putExtra("authPhone", authPhone);
                     startActivity(intent);
                     return true;
                case R.id.share_dest:
@@ -332,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                case R.id.about_dest:
                     Intent intent3 = new Intent(MainActivity.this, AboutActivity.class);
                     intent3.putExtra("userName", userName);
-                    intent3.putExtra("authPhone", authPhone);
+                    //intent3.putExtra("authPhone", authPhone);
                     startActivity(intent3);
                     return true;
                default:

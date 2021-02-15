@@ -3,11 +3,12 @@ package com.anantdevelopers.swipesinalpha.CartFragment.CheckoutFlow;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -19,7 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anantdevelopers.swipesinalpha.HomeFragment.FruitItem.FruitItem;
+import com.anantdevelopers.swipesinalpha.Main.InternetConnectionViewModel;
 import com.anantdevelopers.swipesinalpha.Main.MainActivity;
+import com.anantdevelopers.swipesinalpha.OptionsMenuResources.SettingsActivity.FeedbackActivity;
 import com.anantdevelopers.swipesinalpha.R;
 import com.anantdevelopers.swipesinalpha.UserProfile.User;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,6 +70,10 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
 
      //private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
+     private InternetConnectionViewModel internetConnectionViewModel;
+     private Snackbar noInternetSnackbar;
+     private boolean isItConnected;
+
      @Override
      protected void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
@@ -80,7 +87,6 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           String grandTotal = intent.getStringExtra("grandTotal");
 
           grandTotalPrice = grandTotal.replaceAll("[Rs.\\s]", "");
-          Log.e("CheckoutFlow", "grandTotalPrice = " + grandTotalPrice);
 
           Button payWithUpiButton = findViewById(R.id.upiPaymentButton);
           Button codButton = findViewById(R.id.codButton);
@@ -90,6 +96,14 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           upiCheckImage = findViewById(R.id.upiCheckImage);
           codCheckImage = findViewById(R.id.codCheckImage);
           parentLayout = findViewById(R.id.parent_layout);
+
+          noInternetSnackbar = Snackbar.make(parentLayout, "NO INTERNET CONNECTION", Snackbar.LENGTH_INDEFINITE);
+          noInternetSnackbar.setAction("RETRY", new MyRetryListener());
+          noInternetSnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
+
+          internetConnectionViewModel = new ViewModelProvider(this).get(InternetConnectionViewModel.class);
+          observeConnectivity();
+          startCheckingNetworkConnectivity();
 
           getToken();
 
@@ -119,6 +133,9 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           placeOrderButton.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
+
+                    internetConnectionViewModel.startConnectivityCheck();
+
                     if(paymentMethodNumber == 0) {
                          Toast toast = Toast.makeText(CheckoutFlow.this, "Choose payment method first", Toast.LENGTH_SHORT);
                          toast.setGravity(Gravity.CENTER, 0, 0);
@@ -141,6 +158,27 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           authPhoneNumber = user.getPhoneNumber();
      }
 
+     private void startCheckingNetworkConnectivity() {
+          internetConnectionViewModel.startConnectivityCheck();
+     }
+
+     private void observeConnectivity() {
+          internetConnectionViewModel.getIsConnected().observe(this, new Observer<Boolean>() {
+               @Override
+               public void onChanged(Boolean isConnected) {
+                    isItConnected = isConnected;
+                    if(!isConnected){
+                         //not connected, show SnackBar of retry
+                         //and retry is recreate the activity here
+                         noInternetSnackbar.show();
+                    }
+                    else {
+                         noInternetSnackbar.dismiss();
+                    }
+               }
+          });
+     }
+
      private void getToken() {
           FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
                @Override
@@ -157,10 +195,15 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
 
      @Override
      public void onDialogPositiveClick() {
-          progressBar.setVisibility(View.VISIBLE);
-          progressBarTextView.setVisibility(View.VISIBLE);
-          getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE); //touch input disabled.
-          placeOrder(CASH_ON_DELIVERY);
+          if(!isItConnected){
+               Toast.makeText(this, "Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+          }
+          else {
+               progressBar.setVisibility(View.VISIBLE);
+               progressBarTextView.setVisibility(View.VISIBLE);
+               getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE); //touch input disabled.
+               placeOrder(CASH_ON_DELIVERY);
+          }
      }
 
      private void payUsingUPI() {
@@ -190,21 +233,16 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
           super.onActivityResult(requestCode, resultCode, data);
           if(requestCode == REQUEST_CODE){
                if (resultCode == RESULT_OK){
-                    if(data == null){
-                         Log.e("onActivityResult", "data intent is null");
+                    String status = data.getStringExtra("Status");
+                    if(status.equals("SUCCESS")){
+                         placeOrder(UPI_PAYMENT);
                     }
-                    else {
+                    else if(status.equals("FAILURE")){
+                         //payment is failed
+                         // Todo handle failure
+                         Toast.makeText(this, "Payment Cancelled, Try Again", Toast.LENGTH_LONG).show();
+                    }
 
-                         String status = data.getStringExtra("Status");
-                         Log.e("onActivityResult", "data intent is = " + data.getStringExtra("Status"));
-                         if(status.equals("SUCCESS")){
-                              placeOrder(UPI_PAYMENT);
-                         }
-                         else if(status.equals("FAILURE")){
-                              //payment is failed
-                              // Todo handle failure
-                         }
-                    }
                }
 
                //todo handle RESULT_CANCELLED
@@ -253,6 +291,10 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
                               //TODO : implement this
                               //if order is a failure then close the progressbar and progressbarTetview and tell
                               //user to try again
+                              Toast.makeText(CheckoutFlow.this, "Something went wrong", Toast.LENGTH_LONG).show();
+                              progressBar.setVisibility(View.GONE);
+                              progressBarTextView.setVisibility(View.GONE);
+                              getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                          }
                     });
                }
@@ -260,33 +302,39 @@ public class CheckoutFlow extends AppCompatActivity implements CashOnDeliveryDia
                @Override
                public void onCancelled(@NonNull DatabaseError databaseError) {
                     parentLayout.setVisibility(View.INVISIBLE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                     switch(databaseError.getCode()) {
                          case DatabaseError.DISCONNECTED :
                          case DatabaseError.NETWORK_ERROR :
                               Snackbar mySnackbar = Snackbar.make(parentLayout, "Check your INTERNET Connection", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar.setAction("RETRY", new MyRetryListener());
+                              mySnackbar.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar.show();
                               break;
                          case DatabaseError.OPERATION_FAILED :
                          case DatabaseError.UNKNOWN_ERROR:
                               Snackbar mySnackbar1 = Snackbar.make(parentLayout, "Unknown Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar1.setAction("RETRY", new MyRetryListener());
+                              mySnackbar1.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar1.show();
                               break;
                          case DatabaseError.PERMISSION_DENIED:
                               Snackbar mySnackbar2 = Snackbar.make(parentLayout, "Permission Denied", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar2.setAction("RETRY", new MyRetryListener());
+                              mySnackbar2.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar2.show();
                               break;
                          case DatabaseError.MAX_RETRIES:
                               Snackbar mySnackbar3 = Snackbar.make(parentLayout, "Max tries reached, Try again after some time", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar3.setAction("RETRY", new MyRetryListener());
+                              mySnackbar3.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar3.show();
                               break;
                          default:
                               Snackbar mySnackbar4 = Snackbar.make(parentLayout, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
                               mySnackbar4.setAction("RETRY", new MyRetryListener());
+                              mySnackbar4.setActionTextColor(getResources().getColor(R.color.snackbarTextColor));
                               mySnackbar4.show();
                               break;
                     }
